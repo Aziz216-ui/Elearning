@@ -1,43 +1,60 @@
-{% extends 'base.html.twig' %}
+{% extends 'base1.html.twig' %}
 
 {% block title %}Cours index{% endblock %}
 
 {% block body %}
-    <h1>Cours index</h1>
+    <div class="max-w-5xl mx-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-2xl font-bold text-slate-800 dark:text-white">Cours</h1>
+            <a href="{{ path('app_cours_new') }}" class="px-4 py-2 text-sm font-semibold text-white rounded-lg bg-gradient-to-tl from-emerald-600 to-emerald-400 shadow-md hover:shadow-xl">Nouveau cours</a>
+        </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Id</th>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Price</th>
-                <th>Duration</th>
-                <th>IsPublished</th>
-                <th>actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for cour in cours %}
-            <tr>
-                <td>{{ cour.id }}</td>
-                <td>{{ cour.title }}</td>
-                <td>{{ cour.description }}</td>
-                <td>{{ cour.price }}</td>
-                <td>{{ cour.duration }}</td>
-                <td>{{ cour.isPublished ? 'Yes' : 'No' }}</td>
-                <td>
-                    <a href="{{ path('app_cours_show', {'id': cour.id}) }}">show</a>
-                    <a href="{{ path('app_cours_edit', {'id': cour.id}) }}">edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="7">no records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-
-    <a href="{{ path('app_cours_new') }}">Create new</a>
+        <div class="overflow-hidden bg-white dark:bg-slate-850 shadow-xl dark:shadow-dark-xl rounded-2xl">
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
+                    <thead class="bg-slate-50 dark:bg-slate-800">
+                        <tr>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Id</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Title</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Description</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Price</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Duration</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Publié</th>
+                            <th class="px-6 py-3 text-right text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody class="bg-white dark:bg-slate-850 divide-y divide-slate-200 dark:divide-slate-700">
+                    {% for cour in cours %}
+                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/60">
+                            <td class="px-6 py-4 text-sm text-slate-700 dark:text-slate-300">{{ cour.id }}</td>
+                            <td class="px-6 py-4 text-sm font-medium text-slate-800 dark:text-white">{{ cour.title }}</td>
+                            <td class="px-6 py-4 text-sm text-slate-700 dark:text-slate-300 line-clamp-2">{{ cour.description }}</td>
+                            <td class="px-6 py-4 text-sm text-slate-700 dark:text-slate-300">{{ cour.price }}</td>
+                            <td class="px-6 py-4 text-sm text-slate-700 dark:text-slate-300">
+                                {% if cour.duration is not null %}
+                                    {{ cour.duration|date('d/m/Y H:i') }}
+                                {% else %}
+                                    Non défini
+                                {% endif %}
+                            </td>
+                            <td class="px-6 py-4 text-sm">
+                                <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold {{ cour.isPublished ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300' : 'bg-slate-100 text-slate-700 dark:bg-slate-700/40 dark:text-slate-300' }}">
+                                    {{ cour.isPublished ? 'Oui' : 'Non' }}
+                                </span>
+                            </td>
+                            <td class="px-6 py-4 text-sm text-right">
+                                <a href="{{ path('app_cours_show', {'id': cour.id}) }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 mr-3">Voir</a>
+                                <a href="{{ path('app_cours_edit', {'id': cour.id}) }}" class="text-emerald-600 hover:text-emerald-800 dark:text-emerald-400">Modifier</a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="px-6 py-8 text-center text-sm text-slate-500 dark:text-slate-400">Aucun enregistrement</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 {% endblock %}

@@ -22,19 +22,16 @@ class Cours
 
     #[ORM\Column]
     private ?float $price = null;
-
-    #[ORM\Column]
-    private ?int $duration = null;
+    #[ORM\Column(type: "datetime_immutable", nullable: true)]
+    private ?\DateTimeImmutable $duration = null;
+    
+    
 
     #[ORM\Column]
     private ?bool $isPublished = null;
-
     #[ORM\ManyToOne(inversedBy: 'cours')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Auteur $auteur = null;
-
-    #[ORM\ManyToOne(inversedBy: 'bio')]
-    private ?Auteur $Auteur = null;
 
     public function getId(): ?int
     {
@@ -76,18 +73,18 @@ class Cours
 
         return $this;
     }
-
-    public function getDuration(): ?int
+    public function getDuration(): ?\DateTimeImmutable
     {
         return $this->duration;
     }
-
-    public function setDuration(int $duration): static
+    
+    public function setDuration(?\DateTimeImmutable $duration): static
     {
         $this->duration = $duration;
-
+    
         return $this;
     }
+    
 
     public function isPublished(): ?bool
     {

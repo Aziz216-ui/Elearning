@@ -46,7 +46,7 @@ final class CoursController extends AbstractController
     public function show(Cours $cour): Response
     {
         return $this->render('cours/show.html.twig', [
-            'cour' => $cour,
+            'cours' => $coursRepository->findAll(),
         ]);
     }
 
@@ -55,18 +55,19 @@ final class CoursController extends AbstractController
     {
         $form = $this->createForm(CoursType::class, $cour);
         $form->handleRequest($request);
-
+    
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
-
+    
             return $this->redirectToRoute('app_cours_index', [], Response::HTTP_SEE_OTHER);
         }
-
+    
         return $this->render('cours/edit.html.twig', [
             'cour' => $cour,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
+    
 
     #[Route('/{id}', name: 'app_cours_delete', methods: ['POST'])]
     public function delete(Request $request, Cours $cour, EntityManagerInterface $entityManager): Response

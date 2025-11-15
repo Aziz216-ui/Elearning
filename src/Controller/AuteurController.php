@@ -28,17 +28,17 @@ final class AuteurController extends AbstractController
         $auteur = new Auteur();
         $form = $this->createForm(AuteurType::class, $auteur);
         $form->handleRequest($request);
-
+        
         if ($form->isSubmitted() && $form->isValid()) {
-              // Assigner l'auteur à tous les cours créés via le formulaire
-         foreach ($auteur->getCours() as $cour) {
-            $cour->setAuteur($auteur);
-         }
-
+            foreach ($auteur->getCours() as $cour) {
+                
+                $cour->setAuteur($auteur);
+            }
+        
             $entityManager->persist($auteur);
             $entityManager->flush();
-
-            return $this->redirectToRoute('app_auteur_index', [], Response::HTTP_SEE_OTHER);
+        
+            return $this->redirectToRoute('app_auteur_index');
         }
 
         return $this->render('auteur/new.html.twig', [

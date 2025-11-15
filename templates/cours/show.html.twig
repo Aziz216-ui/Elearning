@@ -1,42 +1,30 @@
-{% extends 'base.html.twig' %}
+{% extends 'base1.html.twig' %}
 
 {% block title %}Cours{% endblock %}
 
 {% block body %}
-    <h1>Cours</h1>
+    <div class="max-w-3xl mx-auto">
+        <div class="flex items-center justify-between mb-6">
+            <h1 class="text-2xl font-bold text-slate-800 dark:text-white">Détails du Cours</h1>
+            <div class="flex gap-3">
+                <a href="{{ path('app_cours_index') }}" class="px-4 py-2 text-sm font-semibold rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">Retour</a>
+                <a href="{{ path('app_cours_edit', {'id': cour.id}) }}" class="px-4 py-2 text-sm font-semibold text-white rounded-lg bg-gradient-to-tl from-blue-600 to-blue-400 shadow-md hover:shadow-xl">Modifier</a>
+            </div>
+        </div>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ cour.id }}</td>
-            </tr>
-            <tr>
-                <th>Title</th>
-                <td>{{ cour.title }}</td>
-            </tr>
-            <tr>
-                <th>Description</th>
-                <td>{{ cour.description }}</td>
-            </tr>
-            <tr>
-                <th>Price</th>
-                <td>{{ cour.price }}</td>
-            </tr>
-            <tr>
-                <th>Duration</th>
-                <td>{{ cour.duration }}</td>
-            </tr>
-            <tr>
-                <th>IsPublished</th>
-                <td>{{ cour.isPublished ? 'Yes' : 'No' }}</td>
-            </tr>
-        </tbody>
-    </table>
+        <div class="overflow-hidden bg-white dark:bg-slate-850 shadow-xl dark:shadow-dark-xl rounded-2xl">
+            <div class="divide-y divide-slate-200 dark:divide-slate-700">
+                <div class="px-6 py-4 flex justify-between"><span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Id</span><span class="text-sm text-slate-800 dark:text-white">{{ cour.id }}</span></div>
+                <div class="px-6 py-4 flex justify-between"><span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Title</span><span class="text-sm text-slate-800 dark:text-white">{{ cour.title }}</span></div>
+                <div class="px-6 py-4"><p class="text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1">Description</p><p class="text-sm text-slate-800 dark:text-white">{{ cour.description }}</p></div>
+                <div class="px-6 py-4 flex justify-between"><span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Price</span><span class="text-sm text-slate-800 dark:text-white">{{ cour.price }}</span></div>
+                <div class="px-6 py-4 flex justify-between"><span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Duration</span><span class="text-sm text-slate-800 dark:text-white">{% if cour.duration is not null %}{{ cour.duration|date('d/m/Y H:i') }}{% else %}Non défini{% endif %}</span></div>
+                <div class="px-6 py-4 flex justify-between"><span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Publié</span><span class="text-sm"> <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold {{ cour.isPublished ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300' : 'bg-slate-100 text-slate-700 dark:bg-slate-700/40 dark:text-slate-300' }}">{{ cour.isPublished ? 'Oui' : 'Non' }}</span></span></div>
+            </div>
+        </div>
 
-    <a href="{{ path('app_cours_index') }}">back to list</a>
-
-    <a href="{{ path('app_cours_edit', {'id': cour.id}) }}">edit</a>
-
-    {{ include('cours/_delete_form.html.twig') }}
+        <div class="flex justify-end pt-6">
+            {{ include('cours/_delete_form.html.twig') }}
+        </div>
+    </div>
 {% endblock %}
