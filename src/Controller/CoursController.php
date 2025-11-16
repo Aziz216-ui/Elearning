@@ -46,7 +46,7 @@ final class CoursController extends AbstractController
     public function show(Cours $cour): Response
     {
         return $this->render('cours/show.html.twig', [
-            'cours' => $coursRepository->findAll(),
+            'cour' => $cour,
         ]);
     }
 

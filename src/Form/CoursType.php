@@ -71,6 +71,16 @@ class CoursType extends AbstractType
                 new Positive(['message' => 'Le prix doit être positif']),
             ],
         ])
+        ->add('category', TextType::class, [
+            'label' => 'Catégorie',
+            'attr' => [
+                'class' => 'form-control',
+                'placeholder' => 'Ex : Développement, Design, ...'
+            ],
+            'constraints' => [
+                new NotBlank(['message' => 'Veuillez entrer une catégorie']),
+            ],
+        ])
         ->add('isPublished', CheckboxType::class, [
             'label' => 'Publié',
             'required' => false, // permet de laisser décoché

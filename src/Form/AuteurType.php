@@ -9,6 +9,7 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 
 class AuteurType extends AbstractType
@@ -19,6 +20,16 @@ class AuteurType extends AbstractType
             ->add('nom', TextType::class)
             ->add('prenom', TextType::class)
             ->add('email', EmailType::class)
+            // Champs facultatifs ajoutés
+            ->add('specialite', TextType::class, [
+                'required' => false,
+                'label' => 'Spécialité / domaine',
+            ])
+            ->add('bio', TextareaType::class, [
+                'required' => false,
+                'label' => 'Bio courte',
+                'attr' => ['rows' => 3],
+            ])
             ->add('cours', EntityType::class, [
                 'class' => Cours::class,
                 'choice_label' => 'title',

@@ -18,6 +18,7 @@
                             <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Nom</th>
                             <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Prénom</th>
                             <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Email</th>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Spécialité</th>
                             <th class="px-6 py-3 text-right text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Actions</th>
                         </tr>
                     </thead>
@@ -28,6 +29,7 @@
                             <td class="px-6 py-4 text-sm font-medium text-slate-800 dark:text-white">{{ auteur.nom }}</td>
                             <td class="px-6 py-4 text-sm text-slate-700 dark:text-slate-300">{{ auteur.prenom }}</td>
                             <td class="px-6 py-4 text-sm text-slate-700 dark:text-slate-300">{{ auteur.email }}</td>
+                            <td class="px-6 py-4 text-sm text-slate-700 dark:text-slate-300">{{ auteur.specialite ?? '' }}</td>
                             <td class="px-6 py-4 text-sm text-right">
                                 <a href="{{ path('app_auteur_show', {'id': auteur.id}) }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 mr-3">Voir</a>
                                 <a href="{{ path('app_auteur_edit', {'id': auteur.id}) }}" class="text-emerald-600 hover:text-emerald-800 dark:text-emerald-400">Modifier</a>
@@ -35,7 +37,7 @@
                         </tr>
                     {% else %}
                         <tr>
-                            <td colspan="5" class="px-6 py-8 text-center text-sm text-slate-500 dark:text-slate-400">Aucun enregistrement</td>
+                            <td colspan="6" class="px-6 py-8 text-center text-sm text-slate-500 dark:text-slate-400">Aucun enregistrement</td>
                         </tr>
                     {% endfor %}
                     </tbody>

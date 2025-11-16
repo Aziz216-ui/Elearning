@@ -22,12 +22,68 @@
 
 
   </head>
+  <style>
+    /* Global reset and fixes */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    html, body {
+      height: 100%;
+      overflow-x: hidden;
+    }
+    /* Clear z-index layers */
+    .z-header { z-index: 1000; }
+    .z-sidebar { z-index: 999; }
+    .z-dropdown { z-index: 1050; }
+    .z-modal { z-index: 1100; }
+    /* Main content wrapper spacing */
+    .main-content-wrapper {
+      min-height: calc(100vh - 80px);
+      display: flex;
+      flex-direction: column;
+      position: relative; /* Ensure stacking context above background/slider */
+      z-index: 1;
+    }
+    /* Mobile responsiveness */
+    @media (max-width: 1023px) {
+      .sidebar-mobile {
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+      }
+      .sidebar-mobile.open {
+        transform: translateX(0);
+      }
+      .main-content-mobile {
+        margin-left: 0 !important;
+        padding-top: 70px;
+      }
+      .navbar-mobile {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+      }
+    }
+    /* Keep content centered and readable */
+    .content-max-width { max-width: 56rem; /* ~max-w-3xl */ width: 100%; position: relative; z-index: 1; }
+    .safe-area { padding: 1rem; overflow: visible; }
+    /* Ensure main area is above any sliders/absolute elements */
+    main#main {
+      position: relative;
+      z-index: 1;
+    }
+  </style>
 
   <body class="m-0 font-sans text-base antialiased font-normal dark:bg-slate-900 leading-default bg-gray-50 text-slate-500 overflow-x-hidden">
     <div class="absolute w-full bg-blue-500 dark:hidden min-h-75 -z-10"></div>
+    <!-- Sidebar Overlay for Mobile -->
+    <div id="sidebarOverlay" class="fixed inset-0 bg-black bg-opacity-50 z-980 hidden lg:hidden"></div>
 
-    <!-- ====== Sidebar (Floating / Off-canvas) ====== -->
-    <aside id="sidebar" class="fixed top-16 bottom-0 left-0 block w-64 p-0 overflow-y-auto antialiased bg-white border-0 shadow-xl dark:shadow-none dark:bg-slate-850 z-40 transform -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out" aria-expanded="true">
+    <!-- ====== Sidebar ====== -->
+    <aside id="sidebar" class="sidebar-mobile fixed inset-y-0 flex-wrap items-center justify-between block w-64 p-0 my-4 overflow-y-auto antialiased transition-transform duration-200 bg-white border-0 shadow-xl dark:shadow-none dark:bg-slate-850 ease-nav-brand z-990 lg:ml-6 rounded-2xl lg:left-0 lg:translate-x-0" aria-expanded="true">
       <div class="h-19">
         <a class="block px-8 py-6 text-sm whitespace-nowrap dark:text-white text-slate-700" href="#">
           <img src="{{ asset('admin/img/logo-ct-dark.png') }}" class="inline h-8 dark:hidden" alt="main_logo" />
@@ -41,7 +97,7 @@
       <div class="overflow-auto grow">
         <ul class="flex flex-col pl-0 mb-0">
           <li class="mt-0.5">
-            <a href="dashboard" class="flex items-center px-4 py-2 text-slate-700 dark:text-white">
+            <a href="{{ path('app_dashboard') }}" class="flex items-center px-4 py-2 text-slate-700 dark:text-white {{ app.request.attributes.get('_route') == 'app_dashboard' ? 'font-semibold text-blue-600 dark:text-blue-400' : '' }}">
               <i class="ni ni-tv-2 text-blue-500 mr-2"></i> Dashboard
             </a>
           </li>
@@ -58,14 +114,12 @@
         </ul>
       </div>
     </aside>
-    <!-- Overlay for mobile sidebar -->
-    <div id="sidebarOverlay" class="fixed inset-0 bg-black/50 z-30 hidden lg:hidden"></div>
     <!-- ====== End Sidebar ====== -->
 
     <!-- ====== Main Content ====== -->
-    <div class="relative min-h-screen flex flex-col pt-16 lg:ml-64">
+    <div class="main-content-wrapper ml-0 lg:ml-64 transition-all duration-200">
       <!-- Navbar -->
-      <nav class="w-full px-6 py-3 bg-white border-b border-gray-200 shadow-sm dark:bg-slate-850 dark:border-slate-800 fixed top-0 left-0 right-0 z-50">
+      <nav class="navbar-mobile w-full px-4 lg:px-6 py-3 bg-white border-b border-gray-200 shadow-sm dark:bg-slate-850 dark:border-slate-800 fixed top-0 left-0 right-0 z-1000">
         <div class="flex items-center justify-between">
           <div class="flex items-center space-x-3">
             <!-- Mobile sidebar toggle -->
@@ -93,15 +147,12 @@
       <!-- End Navbar -->
 
       <!-- Main content -->
-
-<main id="main" class="w-full px-6 py-8">
-  <div class="w-full max-w-5xl mx-auto">
-   {% block body %}
-
-
-    {% endblock %}
-  </div>
-</main>
+      <main id="main" class="main-content-mobile flex-1 w-full px-4 lg:px-10 py-8 mt-16 lg:ml-0 safe-area">
+        <div class="content-max-width mx-auto">
+          {% block body %}
+          {% endblock %}
+        </div>
+      </main>
 
 
       <!-- Footer -->
@@ -123,49 +174,63 @@
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('sidebarOverlay');
         const toggle = document.getElementById('sidebarToggle');
+        const body = document.body;
 
         const openSidebar = () => {
           if (!sidebar) return;
-          sidebar.classList.remove('-translate-x-full');
+          sidebar.classList.add('open');
           if (overlay) overlay.classList.remove('hidden');
-          document.body.classList.add('overflow-hidden');
+          body.classList.add('overflow-hidden');
         };
 
         const closeSidebar = () => {
           if (!sidebar) return;
-          sidebar.classList.add('-translate-x-full');
+          sidebar.classList.remove('open');
           if (overlay) overlay.classList.add('hidden');
-          document.body.classList.remove('overflow-hidden');
+          body.classList.remove('overflow-hidden');
         };
 
+        // Toggle sidebar
         toggle && toggle.addEventListener('click', function () {
-          const isHidden = sidebar.classList.contains('-translate-x-full');
-          if (isHidden) openSidebar(); else closeSidebar();
+          const isOpen = sidebar.classList.contains('open');
+          if (isOpen) closeSidebar(); else openSidebar();
         });
 
+        // Close sidebar when overlay is clicked
         overlay && overlay.addEventListener('click', closeSidebar);
 
-        window.addEventListener('keydown', function (e) {
+        // Close sidebar with Escape key
+        document.addEventListener('keydown', function (e) {
           if (e.key === 'Escape') closeSidebar();
         });
 
-        // Reset state on resize: show sidebar on lg+, hide overlay/body lock
-        const mq = window.matchMedia('(min-width: 1024px)');
+        // Handle responsive behavior
         const handleResize = () => {
-          if (mq.matches) {
-            // Large screens: ensure sidebar is visible and overlay/body unlocked
-            sidebar && sidebar.classList.remove('-translate-x-full');
+          if (window.innerWidth >= 1024) {
+            // Large screens: ensure sidebar is docked and overlay is hidden
+            sidebar && sidebar.classList.remove('open');
             overlay && overlay.classList.add('hidden');
-            document.body.classList.remove('overflow-hidden');
+            body.classList.remove('overflow-hidden');
           } else {
             // Small screens: keep sidebar hidden by default
-            sidebar && sidebar.classList.add('-translate-x-full');
+            sidebar && sidebar.classList.remove('open');
             overlay && overlay.classList.add('hidden');
-            document.body.classList.remove('overflow-hidden');
+            body.classList.remove('overflow-hidden');
           }
         };
+        // Initial setup
         handleResize();
-        mq.addEventListener ? mq.addEventListener('change', handleResize) : window.addEventListener('resize', handleResize);
+        // Listen for resize events
+        window.addEventListener('resize', handleResize);
+
+        // Close sidebar when a navigation link is clicked on mobile
+        document.querySelectorAll('#sidebar a').forEach(link => {
+          link.addEventListener('click', () => {
+            if (window.innerWidth < 1024) {
+              closeSidebar();
+            }
+          });
+        });
       });
     </script>
 

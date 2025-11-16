@@ -24,6 +24,14 @@ class Auteur
     #[ORM\Column(length: 255)]
     private ?string $email = null;
 
+    // Spécialité / Domaine (ex: Développement Web, IA, ...)
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $specialite = null;
+
+    // Bio courte (facultatif)
+    #[ORM\Column(type: 'text', nullable: true)]
+    private ?string $bio = null;
+
     /**
      * @var Collection<int, Cours>
      */
@@ -46,6 +54,12 @@ class Auteur
 
     public function getEmail(): ?string { return $this->email; }
     public function setEmail(string $email): static { $this->email = $email; return $this; }
+
+    public function getSpecialite(): ?string { return $this->specialite; }
+    public function setSpecialite(?string $specialite): static { $this->specialite = $specialite; return $this; }
+
+    public function getBio(): ?string { return $this->bio; }
+    public function setBio(?string $bio): static { $this->bio = $bio; return $this; }
 
     /** @return Collection<int, Cours> */
     public function getCours(): Collection { return $this->cours; }
