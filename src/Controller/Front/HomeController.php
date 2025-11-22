@@ -5,14 +5,18 @@ namespace App\Controller\Front;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Repository\UserRepository;
 
-final class HomeController extends AbstractController
+class HomeController extends AbstractController
 {
     #[Route('/home', name: 'app_home')]
     public function index(): Response
     {
+        // Ici tu peux afficher l'utilisateur connecté
+        $user = $this->getUser();
+
         return $this->render('front/home/index.html.twig', [
-            'controller_name' => 'HomeController',
+            'user' => $user,
         ]);
     }
 }

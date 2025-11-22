@@ -42,19 +42,21 @@
     <!-- Navbar Start -->
     <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
         <a href="index.html" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
-            <h2 class="m-0 text-primary"><i class="fa fa-book me-3"></i>azecdc</h2>
+            <h2 class="m-0 text-primary"><i class="fa fa-book me-3"></i>Elearning</h2>
         </a>
         <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
             <span class="navbar-toggler-icon"></span>
         </button>
         <div class="collapse navbar-collapse" id="navbarCollapse">
             <div class="navbar-nav ms-auto p-4 p-lg-0">
-                <a  href="{{path('app_home_stat')}}" class="nav-item nav-link">Home</a>
+                <a  href="{{path('app_home_stat')}}" class="nav-item nav-link active ">Home</a>
 
 
                 <a href="courses.html" class="nav-item nav-link">Courses</a>
+                <a  href="{{path('payment_plans')}}"class="nav-item nav-link">Abonnement</a>
                 <div class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
+
                     <div class="dropdown-menu fade-down m-0">
                         <a href="team.html" class="dropdown-item">Our Team</a>
                         <a href="testimonial.html" class="dropdown-item">Testimonial</a>
@@ -62,9 +64,11 @@
                     </div>
                 </div>
                 <a href="contact.html" class="nav-item nav-link">Contact</a>
-                <a href="about.html" class="nav-item nav-link active">About</a>
+                <a href="about.html" class="nav-item nav-link">About</a>
+                <a href="{{path('app_login')}}" class="nav-item nav-link ">Connexion</a>
+
             </div>
-            <a href="" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block">Join Now<i class="fa fa-arrow-right ms-3"></i></a>
+            <a href="{{path('app_register')}}" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block">Join Now<i class="fa fa-arrow-right ms-3"></i></a>
         </div>
     </nav>
     <!-- Navbar End -->

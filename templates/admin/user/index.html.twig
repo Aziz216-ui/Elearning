@@ -1,0 +1,76 @@
+{% extends 'base1.html.twig' %}
+
+{% block title %}Gestion des utilisateurs{% endblock %}
+{% block page_title %}Gestion des utilisateurs{% endblock %}
+
+{% block body %}
+<div class="px-6 py-6 mx-auto bg-white rounded-lg shadow-sm">
+    <div class="mb-6">
+        <h1 class="text-2xl font-semibold text-gray-900">Liste des utilisateurs</h1>
+        <p class="text-sm text-gray-500 mt-1">Gérez les utilisateurs de votre plateforme</p>
+    </div>
+
+    <div class="table-container">
+        <div class="overflow-x-auto">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Email</th>
+                        <th>Nom complet</th>
+                        <th class="text-center">Rôle</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for user in users %}
+                    <tr>
+                        <td class="font-medium">#{{ user.id }}</td>
+                        <td class="max-w-xs truncate" title="{{ user.email }}">
+                            {{ user.email }}
+                        </td>
+                        <td>{{ user.name }} {{ user.lastname }}</td>
+                        <td class="text-center">
+                            {% if 'ROLE_ADMIN' in user.roles %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                    Admin
+                                </span>
+                            {% else %}
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                                    Utilisateur
+                                </span>
+                            {% endif %}
+                        </td>
+                        <td class="px-2 py-2">
+                            <div style="display: flex; gap: 8px;">
+                                <a href="{{ path('admin_user_edit', {'id': user.id}) }}" style="background: #2563eb; color: white; padding: 4px 8px; border-radius: 4px; text-decoration: none; font-size: 13px;">
+                                    <i class="fas fa-edit" style="margin-right: 4px;"></i>Modifier
+                                </a>
+                                <form action="{{ path('admin_user_delete', {'id': user.id}) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')" style="display: inline;">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                                    <button type="submit" style="background: #dc2626; color: white; padding: 4px 8px; border: none; border-radius: 4px; cursor: pointer; font-size: 13px;">
+                                        <i class="fas fa-trash" style="margin-right: 4px;"></i>Supprimer
+                                    </button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="4" class="py-8 text-center text-gray-500">
+                            Aucun utilisateur trouvé
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div style="margin-top: 20px;">
+        <a href="{{ path('admin_user_new') }}" style="background: #10b981; color: white; padding: 8px 16px; border-radius: 4px; text-decoration: none; font-size: 14px; display: inline-flex; align-items: center;">
+            <i class="fas fa-plus" style="margin-right: 8px;"></i> Ajouter un utilisateur
+        </a>
+    </div>
+
+</div>
+{% endblock %}
