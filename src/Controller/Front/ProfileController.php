@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\Front;
+namespace App\Controller\front;
 
 use App\Form\RegistrationFormType;
 use Doctrine\ORM\EntityManagerInterface;
