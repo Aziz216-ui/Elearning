@@ -20,6 +20,22 @@
                 <div class="px-6 py-4 flex justify-between"><span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Price</span><span class="text-sm text-slate-800 dark:text-white">{{ cour.price }}</span></div>
                 <div class="px-6 py-4 flex justify-between"><span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Duration</span><span class="text-sm text-slate-800 dark:text-white">{% if cour.duration is not null %}{{ cour.duration|date('d/m/Y H:i') }}{% else %}Non défini{% endif %}</span></div>
                 <div class="px-6 py-4 flex justify-between"><span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Publié</span><span class="text-sm"> <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold {{ cour.isPublished ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300' : 'bg-slate-100 text-slate-700 dark:bg-slate-700/40 dark:text-slate-300' }}">{{ cour.isPublished ? 'Oui' : 'Non' }}</span></span></div>
+                {% if cour.auteur %}
+                <div class="px-6 py-4">
+                    <p class="text-sm font-semibold text-slate-600 dark:text-slate-300 mb-2">Auteur</p>
+                    <div class="flex items-center gap-4">
+                        {% if cour.auteur.photo %}
+                            <img src="{{ asset('uploads/auteurs/' ~ cour.auteur.photo) }}" alt="Photo de {{ cour.auteur.prenom }} {{ cour.auteur.nom }}" class="w-16 h-16 rounded-full object-cover border border-slate-200 dark:border-slate-700" />
+                        {% else %}
+                            <div class="w-16 h-16 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 text-sm">N/A</div>
+                        {% endif %}
+                        <div>
+                            <div class="text-sm text-slate-800 dark:text-white font-medium">{{ cour.auteur.prenom }} {{ cour.auteur.nom }}</div>
+                            {% if cour.auteur.specialite %}<div class="text-xs text-slate-500 dark:text-slate-400">{{ cour.auteur.specialite }}</div>{% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
             </div>
         </div>
 

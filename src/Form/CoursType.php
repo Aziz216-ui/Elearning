@@ -15,13 +15,11 @@ use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
-use Symfony\Component\Form\Extension\Core\Type\CheckboxType; // ✅ importer CheckboxType
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 
-// Contraintes de validation
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Positive;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
-// ✅ manquant
 
 class CoursType extends AbstractType
 {
@@ -92,6 +90,10 @@ class CoursType extends AbstractType
             'placeholder' => 'Sélectionner un auteur',
             'attr' => [
                 'class' => 'form-select',
+            ],
+            'required' => true,
+            'constraints' => [
+                new NotBlank(['message' => 'Veuillez sélectionner un auteur']),
             ],
         ]);
 }

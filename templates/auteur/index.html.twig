@@ -14,6 +14,7 @@
                 <table class="min-w-full divide-y divide-slate-200 dark:divide-slate-700">
                     <thead class="bg-slate-50 dark:bg-slate-800">
                         <tr>
+                            <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Avatar</th>
                             <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Id</th>
                             <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Nom</th>
                             <th class="px-6 py-3 text-left text-xs font-semibold text-slate-600 dark:text-slate-300 uppercase tracking-wider">Prénom</th>
@@ -24,15 +25,34 @@
                     </thead>
                     <tbody class="bg-white dark:bg-slate-850 divide-y divide-slate-200 dark:divide-slate-700">
                     {% for auteur in auteurs %}
-                        <tr class="hover:bg-slate-50 dark:hover:bg-slate-800/60">
+                        <tr class="odd:bg-slate-50/40 dark:odd:bg-slate-800/30 hover:bg-slate-100 dark:hover:bg-slate-800/60">
+                            <td class="px-6 py-4">
+                                {% if auteur.photo %}
+                                    <img src="{{ asset('uploads/auteurs/' ~ auteur.photo) }}" alt="{{ auteur.prenom }} {{ auteur.nom }}" class="w-10 h-10 rounded-full object-cover border border-slate-200 dark:border-slate-700" />
+                                {% else %}
+                                    <div class="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 text-xs font-semibold">
+                                        {{ (auteur.prenom|first ~ auteur.nom|first)|upper }}
+                                    </div>
+                                {% endif %}
+                            </td>
                             <td class="px-6 py-4 text-sm text-slate-700 dark:text-slate-300">{{ auteur.id }}</td>
                             <td class="px-6 py-4 text-sm font-medium text-slate-800 dark:text-white">{{ auteur.nom }}</td>
                             <td class="px-6 py-4 text-sm text-slate-700 dark:text-slate-300">{{ auteur.prenom }}</td>
                             <td class="px-6 py-4 text-sm text-slate-700 dark:text-slate-300">{{ auteur.email }}</td>
                             <td class="px-6 py-4 text-sm text-slate-700 dark:text-slate-300">{{ auteur.specialite ?? '' }}</td>
                             <td class="px-6 py-4 text-sm text-right">
-                                <a href="{{ path('app_auteur_show', {'id': auteur.id}) }}" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 mr-3">Voir</a>
-                                <a href="{{ path('app_auteur_edit', {'id': auteur.id}) }}" class="text-emerald-600 hover:text-emerald-800 dark:text-emerald-400">Modifier</a>
+                                <div class="inline-flex items-center gap-2">
+                                  <a href="{{ path('app_auteur_show', {'id': auteur.id}) }}"
+                                     class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md bg-black text-white hover:bg-gray-900 transition-colors duration-150 shadow-sm">
+                                    <i class="fa fa-eye"></i>
+                                    <span>Voir</span>
+                                  </a>
+                                  <a href="{{ path('app_auteur_edit', {'id': auteur.id}) }}"
+                                     class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-md border border-black text-black hover:bg-black hover:text-white dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-black transition-colors duration-150 shadow-sm">
+                                    <i class="fa fa-pen"></i>
+                                    <span>Modifier</span>
+                                  </a>
+                                </div>
                             </td>
                         </tr>
                     {% else %}

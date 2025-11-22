@@ -1,0 +1,77 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Détails du cours{% endblock %}
+
+{% block body %}
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-10 col-xl-9">
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start mb-3">
+              <h1 class="h3 mb-0">{{ cour.title }}</h1>
+              {% if cour.category is defined and cour.category %}
+                <span class="badge bg-info text-dark">{{ cour.category }}</span>
+              {% endif %}
+            </div>
+
+            {# Auteur avec avatar #}
+            {% if cour.auteur is defined and cour.auteur %}
+              <div class="d-flex align-items-center text-muted mb-3">
+                {% if cour.auteur.photo is defined and cour.auteur.photo %}
+                  <img src="{{ asset('uploads/auteurs/' ~ cour.auteur.photo) }}" alt="{{ cour.auteur.prenom|default('') }} {{ cour.auteur.nom|default('') }}" class="rounded-circle me-2" style="width:40px;height:40px;object-fit:cover;border:1px solid rgba(0,0,0,.1);" />
+                {% else %}
+                  <div class="rounded-circle me-2 d-flex align-items-center justify-content-center bg-light" style="width:40px;height:40px;border:1px solid rgba(0,0,0,.1);">
+                    <span class="text-muted" style="font-size:.9rem;">A</span>
+                  </div>
+                {% endif %}
+                <span>
+                  {{ cour.auteur.prenom is defined ? cour.auteur.prenom : (cour.auteur.firstName is defined ? cour.auteur.firstName : '') }}
+                  {{ cour.auteur.nom is defined ? cour.auteur.nom : (cour.auteur.lastName is defined ? cour.auteur.lastName : '') }}
+                </span>
+              </div>
+            {% elseif cour.author is defined and cour.author %}
+              <div class="d-flex align-items-center text-muted mb-3">
+                {% if cour.author.photo is defined and cour.author.photo %}
+                  <img src="{{ asset('uploads/auteurs/' ~ cour.author.photo) }}" alt="{{ cour.author.firstName|default('') }} {{ cour.author.lastName|default('') }}" class="rounded-circle me-2" style="width:40px;height:40px;object-fit:cover;border:1px solid rgba(0,0,0,.1);" />
+                {% else %}
+                  <div class="rounded-circle me-2 d-flex align-items-center justify-content-center bg-light" style="width:40px;height:40px;border:1px solid rgba(0,0,0,.1);">
+                    <span class="text-muted" style="font-size:.9rem;">A</span>
+                  </div>
+                {% endif %}
+                <span>
+                  {{ cour.author.firstName is defined ? cour.author.firstName : (cour.author.prenom is defined ? cour.author.prenom : '') }}
+                  {{ cour.author.lastName is defined ? cour.author.lastName : (cour.author.nom is defined ? cour.author.nom : '') }}
+                </span>
+              </div>
+            {% endif %}
+
+            <p class="lead">{{ cour.description }}</p>
+
+            <div class="d-flex flex-wrap gap-2 mt-3 mb-4">
+              <span class="badge bg-primary">{{ cour.price }} DT</span>
+              <span class="badge bg-secondary">
+                {% if cour.duration is not null %}
+                  {{ cour.duration|date('H:i') }}
+                {% else %}
+                  Non défini
+                {% endif %}
+              </span>
+            </div>
+
+            <div class="d-flex gap-2">
+              {# TODO: activer la route panier quand disponible #}
+              <a href="#" class="btn btn-outline-primary disabled" aria-disabled="true">Ajouter au panier</a>
+              {% if cour.auteur is defined and cour.auteur %}
+                <a href="{{ path('app_home_author_show', { id: cour.auteur.id }) }}" class="btn btn-outline-secondary">Auteur</a>
+              {% elseif cour.author is defined and cour.author %}
+                <a href="{{ path('app_home_author_show', { id: cour.author.id }) }}" class="btn btn-outline-secondary">Auteur</a>
+              {% endif %}
+              <a href="{{ path('app_home_courses') }}" class="btn btn-secondary">Retour à la liste</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

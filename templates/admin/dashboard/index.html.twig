@@ -2,13 +2,21 @@
 {% extends 'base1.html.twig' %}
 
 
-{% block title %}Dashboard{% endblock %}
+{% block title %}Hello HomeController!{% endblock %}
 
 {% block body %}
-  <div class="max-w-3xl mx-auto px-4 py-8">
-    <div class="w-full bg-white dark:bg-slate-850 shadow-xl dark:shadow-dark-xl rounded-2xl p-6">
-      <h1 class="text-2xl font-bold text-slate-800 dark:text-white mb-2">Hello Dashboard</h1>
-      <p class="text-slate-600 dark:text-slate-300">Bienvenue sur votre tableau de bord.</p>
-    </div>
-  </div>
+<style>
+    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
+    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+</style>
+
+<div class="example-wrapper">
+    <h1>Hello {{ controller_name }}! ✅</h1>
+
+    This friendly message is coming from:
+    <ul>
+        <li>Your controller at <code>C:/Users/Fathi/E-learning/src/Controller/DashboardController.php</code></li>
+        <li>Your template at <code>C:/Users/Fathi/E-learning/templates/dashboard/index.html.twig</code></li>
+    </ul>
+</div>
 {% endblock %}

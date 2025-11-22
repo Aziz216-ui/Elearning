@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 #[Route('/auteur')]
 final class AuteurController extends AbstractController
@@ -30,6 +31,17 @@ final class AuteurController extends AbstractController
         $form->handleRequest($request);
         
         if ($form->isSubmitted() && $form->isValid()) {
+            // Handle photo upload if provided
+            $photoFile = $form->get('photoFile')->getData();
+            if ($photoFile) {
+                $newFilename = bin2hex(random_bytes(8)).'.'.$photoFile->guessExtension();
+                try {
+                    $photoFile->move($this->getParameter('auteur_upload_dir'), $newFilename);
+                    $auteur->setPhoto($newFilename);
+                } catch (FileException $e) {
+                    $this->addFlash('error', 'Upload de la photo échoué.');
+                }
+            }
             foreach ($auteur->getCours() as $cour) {
                 
                 $cour->setAuteur($auteur);
@@ -62,6 +74,17 @@ final class AuteurController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // Handle new photo upload if provided
+            $photoFile = $form->get('photoFile')->getData();
+            if ($photoFile) {
+                $newFilename = bin2hex(random_bytes(8)).'.'.$photoFile->guessExtension();
+                try {
+                    $photoFile->move($this->getParameter('auteur_upload_dir'), $newFilename);
+                    $auteur->setPhoto($newFilename);
+                } catch (FileException $e) {
+                    $this->addFlash('error', 'Upload de la photo échoué.');
+                }
+            }
             $entityManager->flush();
 
             return $this->redirectToRoute('app_auteur_index', [], Response::HTTP_SEE_OTHER);

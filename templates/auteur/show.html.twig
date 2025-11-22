@@ -3,7 +3,7 @@
 {% block title %}Auteur{% endblock %}
 
 {% block body %}
-    <div class="max-w-3xl mx-auto">
+    <div class="max-w-6xl mx-auto">
         <div class="flex items-center justify-between mb-6">
             <h1 class="text-2xl font-bold text-slate-800 dark:text-white">Détails de l'Auteur</h1>
             <div class="flex gap-3">
@@ -11,38 +11,61 @@
                 <a href="{{ path('app_auteur_edit', {'id': auteur.id}) }}" class="px-4 py-2 text-sm font-semibold text-white rounded-lg bg-gradient-to-tl from-blue-600 to-blue-400 shadow-md hover:shadow-xl">Modifier</a>
             </div>
         </div>
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Colonne principale (gauche) -->
+            <div class="lg:col-span-2 space-y-6">
+                <div class="overflow-hidden bg-white dark:bg-slate-850 shadow-xl dark:shadow-dark-xl rounded-2xl">
+                    <div class="divide-y divide-slate-200 dark:divide-slate-700">
+                        <div class="px-6 py-4 flex justify-between"><span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Id</span><span class="text-sm text-slate-800 dark:text-white">{{ auteur.id }}</span></div>
+                        <div class="px-6 py-4 flex justify-between"><span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Nom</span><span class="text-sm text-slate-800 dark:text-white">{{ auteur.nom }}</span></div>
+                        <div class="px-6 py-4 flex justify-between"><span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Prénom</span><span class="text-sm text-slate-800 dark:text-white">{{ auteur.prenom }}</span></div>
+                        <div class="px-6 py-4 flex justify-between"><span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Email</span><span class="text-sm text-slate-800 dark:text-white">{{ auteur.email }}</span></div>
+                        <div class="px-6 py-4 flex justify-between"><span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Spécialité</span><span class="text-sm text-slate-800 dark:text-white">{{ auteur.specialite ?? '—' }}</span></div>
+                        <div class="px-6 py-4 flex items-start justify-between gap-6">
+                            <span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Bio courte</span>
+                            <span class="text-sm text-slate-800 dark:text-white max-w-xl whitespace-pre-line">{{ auteur.bio ?? '—' }}</span>
+                        </div>
+                    </div>
+                </div>
 
-        <div class="overflow-hidden bg-white dark:bg-slate-850 shadow-xl dark:shadow-dark-xl rounded-2xl mb-6">
-            <div class="divide-y divide-slate-200 dark:divide-slate-700">
-                <div class="px-6 py-4 flex justify-between"><span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Id</span><span class="text-sm text-slate-800 dark:text-white">{{ auteur.id }}</span></div>
-                <div class="px-6 py-4 flex justify-between"><span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Nom</span><span class="text-sm text-slate-800 dark:text-white">{{ auteur.nom }}</span></div>
-                <div class="px-6 py-4 flex justify-between"><span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Prénom</span><span class="text-sm text-slate-800 dark:text-white">{{ auteur.prenom }}</span></div>
-                <div class="px-6 py-4 flex justify-between"><span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Email</span><span class="text-sm text-slate-800 dark:text-white">{{ auteur.email }}</span></div>
-                <div class="px-6 py-4 flex justify-between"><span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Spécialité</span><span class="text-sm text-slate-800 dark:text-white">{{ auteur.specialite ?? '—' }}</span></div>
-                <div class="px-6 py-4 flex items-start justify-between gap-6">
-                    <span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Bio courte</span>
-                    <span class="text-sm text-slate-800 dark:text-white max-w-xl whitespace-pre-line">{{ auteur.bio ?? '—' }}</span>
+                <div class="overflow-hidden bg-white dark:bg-slate-850 shadow-xl dark:shadow-dark-xl rounded-2xl">
+                    <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
+                        <h2 class="text-lg font-semibold text-slate-800 dark:text-white">Cours assignés</h2>
+                    </div>
+                    <div class="px-6 py-4">
+                        <ul class="list-disc pl-6 space-y-1">
+                        {% for cours in auteur.cours %}
+                            <li class="text-sm text-slate-800 dark:text-slate-200"><span class="font-medium">{{ cours.title }}</span> - {{ cours.description }}</li>
+                        {% else %}
+                            <li class="text-sm text-slate-500 dark:text-slate-400">Aucun cours assigné</li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="flex justify-end pt-6">
+                    {{ include('auteur/_delete_form.html.twig') }}
                 </div>
             </div>
-        </div>
 
-        <div class="overflow-hidden bg-white dark:bg-slate-850 shadow-xl dark:shadow-dark-xl rounded-2xl">
-            <div class="px-6 py-4 border-b border-slate-200 dark:border-slate-700">
-                <h2 class="text-lg font-semibold text-slate-800 dark:text-white">Cours assignés</h2>
+            <!-- Carte avatar (droite) -->
+            <div class="lg:col-span-1">
+                <div class="overflow-hidden bg-white dark:bg-slate-850 shadow-xl dark:shadow-dark-xl rounded-2xl lg:sticky lg:top-6">
+                    <div class="px-6 py-8 flex flex-col items-center text-center gap-3">
+                        {% if auteur.photo %}
+                            <img src="{{ asset('uploads/auteurs/' ~ auteur.photo) }}" alt="{{ auteur.prenom }} {{ auteur.nom }}" class="w-28 h-28 rounded-full object-cover border border-slate-200 dark:border-slate-700" />
+                        {% else %}
+                            <div class="w-28 h-28 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 text-2xl font-semibold">
+                                {{ (auteur.prenom|first ~ auteur.nom|first)|upper }}
+                            </div>
+                        {% endif %}
+                        <div>
+                            <div class="text-base text-slate-800 dark:text-white font-semibold">{{ auteur.prenom }} {{ auteur.nom }}</div>
+                            {% if auteur.specialite %}<div class="text-xs text-slate-500 dark:text-slate-400 mt-0.5">{{ auteur.specialite }}</div>{% endif %}
+                        </div>
+                    </div>
+                </div>
             </div>
-            <div class="px-6 py-4">
-                <ul class="list-disc pl-6 space-y-1">
-                {% for cours in auteur.cours %}
-                    <li class="text-sm text-slate-800 dark:text-slate-200"><span class="font-medium">{{ cours.title }}</span> - {{ cours.description }}</li>
-                {% else %}
-                    <li class="text-sm text-slate-500 dark:text-slate-400">Aucun cours assigné</li>
-                {% endfor %}
-                </ul>
-            </div>
-        </div>
-
-        <div class="flex justify-end pt-6">
-            {{ include('auteur/_delete_form.html.twig') }}
         </div>
     </div>
 {% endblock %}
