@@ -1,0 +1,66 @@
+{% extends 'base1.html.twig' %}
+
+{% block title %}Gestion des quiz{% endblock %}
+
+{% block page_title %}Gestion des quiz{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1>Gestion des quiz</h1>
+
+    <a href="{{ path('app_quiz_admin_new') }}" class="btn btn-primary mb-3">
+        <i class="fas fa-plus"></i> Créer un nouveau quiz
+    </a>
+
+    <div class="table-responsive">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Titre</th>
+                    <th>Cours associé</th>
+                    <th class="text-end">Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for quiz in quizzes %}
+                <tr>
+                    <td>{{ quiz.id }}</td>
+                    <td>{{ quiz.title }}</td>
+                    <td>
+                        {% if quiz.cours is defined and quiz.cours is not null %}
+                            {{ quiz.cours.title }}
+                        {% else %}
+                            <span class="text-muted">Aucun cours associé</span>
+                        {% endif %}
+
+                    </td>
+                    <td class="text-end">
+                        <div class="btn-group" role="group">
+                            <a href="{{ path('app_quiz_admin_edit', {'id': quiz.id}) }}"
+                               class="btn btn-warning btn-sm"
+                               title="Modifier">
+                                <i class="fas fa-edit"></i> Modifier
+                            </a>
+                            <form method="post"
+                                  action="{{ path('app_quiz_admin_delete', {'id': quiz.id}) }}"
+                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce quiz ?');"
+                                  class="d-inline">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ quiz.id) }}">
+                                <button class="btn btn-danger btn-sm" title="Supprimer">
+                                    <i class="fas fa-trash"></i> Supprimer
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="4" class="text-center">Aucun quiz trouvé</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

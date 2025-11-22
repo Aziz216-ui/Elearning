@@ -1,0 +1,688 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes cours{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .dashboard-section {
+            background: #f7f9f9;
+            padding: 40px 0 70px;
+            min-height: 100vh;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            margin-bottom: 32px;
+        }
+
+        .section-header h1 {
+            color: var(--dark-text);
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .section-header p {
+            color: var(--grey-text);
+            margin: 0;
+        }
+
+        .btn-gradient {
+            background: linear-gradient(90deg,var(--primary),var(--primary-hover));
+            border: none;
+            color: #fff !important;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            box-shadow: 0 10px 20px rgba(39,174,96,0.25);
+        }
+
+        .btn-gradient:hover {
+            opacity: 0.9;
+        }
+
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+            gap: 24px;
+        }
+
+        .course-card {
+            border: 1px solid #eaeaea;
+            padding: 25px;
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+            transition: 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            min-height: 290px;
+        }
+
+        .course-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+        }
+
+        .category-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            background: var(--light-bg);
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .course-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--dark-text);
+            margin-bottom: 12px;
+        }
+
+        .course-description {
+            color: var(--grey-text);
+            font-size: 15px;
+            margin-bottom: 18px;
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+
+        .course-meta {
+            margin-bottom: 10px;
+        }
+
+        .course-meta span {
+            display: block;
+            margin-bottom: 4px;
+            font-size: 14px;
+            color: var(--grey-text);
+        }
+
+        .course-meta strong {
+            color: var(--dark-text);
+        }
+
+        .course-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+        }
+
+        .btn-green {
+            background: var(--primary);
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: none;
+            transition: 0.2s ease;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+        }
+
+        .btn-green:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-outline {
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: 1px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            transition: 0.2s ease;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-outline:hover {
+            background: var(--light-bg);
+        }
+
+        .courses-empty {
+            background: #fff;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+            border: 1px solid #eaeaea;
+        }
+
+        .course-detail-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            z-index: 1050;
+        }
+
+        .course-detail-modal {
+            width: min(1200px, 100%);
+            max-height: 95vh;
+            overflow-y: auto;
+            background: #f7f9f9;
+            border-radius: 16px;
+            position: relative;
+            padding: 35px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+        }
+
+        .course-detail-close {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            background: transparent;
+            border: none;
+            font-size: 32px;
+            color: #2c3e50;
+            cursor: pointer;
+        }
+
+        .cd-container {
+            font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        .cd-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .cd-page-title {
+            color: var(--dark-text);
+            font-size: 32px;
+            font-weight: 700;
+            margin: 0;
+        }
+
+        .cd-back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            background: #fff;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .cd-back-button:hover {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .cd-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+
+        .cd-course-header {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .cd-course-title {
+            color: var(--dark-text);
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .cd-course-description {
+            color: var(--grey-text);
+            font-size: 15px;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .cd-course-date {
+            color: rgba(15, 46, 61, 0.6);
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .cd-section-title {
+            color: var(--dark-text);
+            font-size: 20px;
+            font-weight: 600;
+            margin: 30px 0 20px;
+        }
+
+        .cd-info-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .cd-info-box {
+            background: var(--light-bg);
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid rgba(25,199,216,0.2);
+        }
+
+        .cd-info-number {
+            color: var(--primary);
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .cd-info-label {
+            color: var(--grey-text);
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .cd-objectives-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .cd-objectives-list li {
+            color: var(--grey-text);
+            font-size: 15px;
+            line-height: 1.8;
+            padding: 10px 0 10px 35px;
+            position: relative;
+        }
+
+        .cd-objectives-list li::before {
+            content: '\2713';
+            color: var(--primary);
+            position: absolute;
+            left: 0;
+            top: 10px;
+            font-weight: 700;
+        }
+
+        .cd-modules-container {
+            display: grid;
+            gap: 15px;
+        }
+
+        .cd-module-item {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .cd-module-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .cd-module-name {
+            color: var(--dark-text);
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .cd-module-duration {
+            color: rgba(15, 46, 61, 0.6);
+            font-size: 14px;
+        }
+
+        .cd-module-desc {
+            color: var(--grey-text);
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .cd-requirements-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .cd-requirement-box {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        .cd-requirement-box strong {
+            color: var(--dark-text);
+            font-size: 15px;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .cd-requirement-box p {
+            color: var(--grey-text);
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .cd-button-group {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            flex-wrap: wrap;
+        }
+
+        .cd-btn-quiz,
+        .cd-btn-details {
+            flex: 1;
+            min-width: 200px;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            border: none;
+        }
+
+        .cd-btn-quiz {
+            background: linear-gradient(90deg,#5a63e0,#9b5cf6);
+            color: #fff;
+        }
+
+        .cd-btn-quiz:hover {
+            opacity: 0.9;
+        }
+
+        .cd-btn-details {
+            background: #fff;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .cd-btn-details:hover {
+            background: var(--light-bg);
+        }
+
+        @media (max-width: 768px) {
+            .course-detail-modal {
+                padding: 25px;
+            }
+
+            .cd-header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .section-header {
+                flex-direction: column;
+            }
+
+            .cd-button-group {
+                flex-direction: column;
+            }
+
+            .cd-btn-quiz,
+            .cd-btn-details,
+            .btn-green,
+            .btn-outline {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="dashboard-section">
+    <div class="container">
+        <div class="section-header">
+            <div>
+                <p class="text-uppercase text-muted mb-1" style="letter-spacing: 1px; font-size: 13px;">Espace apprenant</p>
+                <h1>Mes cours</h1>
+                <p>Retrouvez vos formations ajoutées et continuez votre progression.</p>
+            </div>
+            <a href="{{ path('app_dashboard') }}" class="btn-gradient">
+                <i class="fas fa-arrow-left"></i> Retour au catalogue
+            </a>
+        </div>
+
+        {% if panier|length > 0 %}
+            <div class="courses-grid">
+                {% for item in panier %}
+                    {% set cour = item.cours %}
+                    <div class="course-card">
+                        <span class="category-badge">
+                            <i class="fas fa-layer-group"></i>
+                            {{ cour.categorie }}
+                        </span>
+                        <h3 class="course-title">{{ cour.title }}</h3>
+                        <p class="course-description">{{ cour.description|slice(0, 140) }}...</p>
+
+                        <div class="course-meta">
+                            <span><strong>Prix :</strong> {{ cour.price }} €</span>
+                            <span><strong>Ajouté le :</strong> {{ item.createdAt|date('d/m/Y') }}</span>
+                        </div>
+
+                        <div class="course-actions">
+                            <a href="{{ path('app_quiz', {'id': cour.id}) }}" class="btn-green">
+                                <i class="fas fa-play"></i> Passer le quiz
+                            </a>
+                            <button
+                                type="button"
+                                class="btn-outline btn-course-detail"
+                                data-title="{{ cour.title|e('html_attr') }}"
+                                data-description="{{ cour.description|e('html_attr') }}"
+                                data-created="{{ item.createdAt|date('d/m/Y') }}"
+                            >
+                                <i class="fas fa-info-circle"></i> Détails du cours
+                            </button>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="courses-empty">
+                Vous n'avez pas encore de cours. <a href="{{ path('app_dashboard') }}">Parcourir les cours disponibles</a>.
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div id="course-detail-overlay" class="course-detail-overlay d-none">
+    <div class="course-detail-modal">
+        <button type="button" class="course-detail-close" id="close-course-detail" aria-label="Fermer">×</button>
+        <div class="cd-container">
+            <div class="cd-header">
+                <h1 class="cd-page-title">Détails du cours</h1>
+                <a href="#" class="cd-back-button">← Retour aux cours</a>
+            </div>
+
+            <div class="cd-card">
+                <div class="cd-course-header">
+                    <h2 class="cd-course-title" id="detail-course-title">Introduction à PHP</h2>
+                    <p class="cd-course-description" id="detail-course-description">
+                        Cours complet pour apprendre les bases de PHP et créer vos premières pages dynamiques.
+                    </p>
+                    <p class="cd-course-date" id="detail-course-date">Ajouté le : 18/11/2025</p>
+                </div>
+
+                <div class="cd-info-grid">
+                    <div class="cd-info-box">
+                        <div class="cd-info-number" id="detail-info-lessons">12</div>
+                        <div class="cd-info-label">Leçons</div>
+                    </div>
+                    <div class="cd-info-box">
+                        <div class="cd-info-number" id="detail-info-duration">8h</div>
+                        <div class="cd-info-label">Durée totale</div>
+                    </div>
+                    <div class="cd-info-box">
+                        <div class="cd-info-number" id="detail-info-exercises">24</div>
+                        <div class="cd-info-label">Exercices pratiques</div>
+                    </div>
+                    <div class="cd-info-box">
+                        <div class="cd-info-number" id="detail-info-projects">3</div>
+                        <div class="cd-info-label">Projets finaux</div>
+                    </div>
+                </div>
+
+                <h3 class="cd-section-title">Objectifs d'apprentissage</h3>
+                <ul class="cd-objectives-list">
+                    <li>Comprendre les fondamentaux de PHP et sa syntaxe</li>
+                    <li>Maîtriser les variables, types de données et opérateurs</li>
+                    <li>Utiliser les structures de contrôle (conditions et boucles)</li>
+                    <li>Créer et utiliser des fonctions personnalisées</li>
+                    <li>Gérer les formulaires et les données utilisateur</li>
+                    <li>Interagir avec des bases de données MySQL</li>
+                    <li>Implémenter les sessions et cookies</li>
+                    <li>Appliquer les bonnes pratiques de sécurité</li>
+                </ul>
+
+                <h3 class="cd-section-title">Programme détaillé</h3>
+                <div class="cd-modules-container">
+                    <div class="cd-module-item">
+                        <div class="cd-module-header">
+                            <span class="cd-module-name">Module 1 : Introduction et Installation</span>
+                            <span class="cd-module-duration">45 min</span>
+                        </div>
+                        <p class="cd-module-desc">3 leçons • Configuration de l'environnement de développement PHP</p>
+                    </div>
+
+                    <div class="cd-module-item">
+                        <div class="cd-module-header">
+                            <span class="cd-module-name">Module 2 : Syntaxe de base</span>
+                            <span class="cd-module-duration">1h 30min</span>
+                        </div>
+                        <p class="cd-module-desc">4 leçons • Variables, types de données, opérateurs et commentaires</p>
+                    </div>
+
+                    <div class="cd-module-item">
+                        <div class="cd-module-header">
+                            <span class="cd-module-name">Module 3 : Structures de contrôle</span>
+                            <span class="cd-module-duration">1h 15min</span>
+                        </div>
+                        <p class="cd-module-desc">3 leçons • Conditions (if, else, switch) et boucles (for, while, foreach)</p>
+                    </div>
+
+                    <div class="cd-module-item">
+                        <div class="cd-module-header">
+                            <span class="cd-module-name">Module 4 : Fonctions et tableaux</span>
+                            <span class="cd-module-duration">2h</span>
+                        </div>
+                        <p class="cd-module-desc">5 leçons • Création de fonctions et manipulation de tableaux</p>
+                    </div>
+
+                    <div class="cd-module-item">
+                        <div class="cd-module-header">
+                            <span class="cd-module-name">Module 5 : Programmation Orientée Objet</span>
+                            <span class="cd-module-duration">2h 30min</span>
+                        </div>
+                        <p class="cd-module-desc">6 leçons • Classes, objets, héritage et encapsulation</p>
+                    </div>
+
+                    <div class="cd-module-item">
+                        <div class="cd-module-header">
+                            <span class="cd-module-name">Module 6 : Projet final</span>
+                            <span class="cd-module-duration">1h</span>
+                        </div>
+                        <p class="cd-module-desc">1 projet • Développement d'une application web complète</p>
+                    </div>
+                </div>
+
+                <h3 class="cd-section-title">Prérequis</h3>
+                <div class="cd-requirements-grid">
+                    <div class="cd-requirement-box">
+                        <strong>Connaissances de base</strong>
+                        <p>Notions de HTML et CSS recommandées mais non obligatoires</p>
+                    </div>
+                    <div class="cd-requirement-box">
+                        <strong>Logiciels requis</strong>
+                        <p>Éditeur de code (VS Code, Sublime Text ou autre)</p>
+                    </div>
+                    <div class="cd-requirement-box">
+                        <strong>Environnement de travail</strong>
+                        <p>Serveur local XAMPP, WAMP ou MAMP installé</p>
+                    </div>
+                </div>
+
+                <div class="cd-button-group">
+                    <button class="cd-btn-quiz" id="detail-quiz-btn" type="button">▶ Passer le quiz</button>
+                    <button class="cd-btn-details" id="detail-start-btn" type="button">ⓘ Commencer le cours</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const overlay = document.getElementById('course-detail-overlay');
+        const closeBtn = document.getElementById('close-course-detail');
+        const titleEl = document.getElementById('detail-course-title');
+        const descEl = document.getElementById('detail-course-description');
+        const dateEl = document.getElementById('detail-course-date');
+        const lessonsEl = document.getElementById('detail-info-lessons');
+        const durationEl = document.getElementById('detail-info-duration');
+        const exercisesEl = document.getElementById('detail-info-exercises');
+        const projectsEl = document.getElementById('detail-info-projects');
+
+        if (!overlay || !closeBtn || !titleEl || !descEl || !dateEl) {
+            return;
+        }
+
+        const defaultDescription = "Cours complet pour apprendre les bases de PHP et créer vos premières pages dynamiques. Ce cours vous permettra de maîtriser les fondamentaux du langage PHP, de comprendre la programmation côté serveur et de développer des applications web interactives.";
+        const defaults = { lessons: '12', duration: '8h', exercises: '24', projects: '3' };
+
+        const hideOverlay = () => overlay.classList.add('d-none');
+
+        document.querySelectorAll('.btn-course-detail').forEach((button) => {
+            button.addEventListener('click', () => {
+                titleEl.textContent = button.dataset.title || 'Introduction à PHP';
+                descEl.textContent = button.dataset.description || defaultDescription;
+                dateEl.textContent = `Ajouté le : ${button.dataset.created || '—'}`;
+                lessonsEl.textContent = button.dataset.lessons || defaults.lessons;
+                durationEl.textContent = button.dataset.duration || defaults.duration;
+                exercisesEl.textContent = button.dataset.exercises || defaults.exercises;
+                projectsEl.textContent = button.dataset.projects || defaults.projects;
+                overlay.classList.remove('d-none');
+            });
+        });
+
+        closeBtn.addEventListener('click', hideOverlay);
+        overlay.addEventListener('click', (event) => {
+            if (event.target === overlay) {
+                hideOverlay();
+            }
+        });
+    });
+</script>
+{% endblock %}

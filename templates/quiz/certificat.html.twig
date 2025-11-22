@@ -1,0 +1,93 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Certificat de réussite - {{ cours.title }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        @page { margin: 0; }
+        .certificate {
+            border: 10px solid #1a5276;
+            padding: 30px;
+            text-align: center;
+            max-width: 800px;
+            margin: 2cm auto;
+            background-color: #f9f9f9;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .header h1 {
+            color: #1a5276;
+            margin-bottom: 30px;
+        }
+        .content {
+            margin: 40px 0;
+        }
+        .content h2 {
+            color: #2c3e50;
+            margin: 20px 0;
+        }
+        .content h3 {
+            color: #3498db;
+            margin: 15px 0;
+        }
+        .signature {
+            display: flex;
+            justify-content: space-around;
+            margin-top: 50px;
+            text-align: center;
+        }
+        .signature .line {
+            border-top: 1px solid #000;
+            width: 200px;
+            margin: 0 auto 10px;
+        }
+        @media print {
+            body { 
+                margin: 0;
+                padding: 20px;
+            }
+            .certificate {
+                border: none;
+                box-shadow: none;
+                margin: 0;
+                padding: 0;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="certificate">
+        <!-- You can add your logo here -->
+        <!-- <img src="{{ absolute_url(asset('build/images/logo.png')) }}" alt="Logo" class="logo"> -->
+        
+        <div class="header">
+            <h1>CERTIFICAT DE RÉUSSITE</h1>
+        </div>
+        
+        <div class="content">
+            <p>Ceci certifie que</p>
+            <h2>{{ user.name }} {{ user.lastname }}</h2>
+            <p>a réussi le cours</p>
+            <h3>{{ cours.title }}</h3>
+            <p>avec un score de</p>
+            <h2>{{ score|number_format(2) }}%</h2>
+            <p>le {{ date|date('d/m/Y') }}</p>
+        </div>
+        
+        <div class="signature">
+            <div>
+                <div class="line"></div>
+                <p>Signature du directeur</p>
+            </div>
+            <div>
+                <div class="line"></div>
+                <p>Signature du formateur</p>
+            </div>
+        </div>
+        
+        <div class="date">
+            <p>Délivré le : {{ "now"|date("d/m/Y") }}</p>
+        </div>
+    </div>
+{% endblock %}

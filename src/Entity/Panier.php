@@ -13,13 +13,21 @@ class Panier
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class)]
+    #[ORM\ManyToOne(inversedBy: 'paniers')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
-    #[ORM\ManyToOne(targetEntity: Cours::class)]
+    #[ORM\ManyToOne(inversedBy: 'paniers')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Cours $cours = null;
+
+    #[ORM\Column]
+    private ?\DateTimeImmutable $createdAt = null;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
+    }
 
     public function getId(): ?int
     {
@@ -31,7 +39,7 @@ class Panier
         return $this->user;
     }
 
-    public function setUser(User $user): self
+    public function setUser(?User $user): static
     {
         $this->user = $user;
         return $this;
@@ -42,9 +50,20 @@ class Panier
         return $this->cours;
     }
 
-    public function setCours(Cours $cours): self
+    public function setCours(?Cours $cours): static
     {
         $this->cours = $cours;
+        return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
+    {
+        $this->createdAt = $createdAt;
         return $this;
     }
 }

@@ -1,0 +1,479 @@
+{% extends 'base1.html.twig' %}
+
+{% block title %}Gestion des Quiz{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        min-height: 100vh;
+    }
+
+    .container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .header {
+        background: white;
+        padding: 30px;
+        border-radius: 16px 16px 0 0;
+        box-shadow: 0 10px 30px rgba(15,46,61,0.08);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 20px;
+        border: 1px solid rgba(25,199,216,0.15);
+    }
+
+    .header h1 {
+        font-size: 2.2em;
+        color: var(--dark-text);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .btn {
+        padding: 12px 25px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .btn-primary {
+        background: linear-gradient(90deg,var(--primary),var(--primary-hover));
+        color: white;
+        box-shadow: 0 10px 20px rgba(25,199,216,0.25);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .search-bar {
+        background: white;
+        padding: 20px 30px;
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        flex-wrap: wrap;
+        border: 1px solid rgba(25,199,216,0.1);
+        border-radius: 0 0 16px 16px;
+    }
+
+    .search-input {
+        flex: 1;
+        min-width: 300px;
+        padding: 12px 20px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1em;
+        transition: all 0.3s;
+    }
+
+    .search-input:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(25,199,216,0.15);
+    }
+
+    .filter-group {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .filter-group label {
+        font-weight: 600;
+        color: #666;
+    }
+
+    .filter-group select {
+        padding: 10px 15px;
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        font-size: 1em;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .filter-group select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(25,199,216,0.15);
+    }
+
+    .table-container {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 8px 25px rgba(15,46,61,0.08);
+        overflow: hidden;
+        border: 1px solid rgba(25,199,216,0.08);
+    }
+
+    table {
+        width: 100%;
+        border-collapse: collapse;
+    }
+
+    thead {
+        background: linear-gradient(90deg,var(--primary),var(--primary-hover));
+        color: white;
+    }
+
+    thead th {
+        padding: 18px 20px;
+        text-align: left;
+        font-weight: 600;
+        font-size: 0.95em;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    tbody tr {
+        border-bottom: 1px solid #f0f0f0;
+        transition: all 0.3s;
+    }
+
+    tbody tr:hover {
+        background: #f8f9ff;
+        transform: scale(1.01);
+    }
+
+    tbody td {
+        padding: 20px;
+        color: #333;
+    }
+
+    .quiz-id {
+        font-weight: 700;
+        color: var(--primary);
+        font-size: 1.1em;
+    }
+
+    .quiz-title {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .quiz-name {
+        font-weight: 600;
+        color: #333;
+        font-size: 1.05em;
+    }
+
+    .quiz-code {
+        color: #999;
+        font-size: 0.9em;
+    }
+
+    .quiz-course {
+        font-weight: 600;
+        color: var(--grey-text);
+    }
+
+    .actions-cell {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .btn-action {
+        padding: 8px 16px;
+        border: none;
+        border-radius: 6px;
+        font-size: 0.9em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .btn-modify {
+        background: var(--primary);
+        color: white;
+    }
+
+    .btn-modify:hover {
+        background: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(25,199,216,0.3);
+    }
+
+    .btn-delete {
+        background: #ef4444;
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background: #dc2626;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+    }
+
+    .stats {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 20px;
+        flex-wrap: wrap;
+    }
+
+    .stat-card {
+        background: white;
+        padding: 20px 30px;
+        border-radius: 16px;
+        box-shadow: 0 10px 25px rgba(15,46,61,0.08);
+        flex: 1;
+        min-width: 200px;
+        border: 1px solid rgba(25,199,216,0.15);
+    }
+
+    .stat-value {
+        font-size: 2em;
+        font-weight: 700;
+        color: var(--primary);
+    }
+
+    .stat-label {
+        color: var(--grey-text);
+        margin-top: 5px;
+        font-size: 0.95em;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 60px 20px;
+        color: #999;
+    }
+
+    .empty-state svg {
+        width: 100px;
+        height: 100px;
+        margin-bottom: 20px;
+        opacity: 0.5;
+    }
+
+    @media (max-width: 1024px) {
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            min-width: 900px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .header {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .header h1 {
+            font-size: 1.8em;
+        }
+
+        .search-bar {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .search-input {
+            min-width: 100%;
+        }
+
+        .filter-group {
+            flex-direction: column;
+            align-items: stretch;
+        }
+
+        .filter-group select {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <!-- Statistiques -->
+    <div class="stats">
+        <div class="stat-card">
+            <div class="stat-value" id="totalQuizzes">{{ quizzes|length }}</div>
+            <div class="stat-label">📝 Quiz Totaux</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="totalCourses">{{ courses|length }}</div>
+            <div class="stat-label">📚 Cours Actifs</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-value" id="activeQuizzes">{{ quizzes|length }}</div>
+            <div class="stat-label">✅ Quiz Actifs</div>
+        </div>
+    </div>
+
+    <!-- En-tête -->
+    <div class="header">
+        <h1>📋 Gestion des Quiz</h1>
+        <a href="{{ path('app_quiz_admin_new') }}" class="btn btn-primary">
+            ➕ Créer un Nouveau Quiz
+        </a>
+    </div>
+
+    <!-- Barre de recherche -->
+    <div class="search-bar">
+        <input type="text" class="search-input" placeholder="🔍 Rechercher un quiz par titre ou code..." id="searchInput" oninput="filterQuizzes()">
+        
+        <div class="filter-group">
+            <label for="courseFilter">Cours :</label>
+            <select id="courseFilter" onchange="filterQuizzes()">
+                <option value="">Tous les cours</option>
+                {% for course in courses %}
+                    <option value="{{ course.id }}">{{ course.title }}</option>
+                {% endfor %}
+            </select>
+        </div>
+    </div>
+
+    <!-- Tableau -->
+    <div class="table-container">
+        <table id="quizzesTable">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Titre du Quiz</th>
+                    <th>Cours Associé</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="tableBody">
+                {% for quiz in quizzes %}
+                <tr data-course-id="{{ quiz.cours ? quiz.cours.id : '' }}">
+                    <td><span class="quiz-id">{{ quiz.id }}</span></td>
+                    <td>
+                        <div class="quiz-title">
+                            <span class="quiz-name">{{ quiz.title }}</span>
+                        </div>
+                    </td>
+                    <td><span class="quiz-course">{{ quiz.cours.title }}</span></td>
+                    <td>
+                        <div class="actions-cell">
+                            <a href="{{ path('app_quiz_admin_edit', {'id': quiz.id}) }}" class="btn-action btn-modify">
+                                <i class="fas fa-pen"></i> Modifier le quiz
+                            </a>
+                            <form method="post" action="{{ path('app_quiz_admin_delete', {'id': quiz.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce quiz ?')" style="display: inline-block;">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ quiz.id) }}">
+                                <button type="submit" class="btn-action btn-delete">
+                                    <i class="fas fa-trash"></i> Supprimer le quiz
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="4">
+                        <div class="empty-state">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <line x1="8" y1="12" x2="16" y2="12"></line>
+                            </svg>
+                            <h3>Aucun quiz trouvé</h3>
+                            <p>Créez votre premier quiz en cliquant sur le bouton ci-dessus</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize any necessary JavaScript here
+    });
+
+    function filterQuizzes() {
+        const searchValue = document.getElementById('searchInput').value.toLowerCase();
+        const courseValue = document.getElementById('courseFilter').value;
+        const rows = document.querySelectorAll('#tableBody tr:not(.empty-state)');
+        
+        let visibleCount = 0;
+        
+        rows.forEach(row => {
+            if (row.querySelector('.empty-state')) return;
+            
+            const title = row.querySelector('.quiz-name')?.textContent.toLowerCase() || '';
+            const code = row.querySelector('.quiz-code')?.textContent.toLowerCase() || '';
+            const courseId = row.dataset.courseId || '';
+            
+            const matchesSearch = title.includes(searchValue) || code.includes(searchValue);
+            const matchesCourse = !courseValue || courseValue === courseId;
+            
+            if (matchesSearch && matchesCourse) {
+                row.style.display = '';
+                visibleCount++;
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        const emptyState = document.querySelector('.empty-state');
+        if (visibleCount === 0 && !emptyState) {
+            showEmptyState();
+        } else if (visibleCount > 0 && emptyState) {
+            hideEmptyState();
+        }
+    }
+
+    function showEmptyState() {
+        const tbody = document.getElementById('tableBody');
+        if (!tbody.querySelector('.empty-state')) {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td colspan="4">
+                    <div class="empty-state">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <line x1="8" y1="12" x2="16" y2="12"></line>
+                        </svg>
+                        <h3>Aucun quiz trouvé</h3>
+                        <p>Essayez de modifier vos filtres ou créez un nouveau quiz</p>
+                    </div>
+                </td>`;
+            tbody.appendChild(row);
+        }
+    }
+
+    function hideEmptyState() {
+        const emptyStateRow = document.querySelector('.empty-state')?.closest('tr');
+        if (emptyStateRow) {
+            emptyStateRow.remove();
+        }
+    }
+</script>
+{% endblock %}

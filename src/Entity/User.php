@@ -3,6 +3,9 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use App\Entity\UserAnswer;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -45,6 +48,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'date', nullable: true)]
     private ?\DateTimeInterface $birthdate = null;
+
+    /**
+     * @var Collection<int, QuizResult>
+     */
+    #[ORM\OneToMany(targetEntity: QuizResult::class, mappedBy: 'user')]
+    private Collection $quizResults;
+
+    #[ORM\OneToMany(targetEntity: Panier::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $paniers;
+
+    /**
+     * @var Collection<int, UserAnswer>
+     */
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserAnswer::class, orphanRemoval: true)]
+    private Collection $userAnswers;
+
+    public function __construct()
+    {
+        $this->quizResults = new ArrayCollection();
+        $this->paniers = new ArrayCollection();
+        $this->userAnswers = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -148,8 +173,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setBirthdate(\DateTimeInterface $birthdate): static
     {
         // Convertit en DateTimeImmutable si ce n'est pas déjà le cas
-        $this->birthdate = $birthdate instanceof \DateTimeImmutable
-            ? $birthdate
+        $this->birthdate = $birthdate instanceof \DateTimeImmutable 
+            ? $birthdate 
             : \DateTimeImmutable::createFromMutable($birthdate);
 
         return $this;
@@ -163,6 +188,93 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsVerified(bool $isVerified): static
     {
         $this->isVerified = $isVerified;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, QuizResult>
+     */
+    public function getQuizResults(): Collection
+    {
+        return $this->quizResults;
+    }
+
+    /**
+     * @return Collection<int, Panier>
+     */
+    public function getPaniers(): Collection
+    {
+        return $this->paniers;
+    }
+
+    /**
+     * @return Collection<int, UserAnswer>
+     */
+    public function getUserAnswers(): Collection
+    {
+        return $this->userAnswers;
+    }
+
+    public function addUserAnswer(UserAnswer $userAnswer): self
+    {
+        if (!$this->userAnswers->contains($userAnswer)) {
+            $this->userAnswers[] = $userAnswer;
+            $userAnswer->setUser($this);
+        }
+        return $this;
+    }
+
+    public function removeUserAnswer(UserAnswer $userAnswer): self
+    {
+        if ($this->userAnswers->removeElement($userAnswer)) {
+            if ($userAnswer->getUser() === $this) {
+                $userAnswer->setUser(null);
+            }
+        }
+        return $this;
+    }
+
+    public function addPanier(Panier $panier): static
+    {
+        if (!$this->paniers->contains($panier)) {
+            $this->paniers->add($panier);
+            $panier->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removePanier(Panier $panier): static
+    {
+        if ($this->paniers->removeElement($panier)) {
+            // set the owning side to null (unless already changed)
+            if ($panier->getUser() === $this) {
+                $panier->setUser(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function addQuizResult(QuizResult $quizResult): static
+    {
+        if (!$this->quizResults->contains($quizResult)) {
+            $this->quizResults->add($quizResult);
+            $quizResult->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeQuizResult(QuizResult $quizResult): static
+    {
+        if ($this->quizResults->removeElement($quizResult)) {
+            // set the owning side to null (unless already changed)
+            if ($quizResult->getUser() === $this) {
+                $quizResult->setUser(null);
+            }
+        }
 
         return $this;
     }

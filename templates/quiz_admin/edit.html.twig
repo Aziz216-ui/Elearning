@@ -1,0 +1,30 @@
+{% extends 'base1.html.twig' %}
+
+{% block title %}Modifier le quiz{% endblock %}
+
+{% block page_title %}Modifier le quiz{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1>Modifier le quiz</h1>
+
+    {{ form_start(form) }}
+        {{ form_widget(form) }}
+
+        <div class="mt-4">
+            <button type="submit" class="btn btn-primary">Mettre à jour</button>
+            <a href="{{ path('app_quiz_admin_index') }}" class="btn btn-secondary">Annuler</a>
+        </div>
+    {{ form_end(form) }}
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Le même JavaScript que dans new.html.twig
+        document.addEventListener('DOMContentLoaded', function() {
+            // ... (le code JavaScript précédent)
+        });
+    </script>
+{% endblock %}

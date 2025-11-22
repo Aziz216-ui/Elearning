@@ -1,0 +1,100 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Résultats du quiz - {{ quiz.title }}{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <h1>Résultats du quiz : {{ quiz.title }}</h1>
+    
+    <div class="card mb-4">
+        <div class="card-body text-center">
+            <h2 class="mb-4">Votre score</h2>
+            <div class="display-4 mb-3">
+                <span class="badge bg-{{ quizResult.score >= (quizResult.totalPoints * 0.8) ? 'success' : 'danger' }}">
+                    {{ quizResult.score }} / {{ quizResult.totalPoints }} points
+                </span>
+            </div>
+            <p class="lead">
+                Vous avez répondu correctement à 
+                <strong>{{ quizResult.score / quiz.totalPoints * 100|number_format(0) }}%</strong> 
+                des questions.
+            </p>
+            {% if quizResult.score >= (quizResult.totalPoints * 0.8) %}
+                <div class="alert alert-success">
+                    <h4 class="alert-heading">Félicitations !</h4>
+                    <p>Vous avez réussi le quiz avec succès.</p>
+                    <div class="mt-3">
+                        <a href="{{ path('app_certificat_pdf', {'id': quizResult.id}) }}" class="btn btn-success">
+                            <i class="fas fa-download me-2"></i>Télécharger votre certificat
+                        </a>
+                    </div>
+                </div>
+            {% else %}
+                <div class="alert alert-warning">
+                    <h4 class="alert-heading">Presque !</h4>
+                    <p>Vous n'avez pas atteint le score de réussite de 80%. Essayez à nouveau !</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="card-header">
+            <h2 class="h4 mb-0">Détail des réponses</h2>
+        </div>
+        <div class="card-body">
+            {% for question in questions %}
+                <div class="mb-4 p-3 border rounded {% if userAnswers[question.id] is defined and userAnswers[question.id].isCorrect %}border-success{% else %}border-danger{% endif %}">
+                    <h5 class="mb-3">Question {{ loop.index }} ({{ question.points }} points)</h5>
+                    <p class="lead">{{ question.text }}</p>
+                    
+                    <div class="mt-3">
+                        <h6>Votre réponse :</h6>
+                        {% if userAnswers[question.id] is defined and userAnswers[question.id].answer %}
+                            <div class="p-2 mb-3 {% if userAnswers[question.id].isCorrect %}bg-success bg-opacity-10{% else %}bg-danger bg-opacity-10{% endif %}">
+                                {{ userAnswers[question.id].answer.text }}
+                                {% if userAnswers[question.id].isCorrect %}
+                                    <span class="badge bg-success float-end">Correct</span>
+                                {% else %}
+                                    <span class="badge bg-danger float-end">Incorrect</span>
+                                {% endif %}
+                            </div>
+                        {% else %}
+                            <div class="text-muted">Aucune réponse fournie</div>
+                        {% endif %}
+                        
+                        <h6>Réponse(s) correcte(s) :</h6>
+                        <ul class="list-unstyled">
+                            {% for answer in question.answers %}
+                                {% if answer.isCorrect %}
+                                    <li class="text-success">
+                                        <i class="fas fa-check"></i> {{ answer.text }}
+                                    </li>
+                                {% endif %}
+                            {% endfor %}
+                        </ul>
+                        
+                        {% if userAnswers[question.id] is defined and not userAnswers[question.id].isCorrect %}
+                            <div class="alert alert-info mt-2">
+                                <small>Points perdus : {{ question.points }}</small>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+    
+    <div class="mt-4 text-center">
+    <a href="{{ path('app_dashboard') }}" class="btn btn-primary">
+
+            <i class="fas fa-arrow-left"></i> Retour au cours
+        </a>
+        {% if quizResult.score < (quizResult.totalPoints * 0.8) %}
+            <a href="{{ path('app_quiz', {'id': quiz.cours.id}) }}" class="btn btn-warning">
+                <i class="fas fa-redo"></i> Réessayer le quiz
+            </a>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

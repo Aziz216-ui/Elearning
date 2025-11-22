@@ -1,0 +1,244 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord - Liste des cours{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .dashboard-section {
+            background: #f7f9f9;
+            padding: 40px 0;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 20px;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            margin-bottom: 32px;
+        }
+
+        .section-header h1 {
+            color: var(--dark-text);
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+
+        .section-header p {
+            color: var(--grey-text);
+            margin: 0;
+        }
+
+        .courses-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+        }
+
+        .course-card {
+            border: 1px solid #eaeaea;
+            padding: 25px;
+            border-radius: 12px;
+            background: #fff;
+            box-shadow: 0 3px 12px rgba(0,0,0,0.06);
+            transition: 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            min-height: 280px;
+        }
+
+        .course-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.12);
+        }
+
+        .category-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 14px;
+            border-radius: 999px;
+            background: var(--light-bg);
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .course-title {
+            font-size: 22px;
+            font-weight: 700;
+            color: var(--dark-text);
+            margin-bottom: 12px;
+        }
+
+        .course-description {
+            color: var(--grey-text);
+            font-size: 15px;
+            margin-bottom: 18px;
+            line-height: 1.5;
+            flex-grow: 1;
+        }
+
+        .course-meta span {
+            display: block;
+            margin-bottom: 5px;
+            font-size: 14px;
+            color: var(--grey-text);
+        }
+
+        .course-meta strong {
+            color: var(--dark-text);
+        }
+
+        .course-actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+        }
+
+        .course-actions form {
+            display: contents;
+        }
+
+        .btn-green {
+            background: var(--primary);
+            color: #fff;
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: none;
+            transition: 0.2s ease;
+            font-weight: 600;
+        }
+
+        .btn-green:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-outline {
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: 1px solid var(--primary);
+            background: transparent;
+            color: var(--primary);
+            transition: 0.2s ease;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-outline:hover {
+            background: var(--light-bg);
+        }
+
+        .already-added {
+            background: var(--light-bg);
+            color: var(--primary);
+            border-radius: 8px;
+            border: none;
+            padding: 10px 22px;
+            font-weight: 600;
+            width: 100%;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-gradient {
+            background: linear-gradient(90deg,var(--primary),var(--primary-hover));
+            border: none;
+            color: #fff !important;
+            padding: 12px 24px;
+            border-radius: 10px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            box-shadow: 0 10px 20px rgba(39,174,96,0.25);
+        }
+
+        .btn-gradient:hover {
+            opacity: 0.9;
+        }
+
+        .courses-empty {
+            background: #fff;
+            border-radius: 12px;
+            padding: 40px;
+            text-align: center;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+            border: 1px solid #eaeaea;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="dashboard-section">
+    <div class="container">
+        <div class="section-header">
+            <div>
+                <p class="text-uppercase text-muted mb-1" style="letter-spacing: 1px; font-size: 13px;">Catalogue</p>
+                <h1>Liste des cours disponibles</h1>
+                <p>Explorez les formations et ajoutez-les à votre bibliothèque personnelle.</p>
+            </div>
+            <a href="{{ path('app_mes_cours') }}" class="btn-gradient">
+                <i class="fas fa-shopping-cart"></i> Mes cours
+            </a>
+        </div>
+
+        {% for message in app.flashes('success') %}
+            <div class="alert alert-success">{{ message }}</div>
+        {% endfor %}
+
+        {% for message in app.flashes('warning') %}
+            <div class="alert alert-warning">{{ message }}</div>
+        {% endfor %}
+
+        <div class="courses-grid">
+            {% for cour in cours %}
+                <div class="course-card">
+                    <span class="category-badge"><i class="fas fa-layer-group"></i> {{ cour.categorie }}</span>
+                    <h3 class="course-title">{{ cour.title }}</h3>
+                    <p class="course-description">{{ cour.description|slice(0, 110) }}...</p>
+
+                    <div class="course-meta">
+                        <span><strong>Prix :</strong> {{ cour.price }} €</span>
+                        <span><strong>Catégorie :</strong> {{ cour.categorie }}</span>
+                    </div>
+
+                    <div class="course-actions">
+                        {% if cour.id in coursInPanier %}
+                            <button class="already-added" disabled>
+                                ✓ Déjà dans vos cours
+                            </button>
+                            <a href="{{ path('app_cours_detail', {'id': cour.id}) }}" class="btn-outline">
+                                <i class="fas fa-info-circle"></i> Détails
+                            </a>
+                        {% else %}
+                            <form action="{{ path('app_panier_ajouter', {'id': cour.id}) }}" method="post">
+                                <button type="submit" class="btn-green">
+                                    <i class="fas fa-plus"></i> Ajouter à mes cours
+                                </button>
+                            </form>
+                            <a href="{{ path('app_cours_detail', {'id': cour.id}) }}" class="btn-outline">
+                                <i class="fas fa-info-circle"></i> Détails
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% else %}
+                <div class="courses-empty">
+                    <h3>Aucun cours disponible pour le moment.</h3>
+                    <p>Revenez plus tard pour découvrir de nouvelles formations.</p>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
