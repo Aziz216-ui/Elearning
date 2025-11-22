@@ -1,0 +1,13 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Edit ForulComment{% endblock %}
+
+{% block body %}
+    <h1>Edit ForulComment</h1>
+
+    {{ include('forul_comment/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_forul_comment_index') }}">back to list</a>
+
+    {{ include('forul_comment/_delete_form.html.twig') }}
+{% endblock %}

@@ -1,0 +1,104 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Forum Post{% endblock %}
+
+{% block body %}
+<h1 class="mb-4">Forum Post</h1>
+
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+
+            <!-- Carte principale du post -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">{{ forum_post.titre }}</h4>
+                </div>
+
+                <div class="card-body">
+                    <p class="text-muted mb-2">
+                        
+                    </p>
+
+                    <p class="mb-4">{{ forum_post.contenu }}</p>
+
+                    {% if forum_post.image %}
+                        <div class="mb-4">
+                            {% set imagePath = 'uploads/' ~ forum_post.image %}
+                            <!-- Debug: {{ imagePath }} -->
+                            <img src="{{ asset(imagePath) }}" 
+                                 alt="Image du post" 
+                                 class="img-fluid rounded"
+                                 onerror="console.error('Erreur de chargement de l\'image: ' + this.src)">
+                            <div class="mt-2 text-muted small">
+                                Chemin: {{ imagePath }}
+                            </div>
+                        </div>
+                    {% endif %}
+
+                    <hr>
+
+                    <p><strong>Créé le :</strong> {{ forum_post.createdAt ? forum_post.createdAt|date('d/m/Y H:i') : '' }}</p>
+                    <p><strong>Mis à jour le :</strong> {{ forum_post.updatedAt ? forum_post.updatedAt|date('d/m/Y H:i') : '' }}</p>
+                </div>
+
+                <div class="card-footer d-flex justify-content-between">
+                    <a href="{{ path('app_forum_post_index') }}" class="btn btn-secondary btn-sm">Retour à la liste</a>
+
+                    <div>
+                        <a href="{{ path('app_forum_post_edit', {'id': forum_post.id}) }}" class="btn btn-warning btn-sm me-2">Modifier</a>
+                        {{ include('forum_post/_delete_form.html.twig') }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulaire pour ajouter un commentaire -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Ajouter un commentaire</h5>
+                </div>
+
+                <div class="card-body">
+                    <form method="post" action="{{ path('app_forul_comment_add', {'postId': forum_post.id}) }}">
+                        <div class="mb-3">
+                            <textarea 
+                                name="contenu" 
+                                class="form-control" 
+                                rows="3" 
+                                placeholder="Écrivez votre commentaire..."
+                                required
+                            ></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-success btn-sm">Publier</button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Liste des commentaires -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Commentaires</h5>
+                </div>
+
+                <div class="card-body">
+                    {% if forum_post.comments|length > 0 %}
+                        {% for comment in forum_post.comments %}
+                            <div class="border rounded p-2 mb-2">
+                                <p class="mb-1">
+                                    <strong>{{ comment.user.username ?? 'Utilisateur inconnu' }}</strong>
+                                </p>
+                                <p class="mb-1">{{ comment.contenu }}</p>
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>Aucun commentaire pour le moment.</p>
+                    {% endif %}
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+{% endblock %}

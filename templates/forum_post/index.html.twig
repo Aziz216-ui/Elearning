@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Forum Posts{% endblock %}
+
+{% block body %}
+<h1>Forum Posts</h1>
+
+<div class="d-flex justify-content-between mb-4" style="max-width: 100%;">
+    {# Champ de recherche #}
+    <form method="get" action="{{ path('app_forum_post_index') }}" class="d-flex" style="max-width:400px;">
+        <input type="text"
+               name="q"
+               class="form-control me-2"
+               placeholder="Rechercher un post..."
+               value="{{ app.request.get('q') }}">
+        <button class="btn btn-primary">Rechercher</button>
+    </form>
+
+    {# Bouton créer un nouveau post #}
+    <a href="{{ path('app_forum_post_new') }}" class="btn btn-success">
+        Créer un nouveau post
+    </a>
+</div>
+
+<div class="container">
+    <div class="row">
+        {% for post in forum_posts %}
+            <div class="col-12 col-md-6 col-lg-4">
+                <!-- Carte principale pour le post -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>{{ post.titre }}</h5>
+                        <small>Par {{ post.user.username }} le {{ post.createdAt|date('d/m/Y H:i') }}</small>
+                    </div>
+                    <div class="card-body">
+                        {% if post.image %}
+                            <div class="mb-3 text-center">
+                                <img src="{{ asset('uploads/' ~ post.image) }}" alt="Image du post" class="img-fluid rounded" style="max-height: 150px; width: auto;">
+                            </div>
+                        {% endif %}
+                        <p>{{ post.contenu|length > 100 ? post.contenu|slice(0, 100) ~ '...' : post.contenu }}</p>
+
+                        <!-- Sous-cartes pour les commentaires -->
+                        {% if post.comments|length > 0 %}
+                            <h6>Commentaires :</h6>
+                            {% for comment in post.comments %}
+                                <div class="card mb-2">
+                                    <div class="card-body">
+                                        <p><strong>{{ comment.user.username }}</strong> : {{ comment.contenu }}</p>
+                                        <div class="d-flex justify-content-end">
+                                            <!-- CRUD actions pour le commentaire -->
+                                            <a href="{{ path('app_forul_comment_edit', {'id': comment.id}) }}" class="btn btn-sm btn-secondary me-2">Modifier</a>
+                                            {{ include('forul_comment/_delete_form.html.twig', {'forul_comment': comment}) }}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <p>Aucun commentaire pour ce post.</p>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer">
+                        <a href="{{ path('app_forum_post_show', {'id': post.id}) }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-eye"></i> Voir plus
+                        </a>
+                        <a href="{{ path('app_forum_post_edit', {'id': post.id}) }}" class="btn btn-secondary btn-sm">Modifier</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}
