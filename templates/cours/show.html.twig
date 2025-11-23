@@ -3,44 +3,50 @@
 {% block title %}Cours{% endblock %}
 
 {% block body %}
-    <div class="max-w-3xl mx-auto">
-        <div class="flex items-center justify-between mb-6">
-            <h1 class="text-2xl font-bold text-slate-800 dark:text-white">Détails du Cours</h1>
-            <div class="flex gap-3">
-                <a href="{{ path('app_cours_index') }}" class="px-4 py-2 text-sm font-semibold rounded-lg border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800">Retour</a>
-                <a href="{{ path('app_cours_edit', {'id': cour.id}) }}" class="px-4 py-2 text-sm font-semibold text-white rounded-lg bg-gradient-to-tl from-blue-600 to-blue-400 shadow-md hover:shadow-xl">Modifier</a>
-            </div>
+    <div class="container-fluid py-3">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h1 class="h4 mb-0 text-gray-800">Détails du Cours</h1>
+        <div class="d-flex gap-2">
+          <a href="{{ path('app_cours_index') }}" class="btn btn-outline-secondary">Retour</a>
+          <a href="{{ path('app_cours_edit', {'id': cour.id}) }}" class="btn btn-primary">Modifier</a>
         </div>
+      </div>
 
-        <div class="overflow-hidden bg-white dark:bg-slate-850 shadow-xl dark:shadow-dark-xl rounded-2xl">
-            <div class="divide-y divide-slate-200 dark:divide-slate-700">
-                <div class="px-6 py-4 flex justify-between"><span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Id</span><span class="text-sm text-slate-800 dark:text-white">{{ cour.id }}</span></div>
-                <div class="px-6 py-4 flex justify-between"><span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Title</span><span class="text-sm text-slate-800 dark:text-white">{{ cour.title }}</span></div>
-                <div class="px-6 py-4"><p class="text-sm font-semibold text-slate-600 dark:text-slate-300 mb-1">Description</p><p class="text-sm text-slate-800 dark:text-white">{{ cour.description }}</p></div>
-                <div class="px-6 py-4 flex justify-between"><span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Price</span><span class="text-sm text-slate-800 dark:text-white">{{ cour.price }}</span></div>
-                <div class="px-6 py-4 flex justify-between"><span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Duration</span><span class="text-sm text-slate-800 dark:text-white">{% if cour.duration is not null %}{{ cour.duration|date('d/m/Y H:i') }}{% else %}Non défini{% endif %}</span></div>
-                <div class="px-6 py-4 flex justify-between"><span class="text-sm font-semibold text-slate-600 dark:text-slate-300">Publié</span><span class="text-sm"> <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold {{ cour.isPublished ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-500/20 dark:text-emerald-300' : 'bg-slate-100 text-slate-700 dark:bg-slate-700/40 dark:text-slate-300' }}">{{ cour.isPublished ? 'Oui' : 'Non' }}</span></span></div>
-                {% if cour.auteur %}
-                <div class="px-6 py-4">
-                    <p class="text-sm font-semibold text-slate-600 dark:text-slate-300 mb-2">Auteur</p>
-                    <div class="flex items-center gap-4">
-                        {% if cour.auteur.photo %}
-                            <img src="{{ asset('uploads/auteurs/' ~ cour.auteur.photo) }}" alt="Photo de {{ cour.auteur.prenom }} {{ cour.auteur.nom }}" class="w-16 h-16 rounded-full object-cover border border-slate-200 dark:border-slate-700" />
-                        {% else %}
-                            <div class="w-16 h-16 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-600 dark:text-slate-300 text-sm">N/A</div>
-                        {% endif %}
-                        <div>
-                            <div class="text-sm text-slate-800 dark:text-white font-medium">{{ cour.auteur.prenom }} {{ cour.auteur.nom }}</div>
-                            {% if cour.auteur.specialite %}<div class="text-xs text-slate-500 dark:text-slate-400">{{ cour.auteur.specialite }}</div>{% endif %}
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-            </div>
+      <div class="card shadow mb-4">
+        <div class="card-body">
+          <div class="row mb-3"><div class="col-4 text-muted small">Id</div><div class="col-8">{{ cour.id }}</div></div>
+          <div class="row mb-3"><div class="col-4 text-muted small">Title</div><div class="col-8">{{ cour.title }}</div></div>
+          <div class="row mb-3"><div class="col-4 text-muted small">Description</div><div class="col-8">{{ cour.description }}</div></div>
+          <div class="row mb-3"><div class="col-4 text-muted small">Price</div><div class="col-8">{{ cour.price }}</div></div>
+          <div class="row mb-3"><div class="col-4 text-muted small">Duration</div><div class="col-8">{% if cour.duration is not null %}{{ cour.duration|date('d/m/Y H:i') }}{% else %}Non défini{% endif %}</div></div>
+          <div class="row mb-0"><div class="col-4 text-muted small">Publié</div><div class="col-8">{% if cour.isPublished %}<span class="badge bg-success">Oui</span>{% else %}<span class="badge bg-secondary">Non</span>{% endif %}</div></div>
         </div>
+      </div>
 
-        <div class="flex justify-end pt-6">
-            {{ include('cours/_delete_form.html.twig') }}
+      {% if cour.auteur %}
+      <div class="card shadow mb-4">
+        <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Auteur</h6></div>
+        <div class="card-body">
+          <div class="d-flex align-items-center gap-3">
+            {% if cour.auteur.photo %}
+              <img src="{{ asset('uploads/auteurs/' ~ cour.auteur.photo) }}" alt="Photo de {{ cour.auteur.prenom }} {{ cour.auteur.nom }}" class="rounded-circle border" style="width:64px; height:64px; object-fit:cover;" />
+            {% else %}
+              <div class="rounded-circle bg-light d-flex align-items-center justify-content-center border" style="width:64px; height:64px;">
+                <small class="text-muted">N/A</small>
+              </div>
+            {% endif %}
+            <div>
+              <div class="fw-semibold">{{ cour.auteur.prenom }} {{ cour.auteur.nom }}</div>
+              {% if cour.auteur.specialite %}<div class="text-muted small">{{ cour.auteur.specialite }}</div>{% endif %}
+            </div>
+          </div>
         </div>
+      </div>
+      {% endif %}
+
+      <div class="d-flex justify-content-end pt-2">
+        {{ include('cours/_delete_form.html.twig') }}
+      </div>
     </div>
 {% endblock %}
+

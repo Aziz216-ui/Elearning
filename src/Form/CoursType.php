@@ -85,15 +85,16 @@ class CoursType extends AbstractType
         ])
         ->add('auteur', EntityType::class, [
             'class' => Auteur::class,
-            'choice_label' => 'nom', // ou 'prenom'
-            'label' => 'Auteur du cours',
-            'placeholder' => 'Sélectionner un auteur',
-            'attr' => [
-                'class' => 'form-select',
-            ],
+            'choice_label' => function($auteur) {
+                return $auteur->getNom() . ' ' . $auteur->getPrenom();
+            },
             'required' => true,
+            'placeholder' => 'Sélectionner un auteur',
             'constraints' => [
                 new NotBlank(['message' => 'Veuillez sélectionner un auteur']),
+            ],
+            'attr' => [
+                'class' => 'form-select',
             ],
         ]);
 }

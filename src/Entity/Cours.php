@@ -32,7 +32,7 @@ namespace App\Entity;
 
         #[ORM\Column]
         private ?bool $isPublished = null;
-        #[ORM\ManyToOne(inversedBy: 'cours')]
+        #[ORM\ManyToOne(targetEntity: Auteur::class, inversedBy: 'cours')]
         #[ORM\JoinColumn(nullable: false)]
         private ?Auteur $auteur = null;
 
