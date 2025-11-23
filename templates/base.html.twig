@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>eLEARNING - eLearning HTML Template</title>
+    <title>E-learning - eLearning HTML Template</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -29,6 +29,13 @@
 
     <!-- Template Stylesheet -->
     <link href="{{ asset('front/css/style.css') }}" rel="stylesheet">
+    <style>
+      /* Masquer les boutons panier/voir panier dans les cartes sans toucher d'autres fichiers */
+      .card a[href*="app_cart_add"],
+      .card a[href*="app_cart_index"] {
+        display: none !important;
+      }
+    </style>
 </head>
 
 <body>
@@ -52,19 +59,43 @@
                 <a  href="{{path('app_home_stat')}}" class="nav-item nav-link">Home</a>
 
 
-                <a href="courses.html" class="nav-item nav-link">Courses</a>
+                <a href="{{ path('app_home_courses') }}" class="nav-item nav-link">Courses</a>
                 <div class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
                     <div class="dropdown-menu fade-down m-0">
-                        <a href="team.html" class="dropdown-item">Our Team</a>
-                        <a href="testimonial.html" class="dropdown-item">Testimonial</a>
+                        <a href="{{ path('app_team') }}" class="dropdown-item {{ app.request.attributes.get('_route') == 'app_team' ? 'active' : '' }}">Our Team</a>
+                        <a href="{{ path('app_testimonial') }}" class="dropdown-item {{ app.request.attributes.get('_route') == 'app_testimonial' ? 'active' : '' }}">Testimonial</a>
                         <a href="404.html" class="dropdown-item">404 Page</a>
                     </div>
                 </div>
-                <a href="contact.html" class="nav-item nav-link">Contact</a>
-                <a href="about.html" class="nav-item nav-link active">About</a>
+                <a href="{{ path('app_contact') }}" class="nav-item nav-link {{ app.request.attributes.get('_route') == 'app_contact' ? 'active' : '' }}">Contact</a>
+                <a href="{{ path('app_about') }}" class="nav-item nav-link {{ app.request.attributes.get('_route') == 'app_about' ? 'active' : '' }}">About</a>
+                {# Panier et Favoris dans la navbar #}
+                {% set cart = app.session.get('cart') ?? {} %}
+                {% set cartCount = 0 %}
+                {% for _id, qty in cart %}
+                  {% set cartCount = cartCount + qty %}
+                {% endfor %}
+                <a href="{{ path('app_cart_index') }}" class="nav-item nav-link position-relative">
+                  <i class="fa fa-shopping-cart"></i>
+                  {% if cartCount > 0 %}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ cartCount }}</span>
+                  {% endif %}
+                </a>
+                {% set favs = app.session.get('favs') ?? [] %}
+                <a href="{{ path('app_fav_index') }}" class="nav-item nav-link position-relative" title="Archives / Favoris">
+                  <i class="fa fa-heart"></i>
+                  {% if favs|length > 0 %}
+                    <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">{{ favs|length }}</span>
+                  {% endif %}
+                </a>
             </div>
-            <a href="" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block">Join Now<i class="fa fa-arrow-right ms-3"></i></a>
+            <a href="{{ path('app_cart_index') }}" class="btn btn-primary py-2 px-lg-4 d-none d-lg-block">
+              <i class="fa fa-shopping-cart me-2"></i>Panier
+              {% if cartCount is defined and cartCount > 0 %}
+                <span class="badge bg-light text-dark ms-2">{{ cartCount }}</span>
+              {% endif %}
+            </a>
         </div>
     </nav>
     <!-- Navbar End -->
@@ -95,7 +126,7 @@
                 <div class="col-lg-3 col-md-6">
                     <h4 class="text-white mb-3">Quick Link</h4>
                     <a class="btn btn-link" href="">About Us</a>
-                    <a class="btn btn-link" href="">Contact Us</a>
+                    <a class="btn btn-link" href="{{ path('app_contact') }}">Contact Us</a>
                     <a class="btn btn-link" href="">Privacy Policy</a>
                     <a class="btn btn-link" href="">Terms & Condition</a>
                     <a class="btn btn-link" href="">FAQs & Help</a>
@@ -184,6 +215,55 @@
 
     <!-- Template Javascript -->
     <script src="{{ asset('front/js/main.js') }}"></script>
+    <script>
+      // Favoris dans les cartes (sans toucher aux autres fichiers)
+      document.addEventListener('DOMContentLoaded', function () {
+        const favIds = {{ (app.session.get('favs') ?? [])|json_encode|raw }};
+
+        const isFav = (id) => favIds.includes(parseInt(id));
+
+        const enhanceCards = () => {
+          document.querySelectorAll('.card.h-100').forEach(card => {
+            // Assurer le positionnement relatif
+            if (!card.classList.contains('position-relative')) {
+              card.classList.add('position-relative');
+            }
+            // Ne pas dupliquer
+            if (card.querySelector('.fav-toggle')) return;
+
+            // Trouver le lien Détails pour détecter l'id du cours
+            const detailLink = Array.from(card.querySelectorAll('a'))
+              .find(a => a.textContent && a.textContent.trim().toLowerCase() === 'détails');
+            if (!detailLink) return;
+
+            const href = detailLink.getAttribute('href') || '';
+            const match = href.match(/(\d+)(?:[^\d]*)$/);
+            if (!match) return;
+            const id = match[1];
+
+            // Créer le bouton coeur
+            const a = document.createElement('a');
+            a.href = '/favorites/toggle/' + id;
+            a.className = 'fav-toggle btn btn-light btn-sm';
+            a.title = 'Ajouter aux favoris';
+            a.style.position = 'absolute';
+            a.style.top = '10px';
+            a.style.right = '10px';
+            a.style.zIndex = '5';
+
+            const i = document.createElement('i');
+            i.className = 'fa fa-heart';
+            if (isFav(id)) {
+              i.classList.add('text-danger');
+            }
+            a.appendChild(i);
+            card.appendChild(a);
+          });
+        };
+
+        enhanceCards();
+      });
+    </script>
 </body>
 
 </html>

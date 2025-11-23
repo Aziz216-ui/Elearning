@@ -6,13 +6,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-final class HomeStatController extends AbstractController
+final class TeamController extends AbstractController
 {
-    #[Route('/home/stat', name: 'app_home_stat')]
+    #[Route('/team', name: 'app_team', methods: ['GET'])]
     public function index(): Response
     {
-        return $this->render('front/home_stat/index.html.twig', [
-            'controller_name' => 'HomeStatController',
-        ]);
+        return $this->render('front/team/index.html.twig');
     }
 }

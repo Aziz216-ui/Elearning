@@ -1,0 +1,98 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Cours{% endblock %}
+
+{% block body %}
+  <div class="container py-5">
+    <h1 class="mb-4 text-center">Cours</h1>
+
+    {% if cours is empty %}
+      <div class="alert alert-info text-center">Aucun cours disponible pour le moment.</div>
+    {% else %}
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for c in cours %}
+          <div class="col">
+            <div class="card h-100 shadow-sm position-relative">
+              <div class="card-body d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <h5 class="card-title mb-0">{{ c.title }}</h5>
+                  {% if c.category is defined and c.category %}
+                    <span class="badge bg-info text-dark">{{ c.category }}</span>
+                  {% endif %}
+                </div>
+
+                <p class="card-text mb-2" style="display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;">{{ c.description }}</p>
+
+                {# Auteur: après la description (badge couleur primaire) #}
+                {% if c.auteur is defined and c.auteur %}
+                  <div class="d-flex align-items-center mb-2">
+                    {% if c.auteur.photo is defined and c.auteur.photo %}
+                      <img src="{{ asset('uploads/auteurs/' ~ c.auteur.photo) }}" alt="{{ c.auteur.prenom|default('') }} {{ c.auteur.nom|default('') }}" class="rounded-circle me-2" style="width:36px;height:36px;object-fit:cover;border:1px solid rgba(0,0,0,.1);" />
+                    {% else %}
+                      <div class="rounded-circle me-2 d-flex align-items-center justify-content-center bg-light" style="width:36px;height:36px;border:1px solid rgba(0,0,0,.1);">
+                        <span class="text-muted" style="font-size:.8rem;">A</span>
+                      </div>
+                    {% endif %}
+                    <span class="badge bg-primary">
+                      {{ c.auteur.prenom is defined ? c.auteur.prenom : (c.auteur.firstName is defined ? c.auteur.firstName : '') }}
+                      {{ c.auteur.nom is defined ? c.auteur.nom : (c.auteur.lastName is defined ? c.auteur.lastName : '') }}
+                    </span>
+                  </div>
+                {% elseif c.author is defined and c.author %}
+                  <div class="d-flex align-items-center mb-2">
+                    {% if c.author.photo is defined and c.author.photo %}
+                      <img src="{{ asset('uploads/auteurs/' ~ c.author.photo) }}" alt="{{ c.author.firstName|default('') }} {{ c.author.lastName|default('') }}" class="rounded-circle me-2" style="width:36px;height:36px;object-fit:cover;border:1px solid rgba(0,0,0,.1);" />
+                    {% else %}
+                      <div class="rounded-circle me-2 d-flex align-items-center justify-content-center bg-light" style="width:36px;height:36px;border:1px solid rgba(0,0,0,.1);">
+                        <span class="text-muted" style="font-size:.8rem;">A</span>
+                      </div>
+                    {% endif %}
+                    <span class="badge bg-primary">
+                      {{ c.author.firstName is defined ? c.author.firstName : (c.author.prenom is defined ? c.author.prenom : '') }}
+                      {{ c.author.lastName is defined ? c.author.lastName : (c.author.nom is defined ? c.author.nom : '') }}
+                    </span>
+                  </div>
+                {% elseif c.auteurFirstName is defined or c.auteurLastName is defined %}
+                  <p class="mb-2">Auteur: <span class="badge bg-primary">{{ c.auteurFirstName|default('') }} {{ c.auteurLastName|default('') }}</span></p>
+                {% elseif c.authorFirstName is defined or c.authorLastName is defined %}
+                  <p class="mb-2">Auteur: <span class="badge bg-primary">{{ c.authorFirstName|default('') }} {{ c.authorLastName|default('') }}</span></p>
+                {% elseif c.auteurName is defined and c.auteurName %}
+                  <p class="mb-2">Auteur: <span class="badge bg-primary">{{ c.auteurName }}</span></p>
+                {% elseif c.authorName is defined and c.authorName %}
+                  <p class="mb-2">Auteur: <span class="badge bg-primary">{{ c.authorName }}</span></p>
+                {% endif %}
+
+                {# Prix (badge même couleur primaire) #}
+                <p class="mb-1"><strong>Prix:</strong> <span class="badge bg-primary">{{ c.price }} DT</span></p>
+                {# Durée (texte) #}
+                <p class="mb-3"><strong>Durée:</strong>
+                  {% if c.duration is not null %}
+                    {{ c.duration|date('H:i') }}
+                  {% else %}
+                    <span class="text-muted">Non défini</span>
+                  {% endif %}
+                </p>
+
+                <div class="mt-auto d-flex flex-wrap gap-2">
+                  {# Ajouter au panier #}
+                  <a href="{{ path('app_cart_add', { id: c.id }) }}" class="btn btn-outline-primary flex-grow-1">Ajouter au panier</a>
+                  <a href="{{ path('app_cart_index') }}" class="btn btn-outline-success">Voir panier</a>
+                  {# Détails cours (front) #}
+                  <a href="{{ path('app_home_course_show', { id: c.id }) }}" class="btn btn-primary flex-grow-1">Détails</a>
+                  {# Détails auteur (front) #}
+                  {% if c.auteur is defined and c.auteur %}
+                    <a href="{{ path('app_home_author_show', { id: c.auteur.id }) }}" class="btn btn-outline-secondary flex-grow-1">Auteur</a>
+                  {% elseif c.author is defined and c.author %}
+                    <a href="{{ path('app_home_author_show', { id: c.author.id }) }}" class="btn btn-outline-secondary flex-grow-1">Auteur</a>
+                  {% else %}
+                    <a href="#" class="btn btn-outline-secondary flex-grow-1 disabled" aria-disabled="true" title="Auteur non disponible">Auteur</a>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}
