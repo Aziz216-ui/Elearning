@@ -29,11 +29,18 @@ class ForumPost
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeImmutable $updatedAt = null;
+
     #[ORM\Column(type: 'boolean')]
     private bool $enabled = true;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $likes = 0;
+
+    #[ORM\Column(nullable: true)]
+    private ?int $vues = 0;
 
     // -----------------------
     // RELATION 1 -> *
@@ -48,9 +55,18 @@ class ForumPost
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
+    // -----------------------
+    // NOUVELLE RELATION MANY TO ONE -> Category
+    // -----------------------
+    #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'forumPosts')]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Category $category = null;
+
     public function __construct()
     {
         $this->comments = new ArrayCollection();
+        $this->likes = 0;
+        $this->vues = 0;
     }
 
     // -----------------------
@@ -105,6 +121,62 @@ class ForumPost
         return $this;
     }
 
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
+    }
+
+    public function setEnabled(bool $enabled): static
+    {
+        $this->enabled = $enabled;
+        return $this;
+    }
+
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    public function setImage(?string $image): static
+    {
+        $this->image = $image;
+        return $this;
+    }
+
+    public function getLikes(): ?int
+    {
+        return $this->likes;
+    }
+
+    public function setLikes(?int $likes): static
+    {
+        $this->likes = $likes;
+        return $this;
+    }
+
+    public function incrementLikes(): static
+    {
+        $this->likes++;
+        return $this;
+    }
+
+    public function getVues(): ?int
+    {
+        return $this->vues;
+    }
+
+    public function setVues(?int $vues): static
+    {
+        $this->vues = $vues;
+        return $this;
+    }
+
+    public function incrementVues(): static
+    {
+        $this->vues++;
+        return $this;
+    }
+
     // -----------------------
     // Comments
     // -----------------------
@@ -149,6 +221,23 @@ class ForumPost
         return $this;
     }
 
+    // -----------------------
+    // Category (NOUVEAU)
+    // -----------------------
+    public function getCategory(): ?Category
+    {
+        return $this->category;
+    }
+
+    public function setCategory(?Category $category): static
+    {
+        $this->category = $category;
+        return $this;
+    }
+
+    // -----------------------
+    // Lifecycle Callbacks
+    // -----------------------
     #[ORM\PrePersist]
     public function onPrePersist(): void
     {
@@ -163,26 +252,5 @@ class ForumPost
     public function onPreUpdate(): void
     {
         $this->updatedAt = new \DateTimeImmutable();
-    }
-    public function isEnabled(): bool
-{
-    return $this->enabled;
-}
-
-    public function setEnabled(bool $enabled): static
-    {
-        $this->enabled = $enabled;
-        return $this;
-    }
-
-    public function getImage(): ?string
-    {
-        return $this->image;
-    }
-
-    public function setImage(?string $image): static
-    {
-        $this->image = $image;
-        return $this;
     }
 }

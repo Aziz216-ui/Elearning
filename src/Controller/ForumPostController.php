@@ -183,7 +183,7 @@ class ForumPostController extends AbstractController
     // ---------------------- SHOW POST ----------------------
     #[Route('/{id}', name: 'app_forum_post_show', methods: ['GET'])]
     public function show(ForumPost $forumPost): Response
-    {
+    {  
         return $this->render('forum_post/show.html.twig', [
             'forum_post' => $forumPost,
         ]);
