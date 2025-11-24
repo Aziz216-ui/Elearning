@@ -3,6 +3,79 @@
 {% block title %}Gestion des utilisateurs{% endblock %}
 
 {% block body %}
+
+<!-- Barre de recherche stylée -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<form id="searchForm" method="get" action="{{ path('admin_user_search') }}" style="display:flex;gap:0.5rem;align-items:center;">
+    <div class="d-flex justify-content-center" style="width:100%;">
+        <div class="search" style="margin:0 auto;">
+            <input id="searchInput" type="text" class="search-input" name="q" placeholder="Rechercher un utilisateur..." value="{{ term|default('') }}">
+            <button type="submit" class="search-icon"><i class="fa fa-search"></i></button>
+        </div>
+
+    </div>
+</form>
+
+<style>
+/* Styles adaptatifs pour la barre de recherche (n'affecte pas le body global) */
+.search{
+    display:flex;
+    align-items:center;
+    height:50px;
+    background-color: #fff;
+    padding: 6px 8px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+.search-input{
+    border:0;
+    outline: 0;
+    background: none;
+    width: 420px;
+    margin-left:8px;
+    caret-color: #536bf6;
+    line-height: 40px;
+    transition: width 0.4s linear;
+    font-size:16px;
+}
+.search-icon{
+    height: 36px;
+    width: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    background-color: #536bf6;
+    border: none;
+    border-radius:4px;
+    cursor:pointer;
+}
+.search-icon i{ font-size:14px; }
+@media (max-width:768px){
+    .search-input{ width:200px; }
+}
+</style>
+
+<script>
+// Soumet automatiquement le formulaire quand le champ est vidé (UX)
+(function(){
+    const input = document.getElementById('searchInput');
+    const form = document.getElementById('searchForm');
+    if (!input || !form) return;
+
+    let debounce;
+    input.addEventListener('input', function() {
+        clearTimeout(debounce);
+        debounce = setTimeout(() => {
+            if (input.value.trim() === '') {
+                // soumettre pour récupérer la liste complète
+                form.submit();
+            }
+        }, 300);
+    });
+})();
+</script>
+
 <div class="px-6 py-6 mx-auto">
     <h1 class="text-2xl font-semibold text-slate-700 dark:text-white mb-6">Liste des utilisateurs</h1>
 
@@ -14,7 +87,7 @@
                     <th scope="col" >Email</th>
                     <th scope="col" >Nom</th>
                     <th scope="col" >Prénom</th>
-                    <th scope="col" >Rôles</th>
+
                 </tr>
             </thead>
             <tbody class="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
@@ -24,14 +97,7 @@
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">{{ user.email }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">{{ user.name }}</td>
                     <td class="px-4 py-2 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">{{ user.lastname }}</td>
-                    <td class="px-4 py-2 whitespace-nowrap text-sm">
-                        {% for role in user.roles %}
-                            {% set badgeColor = (role == 'ROLE_ADMIN') ? 'emerald' : 'slate' %}
-                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-{{ badgeColor }}-100 text-{{ badgeColor }}-800 mr-1 mb-1">
-                                {{ role|replace({'ROLE_':''})|lower|capitalize }}
-                            </span>
-                        {% endfor %}
-                    </td>
+
                 </tr>
             {% else %}
                 <tr>
@@ -40,6 +106,9 @@
             {% endfor %}
             </tbody>
         </table>
+         <div>
+              <a href="{{ path('app_admin') }}" class="btn btn-secondary" style="margin-left:12px; padding:0.4rem 0.6rem; background:#e2e8f0; border-radius:4px; color:#1f2937; text-decoration:none;">Réinitialiser</a>
+         </div>
     </div>
 </div>
 {% endblock %}

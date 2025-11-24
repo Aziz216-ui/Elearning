@@ -74,6 +74,16 @@
                                     }
                                 }) }}
                                 {{ form_errors(registrationForm.birthdate) }}
+
+                            </div>
+                            <div class="mb-3">    {{ form_label(registrationForm.sexe, 'Sexe', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(registrationForm.sexe, {
+                                    'attr': {
+                                        'class': 'form-control',
+                                        'placeholder': 'Select your sexe'
+                                    }
+                                }) }}
+                                {{ form_errors(registrationForm.sexe) }}
                             </div>
 
                             <div class="mb-3 form-check">

@@ -12,18 +12,19 @@
 
                 <div class="flex items-center justify-between p-6 pb-0 border-b-0 rounded-t-2xl">
                     <h6 class="text-lg font-bold dark:text-white">Créer un nouvel utilisateur</h6>
+
                     <a href="{{ path('admin_user_index') }}"
-                       class="px-6 py-3 py-3 text-xs font-bold text-slate-600 uppercase border border-slate-600 rounded-lg hover:bg-slate-600 hover:text-white transition">
-                        Retour
+                       <button type="button" class="btn btn-danger">Retour </button>
                     </a>
+
                 </div>
 
-                <div class="flex-auto p-8">
+                <div class="flex justify-end gap-4 mt-10 pt-6 border-t border-gray-200">
                     {{ form_start(form, {attr: {novalidate: 'novalidate', class: 'space-y-6'}}) }}
 
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
 
-                        <div class="space-y-6">
+                        <div class="flex flex-col gap-6">
                             {{ form_row(form.email, {
                                 label: 'Adresse email',
                                 label_attr: {class: 'block mb-2 text-sm font-bold text-slate-700 dark:text-white'},
@@ -43,9 +44,15 @@
                             }) }}
                         </div>
 
-                        <div class="space-y-6">
+                        <div class="flex flex-col gap-6">
                             {{ form_row(form.birthdate, {
                                 label: 'Date de naissance',
+                                label_attr: {class: 'block mb-2 text-sm font-bold text-slate-700 dark:text-white'},
+                                attr: {class: 'w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none dark:bg-slate-800'}
+                            }) }}
+
+                            {{ form_row(form.sexe, {
+                                label: 'Sexe',
                                 label_attr: {class: 'block mb-2 text-sm font-bold text-slate-700 dark:text-white'},
                                 attr: {class: 'w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none dark:bg-slate-800'}
                             }) }}
@@ -56,22 +63,14 @@
                                 attr: {class: 'w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none dark:bg-slate-800'},
                                 help: 'Minimum 6 caractères'
                             }) }}
-
-                            {{ form_row(form.roles, {
-                                label: 'Rôle',
-                                label_attr: {class: 'block mb-2 text-sm font-bold text-slate-700 dark:text-white'},
-                                attr: {class: 'w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none dark:bg-slate-800'}
-                            }) }}
                         </div>
                     </div>
 
                     <div class="flex justify-end gap-4 mt-10 pt-6 border-t border-gray-200">
-                        <button type="submit"
-                               class="btn btn-primary px-4 py-2">
+                        <button type="submit" class="btn btn-primary px-4 py-2">
                             Créer l'utilisateur
                         </button>
-                        <a href="{{ path('admin_user_index') }}"
-                           class="px-8 py-3 font-bold text-slate-600 hover:text-slate-800 transition">
+                        <a href="{{ path('admin_user_index') }}" class="px-8 py-3 font-bold text-slate-600 hover:text-slate-800 transition">
                             Annuler
                         </a>
                     </div>

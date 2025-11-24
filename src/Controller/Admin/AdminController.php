@@ -105,4 +105,23 @@ final class AdminController extends AbstractController
 
         return $this->redirectToRoute('admin_user_index');
     }
+
+    #[Route('/admin/users/search', name: 'admin_user_search')]
+    public function search(Request $request, UserRepository $repo): Response
+    {
+        $term = trim((string) $request->query->get('q', ''));
+
+        if ($term === '') {
+            // Si le champ de recherche est vide, afficher la liste complète
+            $users = $repo->findAll();
+        } else {
+            $users = $repo->findUserByName($term);
+        }
+
+        return $this->render('admin/dashboard/index.html.twig', [
+            'users' => $users,
+            'term' => $term
+        ]);
+    }
+
 }

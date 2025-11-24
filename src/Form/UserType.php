@@ -33,14 +33,14 @@ class UserType extends AbstractType
                 'widget' => 'single_text',
                 'required' => false,
             ])
-            ->add('roles', ChoiceType::class, [
+            ->add('sexe', ChoiceType::class, [
+                'label' => 'Sexe',
                 'choices' => [
-                    'Utilisateur'      => 'ROLE_USER',
-                    'Administrateur'   => 'ROLE_ADMIN',
+                    'Homme' => 'M',
+                    'Femme' => 'F',
                 ],
-                'multiple' => true,
-                'expanded' => true,
-                'label' => 'Rôles',
+                'placeholder' => 'Choisir',
+                'required' => true,
             ]);
 
         // Mot de passe

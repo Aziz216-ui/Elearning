@@ -14,8 +14,8 @@
                         Modifier l'utilisateur #{{ user.id }} – {{ user.email }}
                     </h6>
                     <a href="{{ path('admin_user_index') }}"
-                       class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded hover:bg-blue-700 transition">
-                        Retour
+                       <button type="button" class="btn btn-success">Retour</button>
+
                     </a>
                 </div>
 
@@ -30,6 +30,12 @@
                             {{ form_row(form.name, {label: 'Nom de famille', label_attr: {class: 'block mb-2 text-sm font-bold text-slate-700 dark:text-white'}, attr: {class: 'w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none dark:bg-slate-800'}}) }}
 
                             {{ form_row(form.lastname, {label: 'Prénom', label_attr: {class: 'block mb-2 text-sm font-bold text-slate-700 dark:text-white'}, attr: {class: 'w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none dark:bg-slate-800'}}) }}
+
+                          {{ form_row(form.sexe, {
+                                                          label: 'Sexe',
+                                                          label_attr: {class: 'block mb-2 text-sm font-bold text-slate-700 dark:text-white'},
+                                                          attr: {class: 'w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none dark:bg-slate-800'}
+                                                      }) }}
                         </div>
 
                         <div class="space-y-6">
@@ -42,18 +48,17 @@
                                 {{ form_errors(form.plainPassword) }}
                             </div>
 
-                            {{ form_row(form.roles, {label: 'Rôle', label_attr: {class: 'block mb-2 text-sm font-bold text-slate-700 dark:text-white'}, attr: {class: 'w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none dark:bg-slate-800'}}) }}
+
                         </div>
                     </div>
 
-                    <div class="flex justify-end gap-4 mt-10 pt-6 border-t border-gray-200">
-                        <button type="submit"
-                               class="inline-flex items-center px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded hover:bg-blue-700 transition">
+                   <div class="flex justify-end gap-4 mt-10 pt-6 border-t border-gray-200">
+                                           <button type="submit" class="btn btn-primary px-4 py-2">
                             Enregistrer les modifications
                         </button>
                         <a href="{{ path('admin_user_index') }}"
-                           class="inline-flex items-center px-4 py-2 text-sm font-semibold text-slate-600 hover:text-slate-800 transition">
-                            Annuler
+                          <button type="button" class="btn btn-danger"> Annuler</button>
+
                         </a>
                     </div>
 
