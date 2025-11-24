@@ -6,8 +6,10 @@ use App\Repository\ForulCommentRepository;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\ForumPost;
 use App\Entity\User;
+use Doctrine\DBAL\Types\Types;
 
 #[ORM\Entity(repositoryClass: ForulCommentRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class ForulComment
 {
     #[ORM\Id]
@@ -31,6 +33,12 @@ class ForulComment
     #[ORM\ManyToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $createdAt = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $updatedAt = null;
 
     // -----------------------
     // Getters & Setters
@@ -72,5 +80,33 @@ class ForulComment
     {
         $this->user = $user;
         return $this;
+    }
+
+    public function getCreatedAt(): ?\DateTimeInterface
+    {
+        return $this->createdAt;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updatedAt;
+    }
+    
+    public function setUpdatedAt(\DateTimeInterface $updatedAt): self
+    {
+        $this->updatedAt = $updatedAt;
+        return $this;
+    }
+
+    #[ORM\PrePersist]
+    public function setCreatedAtValue(): void
+    {
+        $this->createdAt = new \DateTime();
+    }
+
+    #[ORM\PreUpdate]
+    public function setUpdatedAtValue(): void
+    {
+        $this->updatedAt = new \DateTime();
     }
 }

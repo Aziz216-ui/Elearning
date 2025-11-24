@@ -110,13 +110,68 @@ final class ForulCommentController extends AbstractController
     #[Route('/{id}/edit', name: 'app_forul_comment_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, ForulComment $forulComment, EntityManagerInterface $entityManager): Response
     {
+        try {
+            // Vérifier que l'utilisateur est connecté
+            if (!$this->getUser()) {
+                if ($request->isXmlHttpRequest() || $request->headers->get('X-Requested-With') === 'XMLHttpRequest') {
+                    return $this->json([
+                        'success' => false,
+                        'message' => 'Vous devez être connecté pour modifier un commentaire.'
+                    ], 403);
+                }
+                throw $this->createAccessDeniedException('Vous devez être connecté pour modifier un commentaire.');
+            }
+
+            // Vérifier que l'utilisateur est l'auteur du commentaire ou un admin
+            if ($this->getUser() !== $forulComment->getUser() && !$this->isGranted('ROLE_ADMIN')) {
+                if ($request->isXmlHttpRequest() || $request->headers->get('X-Requested-With') === 'XMLHttpRequest') {
+                    return $this->json([
+                        'success' => false,
+                        'message' => 'Vous n\'êtes pas autorisé à modifier ce commentaire.'
+                    ], 403);
+                }
+                throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à modifier ce commentaire');
+            }
+
+            // Vérifier si c'est une requête AJAX
+            if ($request->isXmlHttpRequest() || $request->headers->get('X-Requested-With') === 'XMLHttpRequest') {
+                $newContent = $request->request->get('contenu');
+                
+                if (empty($newContent)) {
+                    return $this->json([
+                        'success' => false,
+                        'message' => 'Le commentaire ne peut pas être vide.'
+                    ], 400);
+                }
+                
+                $forulComment->setContenu($newContent);
+                $forulComment->setUpdatedAtValue(); // Utilisation de la méthode de cycle de vie
+                $entityManager->flush();
+                
+                return $this->json([
+                    'success' => true,
+                    'message' => 'Commentaire mis à jour avec succès',
+                    'content' => nl2br(htmlspecialchars($newContent, ENT_QUOTES, 'UTF-8'))
+                ]);
+            }
+        } catch (\Exception $e) {
+            if ($request->isXmlHttpRequest() || $request->headers->get('X-Requested-With') === 'XMLHttpRequest') {
+                return $this->json([
+                    'success' => false,
+                    'message' => 'Une erreur est survenue lors de la mise à jour du commentaire: ' . $e->getMessage()
+                ], 500);
+            }
+            throw $e;
+        }
+
         $form = $this->createForm(ForulCommentType::class, $forulComment);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $forulComment->setUpdatedAt(new \DateTimeImmutable());
             $entityManager->flush();
-
-            return $this->redirectToRoute('app_forul_comment_index');
+            $this->addFlash('success', 'Commentaire mis à jour avec succès');
+            return $this->redirectToRoute('app_forum_post_show', ['id' => $forulComment->getPost()->getId()]);
         }
 
         return $this->render('forul_comment/edit.html.twig', [
@@ -128,11 +183,19 @@ final class ForulCommentController extends AbstractController
     #[Route('/{id}', name: 'app_forul_comment_delete', methods: ['POST'])]
     public function delete(Request $request, ForulComment $forulComment, EntityManagerInterface $entityManager): Response
     {
+        // Vérifier que l'utilisateur est l'auteur du commentaire ou un admin
+        if ($this->getUser() !== $forulComment->getUser() && !$this->isGranted('ROLE_ADMIN')) {
+            throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à supprimer ce commentaire');
+        }
+
+        $postId = $forulComment->getPost()->getId();
+        
         if ($this->isCsrfTokenValid('delete'.$forulComment->getId(), $request->request->get('_token'))) {
             $entityManager->remove($forulComment);
             $entityManager->flush();
+            $this->addFlash('success', 'Commentaire supprimé avec succès');
         }
 
-        return $this->redirectToRoute('app_forul_comment_index');
+        return $this->redirectToRoute('app_forum_post_show', ['id' => $postId]);
     }
 }

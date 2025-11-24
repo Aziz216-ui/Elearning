@@ -39,8 +39,8 @@ class ForumPost
     #[ORM\Column(nullable: true)]
     private ?int $likes = 0;
 
-    #[ORM\Column(nullable: true)]
-    private ?int $vues = 0;
+    #[ORM\Column(type: Types::INTEGER, options: ['default' => 0])]
+    private int $vues = 0;
 
     // -----------------------
     // RELATION 1 -> *
@@ -160,12 +160,12 @@ class ForumPost
         return $this;
     }
 
-    public function getVues(): ?int
+    public function getVues(): int
     {
         return $this->vues;
     }
 
-    public function setVues(?int $vues): static
+    public function setVues(int $vues): static
     {
         $this->vues = $vues;
         return $this;

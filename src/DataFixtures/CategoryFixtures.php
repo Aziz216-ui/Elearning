@@ -11,11 +11,11 @@ class CategoryFixtures extends Fixture
     public function load(ObjectManager $manager): void
     {
         $categories = [
-            ['nom' => 'Mathématiques', 'slug' => 'mathematiques', 'couleur' => '#3498db', 'icone' => '📐'],
-            ['nom' => 'Statistiques', 'slug' => 'statistiques', 'couleur' => '#27ae60', 'icone' => '📊'],
-            ['nom' => 'Algèbre', 'slug' => 'algebre', 'couleur' => '#e74c3c', 'icone' => '🔢'],
-            ['nom' => 'Analyse', 'slug' => 'analyse', 'couleur' => '#9b59b6', 'icone' => '📈'],
-            ['nom' => 'Géométrie', 'slug' => 'geometrie', 'couleur' => '#e67e22', 'icone' => '🌐'],
+            ['nom' => 'Développement Web avec Symfony', 'slug' => 'Développemrnt Web avec Symfony', 'couleur' => '#3498db', 'icone' => '📐'],
+            ['nom' => 'HTML & CSS', 'slug' => 'Html&CSS', 'couleur' => '#27ae60', 'icone' => '📊'],
+            ['nom' => 'Introduction à PHP', 'slug' => 'Introduction a PHP', 'couleur' => '#e74c3c', 'icone' => '🔢'],
+            ['nom' => 'JavaScript', 'slug' => 'JavaScript', 'couleur' => '#9b59b6', 'icone' => '📈'],
+            ['nom' => 'MySQL', 'slug' => 'MySQL', 'couleur' => '#e67e22', 'icone' => '🌐'],
         ];
 
         foreach ($categories as $cat) {

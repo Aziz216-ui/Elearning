@@ -3,6 +3,39 @@
 {% block title %}{{ forum_post.titre }}{% endblock %}
 
 {% block body %}
+    {{ include('_flash_messages.html.twig') }}
+    
+    <style>
+        .edit-comment-form {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 10px;
+            border: 1px solid #dee2e6;
+        }
+        .edit-comment-form textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 10px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
+        .comment-actions {
+            margin-top: 10px;
+            display: flex;
+            gap: 10px;
+        }
+        .edit-notification {
+            padding: 5px 10px;
+            background: #d4edda;
+            color: #155724;
+            border-radius: 4px;
+            font-size: 0.9em;
+            margin-top: 5px;
+            display: inline-block;
+        }
+    </style>
     <style>
         .forum-show-wrapper {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -390,10 +423,12 @@
                         ← Retour à la liste
                     </a>
                     <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                        <a href="{{ path('app_forum_post_edit', {'id': forum_post.id}) }}" class="forum-btn forum-btn-edit">
-                            ✏️ Modifier
-                        </a>
-                        {{ include('forum_post/_delete_form.html.twig') }}
+                        {% if app.user and forum_post.user is not null and app.user.id == forum_post.user.id %}
+                            <a href="{{ path('app_forum_post_edit', {'id': forum_post.id}) }}" class="forum-btn forum-btn-edit">
+                                ✏️ Modifier
+                            </a>
+                            {{ include('forum_post/_delete_form.html.twig') }}
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -431,18 +466,43 @@
                 <div class="forum-comments-body">
                     {% if forum_post.comments|length > 0 %}
                         {% for comment in forum_post.comments %}
-                            <div class="forum-comment-item">
+                            <div class="forum-comment-item" id="comment-{{ comment.id }}">
                                 <div class="forum-comment-author">
                                     <div class="forum-comment-avatar">
                                         {{ comment.user.username|first|upper }}
                                     </div>
                                     <span class="forum-comment-username">
                                         {{ comment.user.username ?? 'Utilisateur inconnu' }}
+                                        <small class="text-muted">
+                                            - {{ comment.createdAt|date('d/m/Y H:i') }}
+                                            {% if comment.updatedAt and comment.updatedAt != comment.createdAt %}
+                                                (modifié le {{ comment.updatedAt|date('d/m/Y H:i') }})
+                                            {% endif %}
+                                        </small>
                                     </span>
                                 </div>
                                 <div class="forum-comment-text">
                                     {{ comment.contenu|nl2br }}
                                 </div>
+                                
+                                {# Boutons d'action pour le commentaire #}
+                                {% if app.user and (app.user == comment.user or is_granted('ROLE_ADMIN')) %}
+                                <div class="comment-actions">
+                                    <button class="btn btn-sm btn-outline-primary edit-comment" 
+                                            data-comment-id="{{ comment.id }}"
+                                            data-original-content="{{ comment.contenu|e('html_attr') }}">
+                                        <i class="fas fa-edit"></i> Modifier
+                                    </button>
+                                    <form method="post" action="{{ path('app_forul_comment_delete', {'id': comment.id}) }}" 
+                                          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?');" 
+                                          style="display: inline-block;">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ comment.id) }}">
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">
+                                            <i class="fas fa-trash"></i> Supprimer
+                                        </button>
+                                    </form>
+                                </div>
+                                {% endif %}
                             </div>
                         {% endfor %}
                     {% else %}
