@@ -1,0 +1,211 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord - Statistiques{% endblock %}
+
+{% block body %}
+<!-- Carousel Start -->
+<div class="container-fluid p-0 mb-5">
+    <div class="owl-carousel header-carousel position-relative">
+        <!-- Première image -->
+        <div class="owl-carousel-item position-relative">
+            <img class="img-fluid" src="{{ asset('front/img/carousel-1.jpg') }}" alt="">
+            <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center"
+                 style="background: rgba(24, 29, 56, .7);">
+                <div class="container">
+                    <div class="row justify-content-start">
+                        <div class="col-sm-10 col-lg-8">
+                            <h5 class="text-primary text-uppercase mb-3 animated slideInDown">Meilleurs cours en ligne</h5>
+                            <h1 class="display-3 text-white animated slideInDown">La meilleure plateforme d'apprentissage en ligne</h1>
+                            <p class="fs-5 text-white mb-4 pb-2">
+                                Découvrez une nouvelle façon d'apprendre avec nos cours en ligne de qualité supérieure.
+                            </p>
+                            <a href="#" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft">En savoir plus</a>
+                            <a href="#" class="btn btn-light py-md-3 px-md-5 animated slideInRight">S'inscrire maintenant</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Deuxième image -->
+        <div class="owl-carousel-item position-relative">
+            <img class="img-fluid" src="{{ asset('front/img/carousel-2.jpg') }}" alt="">
+            <div class="position-absolute top-0 start-0 w-100 h-100 d-flex align-items-center"
+                 style="background: rgba(24, 29, 56, .7);">
+                <div class="container">
+                    <div class="row justify-content-start">
+                        <div class="col-sm-10 col-lg-8">
+                            <h5 class="text-primary text-uppercase mb-3 animated slideInDown">Formation en ligne</h5>
+                            <h1 class="display-3 text-white animated slideInDown">Étudiez depuis chez vous</h1>
+                            <p class="fs-5 text-white mb-4 pb-2">
+                                Accédez à nos formations où que vous soyez et progressez à votre rythme.
+                            </p>
+                            <a href="#" class="btn btn-primary py-md-3 px-md-5 me-3 animated slideInLeft">En savoir plus</a>
+                            <a href="#" class="btn btn-light py-md-3 px-md-5 animated slideInRight">Commencer</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Carousel End -->
+
+<!-- Statistiques -->
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-md-4">
+                <div class="card text-white bg-primary mb-3">
+                    <div class="card-body text-center p-4">
+                        <i class="fa fa-users fa-3x mb-3"></i>
+                        <h3 class="card-title">Utilisateurs</h3>
+                        <p class="card-text display-4">{{ stats.users_count|number_format(0, ',', ' ') }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-success mb-3">
+                    <div class="card-body text-center p-4">
+                        <i class="fa fa-book fa-3x mb-3"></i>
+                        <h3 class="card-title">Cours</h3>
+                        <p class="card-text display-4">{{ stats.courses_count }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-white bg-info mb-3">
+                    <div class="card-body text-center p-4">
+                        <i class="fa fa-tasks fa-3x mb-3"></i>
+                        <h3 class="card-title">Quiz complétés</h3>
+                        <p class="card-text display-4">{{ stats.completed_quizzes|number_format(0, ',', ' ') }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Cours populaires -->
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="text-center wow fadeInUp" data-wow-delay="0.1s">
+            <h6 class="section-title bg-white text-center text-primary px-3">Cours</h6>
+            <h1 class="mb-5">Cours populaires</h1>
+        </div>
+        <div class="row g-4 justify-content-center">
+            {% for i in stats.popular_courses %}
+            <div class="col-lg-4 col-md-6 wow fadeInUp" data-wow-delay="{{ loop.index0 * 0.2 }}s">
+                <div class="course-item bg-light">
+                    <div class="position-relative overflow-hidden">
+                        <img class="img-fluid" src="{{ asset('front/img/course-' ~ i ~ '.jpg') }}" alt="">
+                        <div class="w-100 d-flex justify-content-center position-absolute bottom-0 start-0 mb-4">
+                            <a href="#" class="btn btn-sm btn-primary px-3 border-end">Voir plus</a>
+                            <a href="#" class="btn btn-sm btn-primary px-3">S'inscrire</a>
+                        </div>
+                    </div>
+                    <div class="text-center p-4 pb-0">
+                        <h3 class="mb-0">149,00 €</h3>
+                        <div class="mb-3">
+                            {% for j in 1..5 %}<small class="fa fa-star text-primary"></small>{% endfor %}
+                            <small>(123)</small>
+                        </div>
+                        <h5 class="mb-4">Formation complète en développement web</h5>
+                    </div>
+                    <div class="d-flex border-top">
+                        <small class="flex-fill text-center py-2"><i class="fa fa-user-tie text-primary me-2"></i>John Doe</small>
+                        <small class="flex-fill text-center py-2"><i class="fa fa-clock text-primary me-2"></i>10h 30m</small>
+                        <small class="flex-fill text-center py-2"><i class="fa fa-user text-primary me-2"></i>30 Étudiants</small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Équipe -->
+<div class="container-xxl py-5">
+    <div class="container">
+        <div class="text-center wow fadeInUp">
+            <h6 class="section-title bg-white text-center text-primary px-3">Instructeurs</h6>
+            <h1 class="mb-5">Nos experts</h1>
+        </div>
+        <div class="row g-4">
+            {% for i in stats.instructors %}
+            <div class="col-lg-3 col-md-6 wow fadeInUp" data-wow-delay="{{ loop.index0 * 0.2 }}s">
+                <div class="team-item bg-light">
+                    <div class="overflow-hidden">
+                        <img class="img-fluid" src="{{ asset('front/img/team-' ~ i ~ '.jpg') }}" alt="">
+                    </div>
+                    <div class="position-relative d-flex justify-content-center" style="margin-top: -23px;">
+                        <div class="bg-light d-flex justify-content-center pt-2 px-1">
+                            <a class="btn btn-sm-square btn-primary mx-1" href="#"><i class="fab fa-facebook-f"></i></a>
+                            <a class="btn btn-sm-square btn-primary mx-1" href="#"><i class="fab fa-twitter"></i></a>
+                            <a class="btn btn-sm-square btn-primary mx-1" href="#"><i class="fab fa-instagram"></i></a>
+                        </div>
+                    </div>
+                    <div class="text-center p-4">
+                        <h5 class="mb-0">Instructeur {{ i }}</h5>
+                        <small>Expert en développement</small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+
+<!-- Témoignages -->
+<div class="container-xxl py-5 wow fadeInUp">
+    <div class="container">
+        <div class="text-center">
+            <h6 class="section-title bg-white text-center text-primary px-3">Témoignages</h6>
+            <h1 class="mb-5">Ce que disent nos étudiants</h1>
+        </div>
+        <div class="owl-carousel testimonial-carousel position-relative">
+            {% for i in stats.testimonials %}
+            <div class="testimonial-item text-center">
+                <img class="border rounded-circle p-2 mx-auto mb-3"
+                     src="{{ asset('front/img/testimonial-' ~ i ~ '.jpg') }}"
+                     style="width: 80px; height: 80px;">
+                <h5 class="mb-0">Étudiant {{ i }}</h5>
+                <p>Développeur Web</p>
+                <div class="testimonial-text bg-light text-center p-4">
+                    <p class="mb-0">Formation exceptionnelle ! Le contenu est clair et les exercices pratiques sont très utiles.</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<!-- Scripts pour les animations et les carrousels -->
+<script>
+    // Initialisation du carrousel
+    $('.owl-carousel').owlCarousel({
+        loop: true,
+        margin: 10,
+        nav: true,
+        autoplay: true,
+        autoplayTimeout: 5000,
+        responsive: {
+            0: {
+                items: 1
+            },
+            600: {
+                items: 2
+            },
+            1000: {
+                items: 3
+            }
+        }
+    });
+
+    // Animation au défilement
+    new WOW().init();
+</script>
+{% endblock %}

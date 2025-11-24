@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\QuestionRepository;
-use App\Entity\UserAnswer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -35,16 +34,9 @@ class Question
     #[ORM\OneToMany(targetEntity: Answer::class, mappedBy: 'question', cascade: ['persist', 'remove'], orphanRemoval: true)]
     private Collection $answers;
 
-    /**
-     * @var Collection<int, UserAnswer>
-     */
-    #[ORM\OneToMany(mappedBy: 'question', targetEntity: UserAnswer::class, orphanRemoval: true)]
-    private Collection $userAnswers;
-
     public function __construct()
     {
         $this->answers = new ArrayCollection();
-        $this->userAnswers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -118,33 +110,6 @@ class Question
         if ($this->answers->removeElement($answer)) {
             if ($answer->getQuestion() === $this) {
                 $answer->setQuestion(null);
-            }
-        }
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, UserAnswer>
-     */
-    public function getUserAnswers(): Collection
-    {
-        return $this->userAnswers;
-    }
-
-    public function addUserAnswer(UserAnswer $userAnswer): self
-    {
-        if (!$this->userAnswers->contains($userAnswer)) {
-            $this->userAnswers[] = $userAnswer;
-            $userAnswer->setQuestion($this);
-        }
-        return $this;
-    }
-
-    public function removeUserAnswer(UserAnswer $userAnswer): self
-    {
-        if ($this->userAnswers->removeElement($userAnswer)) {
-            if ($userAnswer->getQuestion() === $this) {
-                $userAnswer->setQuestion(null);
             }
         }
         return $this;

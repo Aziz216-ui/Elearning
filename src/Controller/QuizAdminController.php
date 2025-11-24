@@ -10,7 +10,6 @@ use App\Entity\Question;        // <-- AJOUTE CECI
 use App\Entity\Answer;          // <-- AJOUTE CECI
 use App\Form\QuizType;
 use App\Repository\QuizRepository;
-use App\Repository\CoursRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -22,14 +21,12 @@ use Symfony\Component\Routing\Attribute\Route;
 class QuizAdminController extends AbstractController
 {
     #[Route('/', name: 'app_quiz_admin_index', methods: ['GET'])]
-    public function index(QuizRepository $quizRepository, CoursRepository $coursRepository): Response
+    public function index(QuizRepository $quizRepository): Response
     {
         $quizzes = $quizRepository->findAll();
-        $courses = $coursRepository->findAll();
 
-        return $this->render('quiz_admin/quiz_management.html.twig', [
+        return $this->render('quiz_admin/index.html.twig', [
             'quizzes' => $quizzes,
-            'courses' => $courses,
         ]);
     }
 
@@ -44,8 +41,8 @@ class QuizAdminController extends AbstractController
 
             $data = $request->request->all();
 
-            if (isset($data['questions'])) {
-                foreach ($data['questions'] as $qKey => $qData) {
+            if (isset($data['quiz']['questions'])) {
+                foreach ($data['quiz']['questions'] as $qKey => $qData) {
 
                     if (!preg_match('/^q\d+$/', $qKey)) continue;
 
@@ -116,8 +113,8 @@ class QuizAdminController extends AbstractController
             $data = $request->request->all();
             
             // Vérifier si nous avons des données de formulaire
-            if (isset($data['questions'])) {
-                $questionsData = $data['questions'];
+            if (isset($data['quiz']['questions'])) {
+                $questionsData = $data['quiz']['questions'];
                 
                 // Parcourir les questions du formulaire
                 foreach ($questionsData as $questionKey => $questionData) {
@@ -187,6 +184,18 @@ class QuizAdminController extends AbstractController
             'quiz' => $quiz,
             'form' => $form->createView(),
         ]);
+    }
+
+    #[Route('/{id}/toggle-visibility', name: 'app_quiz_admin_toggle_visibility', methods: ['POST'])]
+    public function toggleVisibility(Request $request, Quiz $quiz, EntityManagerInterface $entityManager): Response
+    {
+        if ($this->isCsrfTokenValid('toggle_visibility'.$quiz->getId(), $request->request->get('_token'))) {
+            $quiz->setIsVisible(!$quiz->isVisible());
+            $entityManager->flush();
+            $this->addFlash('success', sprintf('Le quiz a été marqué comme %s avec succès.', $quiz->isVisible() ? 'visible' : 'masqué'));
+        }
+
+        return $this->redirectToRoute('app_quiz_admin_index');
     }
 
     #[Route('/{id}', name: 'app_quiz_admin_delete', methods: ['POST'])]

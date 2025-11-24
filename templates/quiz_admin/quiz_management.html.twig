@@ -179,6 +179,26 @@
         color: #333;
         font-size: 1.05em;
     }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 4px 10px;
+        border-radius: 12px;
+        font-size: 0.85em;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .status-active {
+        background-color: #e3fcef;
+        color: #0e9f6e;
+    }
+    
+    .status-inactive {
+        background-color: #fde8e8;
+        color: #c81e1e;
+    }
 
     .quiz-code {
         color: #999;
@@ -362,6 +382,7 @@
                 <tr>
                     <th>ID</th>
                     <th>Titre du Quiz</th>
+                    <th>Statut</th>
                     <th>Cours Associé</th>
                     <th>Actions</th>
                 </tr>
@@ -374,6 +395,11 @@
                         <div class="quiz-title">
                             <span class="quiz-name">{{ quiz.title }}</span>
                         </div>
+                    </td>
+                    <td>
+                        <span class="status-badge {{ quiz.isPublished ? 'status-active' : 'status-inactive' }}">
+                            {{ quiz.isPublished ? 'Publié' : 'Brouillon' }}
+                        </span>
                     </td>
                     <td><span class="quiz-course">{{ quiz.cours.title }}</span></td>
                     <td>

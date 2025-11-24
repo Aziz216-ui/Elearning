@@ -1,53 +1,84 @@
 <!DOCTYPE html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<html lang="fr">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-    <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('admin/img/apple-icon.png') }}" />
-    <link rel="icon" type="image/png" href="{{ asset('admin/img/favicon.png') }}" />
+    <title>{% block title %}Tableau de bord{% endblock %} - Elearning Admin</title>
 
-    <title>{% block title %}Tableau de bord{% endblock %} - Admin</title>
+    <!-- Custom fonts for this template-->
+    <link href="{{ asset('admin/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
 
-    <!-- Fonts and icons -->
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
-    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
-
-    <!-- Nucleo Icons -->
-    <link href="{{ asset('admin/css/nucleo-icons.css') }}" rel="stylesheet" />
-    <link href="{{ asset('admin/css/nucleo-svg.css') }}" rel="stylesheet" />
-
-    <!-- Main Styling -->
-    <link href="{{ asset('admin/css/argon-dashboard-tailwind.css') }}" rel="stylesheet" />
+    <!-- Custom styles for this template-->
+    <link href="{{ asset('admin/css/sb-admin-2.min.css') }}" rel="stylesheet">
     
     <style>
-      :root {
-        --primary: #19C7D8;
-        --primary-hover: #14B2C2;
-        --light-bg: #E6FAFC;
-        --dark-text: #0F2E3D;
-        --grey-text: #5C6B73;
-      }
+        :root {
+            --primary: #4e73df;
+            --primary-hover: #2e59d9;
+            --secondary: #858796;
+            --light: #f8f9fc;
+            --dark: #5a5c69;
+            --success: #1cc88a;
+            --info: #36b9cc;
+            --warning: #f6c23e;
+            --danger: #e74a3b;
+            --light-bg: #f8f9fc;
+            --dark-text: #5a5c69;
+            --grey-text: #858796;
+        }
 
-      h1, h2, h3 {
-        color: var(--dark-text);
-      }
+        body {
+            color: var(--grey-text);
+        }
 
-      .btn-primary-custom {
-        background: var(--primary);
-        color: #fff;
-        border: none;
-        padding: 10px 22px;
-        border-radius: 8px;
-        font-weight: 600;
-        transition: 0.2s ease;
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        text-decoration: none;
-      }
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--dark-text);
+        }
 
-      .btn-primary-custom:hover {
+        .bg-gradient-primary {
+            background-color: var(--primary);
+            background-image: linear-gradient(180deg, var(--primary) 10%, #224abe 100%);
+            background-size: cover;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+
+        .sidebar .nav-item .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .sidebar .nav-item .nav-link:hover {
+            color: #fff;
+        }
+
+        .sidebar .nav-item.active .nav-link {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .card {
+            border: none;
+            border-radius: 0.35rem;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        }
+
+        .card-header {
+            background-color: #f8f9fc;
+            border-bottom: 1px solid #e3e6f0;
+        }
         background: var(--primary-hover);
         color: #fff;
       }
@@ -94,144 +125,297 @@
         transform: translateY(-4px);
         box-shadow: 0 6px 20px rgba(0,0,0,0.15);
       }
+      
+      /* Styles spécifiques pour les formulaires */
+      .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+      }
+      
+      /* Styles pour les onglets */
+      .nav-tabs .nav-link {
+        color: var(--secondary);
+      }
+      
+      .nav-tabs .nav-link.active {
+        color: var(--primary);
+        border-color: var(--primary) var(--primary) #fff;
+      }
+      
+      /* Styles pour les tableaux */
+      .table thead th {
+        border-bottom: 2px solid #e3e6f0;
+        color: var(--dark);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+      }
+      
+      /* Styles pour les alertes */
+      .alert {
+        border: none;
+        border-left: 4px solid;
+      }
+      
+      .alert-success {
+        background-color: #d1e7dd;
+        border-color: #0f5132;
+        color: #0f5132;
+      }
+      
+      .alert-danger {
+        background-color: #f8d7da;
+        border-color: #842029;
+        color: #842029;
+      }
+      
+      .alert-warning {
+        background-color: #fff3cd;
+        border-color: #664d03;
+        color: #664d03;
+      }
+      
+      .alert-info {
+        background-color: #cff4fc;
+        border-color: #055160;
+        color: #055160;
+      }
     </style>
 
     {% block stylesheets %}{% endblock %}
   </head>
 
-  <body class="m-0 font-sans text-base antialiased font-normal dark:bg-slate-900 leading-default bg-gray-50 text-slate-500">
-    <div class="absolute w-full bg-blue-500 dark:hidden min-h-75"></div>
-
-    <!-- ====== Sidebar ====== -->
-    <aside class="fixed inset-y-0 flex-wrap items-center justify-between block w-full p-0 my-4 overflow-y-auto antialiased transition-transform duration-200 -translate-x-full bg-white border-0 shadow-xl dark:shadow-none dark:bg-slate-850 max-w-64 ease-nav-brand z-990 xl:ml-6 rounded-2xl xl:left-0 xl:translate-x-0" aria-expanded="false">
-      <div class="h-19">
-        <a class="block px-8 py-6 text-sm whitespace-nowrap dark:text-white text-slate-700" href="{{ path('app_dashboard') }}">
-          <img src="{{ asset('admin/img/logo-ct-dark.png') }}" class="inline h-8 dark:hidden" alt="Logo" />
-          <img src="{{ asset('admin/img/logo-ct.png') }}" class="hidden h-8 dark:inline" alt="Logo" />
-          <span class="ml-1 font-semibold">Tableau de bord</span>
+  <body id="page-top">
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+      <!-- Sidebar -->
+      <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+        <!-- Sidebar - Brand -->
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ path('app_dashboard') }}">
+          <div class="sidebar-brand-icon">
+            <i class="fas fa-graduation-cap"></i>
+          </div>
+          <div class="sidebar-brand-text mx-3">Elearning Admin</div>
         </a>
-      </div>
 
-      <hr class="h-px mt-0 bg-transparent bg-gradient-to-r from-transparent via-black/40 to-transparent" />
+        <!-- Divider -->
+        <hr class="sidebar-divider my-0">
 
-      <div class="overflow-auto grow">
-        <ul class="flex flex-col pl-0 mb-0">
-          <li class="mt-0.5">
-            <a href="{{ path('app_dashboard') }}" class="flex items-center px-4 py-2 text-slate-700 dark:text-white {% if app.request.get('_route') == 'app_dashboard' %}bg-blue-500/20 rounded-lg text-blue-500{% endif %}">
-              <i class="ni ni-tv-2 text-blue-500 mr-2"></i> Tableau de bord
-            </a>
-          </li>
-          {# Liens désactivés jusqu'à ce que les contrôleurs correspondants soient créés
-          <li class="mt-0.5">
-            <a href="#" class="flex items-center px-4 py-2 text-slate-400 dark:text-slate-500 cursor-not-allowed">
-              <i class="ni ni-books text-slate-400 mr-2"></i> Cours
-              <span class="ml-2 text-xs text-slate-500">(Bientôt disponible)</span>
-            </a>
-          </li>
-          <li class="mt-0.5">
-            <a href="#" class="flex items-center px-4 py-2 text-slate-400 dark:text-slate-500 cursor-not-allowed">
-              <i class="ni ni-single-02 text-slate-400 mr-2"></i> Utilisateurs
-              <span class="ml-2 text-xs text-slate-500">(Bientôt disponible)</span>
-            </a>
-          </li>
-          <li class="mt-0.5">
-            <a href="#" class="flex items-center px-4 py-2 text-slate-400 dark:text-slate-500 cursor-not-allowed">
-              <i class="ni ni-tag text-slate-400 mr-2"></i> Catégories
-              <span class="ml-2 text-xs text-slate-500">(Bientôt disponible)</span>
-            </a>
-          </li>
-          #}
-        </ul>
-      </div>
-    </aside>
-    <!-- ====== End Sidebar ====== -->
+        <!-- Nav Item - Dashboard -->
+        <li class="nav-item {% if app.request.get('_route') == 'app_dashboard' %}active{% endif %}">
+          <a class="nav-link" href="{{ path('app_dashboard') }}">
+            <i class="fas fa-fw fa-tachometer-alt"></i>
+            <span>Tableau de bord</span>
+          </a>
+        </li>
 
-    <!-- ====== Main Content ====== -->
-    <div class="xl:ml-64 relative min-h-screen flex flex-col">
-      <!-- Navbar -->
-      <nav class="w-full px-6 py-3 bg-white border-b border-gray-200 shadow-sm dark:bg-slate-850 dark:border-slate-800 sticky top-0 z-40">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-3">
-            <button class="xl:hidden text-slate-700 dark:text-white" id="sidebarToggle">
-              <i class="fas fa-bars"></i>
+        <!-- Divider -->
+        <hr class="sidebar-divider">
+
+        <!-- Heading -->
+        <div class="sidebar-heading">
+          Gestion
+        </div>
+
+        <!-- Nav Item - Cours -->
+        <li class="nav-item">
+          <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseCourses"
+            aria-expanded="true" aria-controls="collapseCourses">
+            <i class="fas fa-fw fa-book"></i>
+            <span>Cours</span>
+          </a>
+          <div id="collapseCourses" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
+            <div class="bg-white py-2 collapse-inner rounded">
+              <h6 class="collapse-header">Gestion des cours:</h6>
+              <a class="collapse-item" href="{{ path('app_home') }}">Liste des cours</a>
+              <a class="collapse-item" href="#">Ajouter un cours</a>
+              <a class="collapse-item" href="#">Catégories</a>
+            </div>
+          </div>
+        </li>
+
+        <!-- Nav Item - Utilisateurs -->
+        <li class="nav-item">
+          <a class="nav-link" href="#">
+            <i class="fas fa-fw fa-users"></i>
+            <span>Utilisateurs</span>
+          </a>
+        </li>
+
+        <!-- Nav Item - Quiz -->
+        <li class="nav-item {% if 'app_quiz_admin' in app.request.get('_route') %}
+          active
+        {% endif %}">
+          <a class="nav-link" href="{{ path('app_quiz_admin_index') }}">
+            <i class="fas fa-fw fa-question-circle"></i>
+            <span>Quiz</span>
+          </a>
+        </li>
+
+        <!-- Divider -->
+        <hr class="sidebar-divider d-none d-md-block">
+
+        <!-- Sidebar Toggler (Sidebar) -->
+        <div class="text-center d-none d-md-inline">
+          <button class="rounded-circle border-0" id="sidebarToggle"></button>
+        </div>
+      </ul>
+      <!-- End of Sidebar -->
+
+      <!-- Content Wrapper -->
+      <div id="content-wrapper" class="d-flex flex-column">
+        <!-- Main Content -->
+        <div id="content">
+          <!-- Topbar -->
+          <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+            <!-- Sidebar Toggle (Topbar) -->
+            <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+              <i class="fa fa-bars"></i>
             </button>
-            <h1 class="text-xl font-semibold text-slate-700 dark:text-white">
-              {% block page_title %}{% endblock %}
-            </h1>
-          </div>
-          <div class="flex items-center space-x-4">
-            <div class="relative">
-              <button class="p-2 text-slate-600 dark:text-slate-200 rounded-full hover:bg-gray-100 dark:hover:bg-slate-700">
-                <i class="fas fa-bell"></i>
-                <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full"></span>
-              </button>
-            </div>
-            <div class="relative" x-data="{ open: false }">
-              <button @click="open = !open" class="flex items-center space-x-2">
-                <div class="w-8 h-8 rounded-full bg-blue-500 flex items-center justify-center text-white">
-                  {{ app.user ? app.user.name|first|upper : 'A' }}
+
+            <!-- Topbar Navbar -->
+            <ul class="navbar-nav ml-auto">
+              <!-- Nav Item - User Information -->
+              <li class="nav-item dropdown no-arrow">
+                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <span class="mr-2 d-none d-lg-inline text-gray-600 small">
+                    {% if app.user %}
+                      {{ app.user.name }} {{ app.user.lastname }}
+                    {% else %}
+                      Invité
+                    {% endif %}
+                  </span>
+                  <img class="img-profile rounded-circle" src="{{ asset('admin/img/undraw_profile.svg') }}">
+                </a>
+                <!-- Dropdown - User Information -->
+                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                  aria-labelledby="userDropdown">
+                  <a class="dropdown-item" href="{{ path('app_profile') }}">
+                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                    Profil
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                    Déconnexion
+                  </a>
                 </div>
-                <span class="text-slate-700 dark:text-white">{{ app.user ? app.user.name : 'Admin' }}</span>
-                <i class="fas fa-chevron-down text-xs"></i>
-              </button>
-              <div x-show="open" @click.away="open = false" class="absolute right-0 mt-2 w-48 bg-white dark:bg-slate-800 rounded-md shadow-lg py-1 z-50">
-                <a href="{{ path('app_profile') }}" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700">
-                  <i class="fas fa-user mr-2"></i> Mon profil
-                </a>
-                <a href="{{ path('app_logout') }}" class="block px-4 py-2 text-sm text-red-600 hover:bg-gray-100 dark:hover:bg-slate-700">
-                  <i class="fas fa-sign-out-alt mr-2"></i> Déconnexion
-                </a>
-              </div>
+              </li>
+            </ul>
+          </nav>
+          <!-- End of Topbar -->
+
+          <!-- Begin Page Content -->
+          <div class="container-fluid">
+            <!-- Page Heading -->
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+              <h1 class="h3 mb-0 text-gray-800">{% block page_title %}{% endblock %}</h1>
+              {% block actions %}{% endblock %}
+            </div>
+
+            {% for label, messages in app.flashes %}
+              {% for message in messages %}
+                <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                  {{ message }}
+                  <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                  </button>
+                </div>
+              {% endfor %}
+            {% endfor %}
+
+            {% block body %}{% endblock %}
+          </div>
+          <!-- /.container-fluid -->
+        </div>
+        <!-- End of Main Content -->
+
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white">
+          <div class="container my-auto">
+            <div class="copyright text-center my-auto">
+              <span>Copyright &copy; Elearning {{ "now"|date("Y") }}</span>
             </div>
           </div>
-        </div>
-      </nav>
-      <!-- End Navbar -->
+        </footer>
+        <!-- End of Footer -->
+      </div>
+      <!-- End of Content Wrapper -->
+    </div>
+    <!-- End of Page Wrapper -->
 
-      <!-- Main content -->
-      <main class="flex-1 p-6">
-        {% block body %}{% endblock %}
-      </main>
-      <!-- End Main content -->
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+      <i class="fas fa-angle-up"></i>
+    </a>
 
-      <!-- Footer -->
-      <footer class="pt-4 mt-auto">
-        <div class="w-full px-6 mx-auto text-center text-sm text-slate-500">
-          © {{ "now"|date("Y") }}, fait avec <i class="fa fa-heart text-red-500"></i> par
-          <a href="{{ path('app_home') }}" class="font-semibold text-slate-700 dark:text-white hover:text-blue-500">eLEARNING</a>
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+      aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Prêt à partir ?</h5>
+            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">Sélectionnez "Déconnexion" ci-dessous si vous êtes prêt à mettre fin à votre session en cours.</div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" type="button" data-dismiss="modal">Annuler</button>
+            <a class="btn btn-primary" href="{{ path('app_logout') }}">Déconnexion</a>
+          </div>
         </div>
-      </footer>
-      <!-- End Footer -->
+      </div>
     </div>
 
-    <!-- ====== Scripts ====== -->
-    <script src="{{ asset('admin/js/plugins/chartjs.min.js') }}"></script>
-    <script src="{{ asset('admin/js/plugins/perfect-scrollbar.min.js') }}"></script>
-    <script src="{{ asset('admin/js/argon-dashboard-tailwind.js') }}"></script>
+    <!-- Bootstrap core JavaScript-->
+    <script src="{{ asset('admin/vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('admin/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+
+    <!-- Core plugin JavaScript-->
+    <script src="{{ asset('admin/vendor/jquery-easing/jquery.easing.min.js') }}"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="{{ asset('admin/js/sb-admin-2.min.js') }}"></script>
+
+    <!-- Page level plugins -->
+    <script src="{{ asset('admin/vendor/chart.js/Chart.min.js') }}"></script>
+
+    <!-- Page level custom scripts -->
+    <script src="{{ asset('admin/js/demo/chart-area-demo.js') }}"></script>
+    <script src="{{ asset('admin/js/demo/chart-pie-demo.js') }}"></script>
+
+    {% block javascripts %}{% endblock %}
     
     <script>
-      // Toggle sidebar on mobile
-      document.addEventListener('DOMContentLoaded', function() {
-        const sidebarToggle = document.getElementById('sidebarToggle');
-        const sidebar = document.querySelector('aside');
+      // Activer les tooltips partout avec data-toggle="tooltip"
+      $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+      })
+      
+      // Activer les popovers partout avec data-toggle="popover"
+      $(function () {
+        $('[data-toggle="popover"]').popover()
+      })
+      
+      // Fermer les alertes après 5 secondes
+      $(document).ready(function() {
+        // Fermer automatiquement les alertes après 5 secondes
+        setTimeout(function() {
+          $('.alert').fadeOut('slow', function() {
+            $(this).remove();
+          });
+        }, 5000);
         
-        if (sidebarToggle && sidebar) {
-          sidebarToggle.addEventListener('click', function() {
-            sidebar.classList.toggle('-translate-x-full');
+        // Fermer les alertes au clic sur le bouton de fermeture
+        $('.alert .close').on('click', function() {
+          $(this).closest('.alert').fadeOut('slow', function() {
+            $(this).remove();
           });
-          
-          // Close sidebar when clicking outside on mobile
-          document.addEventListener('click', function(event) {
-            if (window.innerWidth < 1280 && 
-                !sidebar.contains(event.target) && 
-                !sidebarToggle.contains(event.target)) {
-              sidebar.classList.add('-translate-x-full');
-            }
-          });
-        }
+        });
       });
     </script>
-    
-    {% block javascripts %}{% endblock %}
   </body>
 </html>

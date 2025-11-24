@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
-use App\Entity\UserAnswer;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -58,17 +57,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Panier::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $paniers;
 
-    /**
-     * @var Collection<int, UserAnswer>
-     */
-    #[ORM\OneToMany(mappedBy: 'user', targetEntity: UserAnswer::class, orphanRemoval: true)]
-    private Collection $userAnswers;
-
     public function __construct()
     {
         $this->quizResults = new ArrayCollection();
         $this->paniers = new ArrayCollection();
-        $this->userAnswers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -206,33 +198,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function getPaniers(): Collection
     {
         return $this->paniers;
-    }
-
-    /**
-     * @return Collection<int, UserAnswer>
-     */
-    public function getUserAnswers(): Collection
-    {
-        return $this->userAnswers;
-    }
-
-    public function addUserAnswer(UserAnswer $userAnswer): self
-    {
-        if (!$this->userAnswers->contains($userAnswer)) {
-            $this->userAnswers[] = $userAnswer;
-            $userAnswer->setUser($this);
-        }
-        return $this;
-    }
-
-    public function removeUserAnswer(UserAnswer $userAnswer): self
-    {
-        if ($this->userAnswers->removeElement($userAnswer)) {
-            if ($userAnswer->getUser() === $this) {
-                $userAnswer->setUser(null);
-            }
-        }
-        return $this;
     }
 
     public function addPanier(Panier $panier): static

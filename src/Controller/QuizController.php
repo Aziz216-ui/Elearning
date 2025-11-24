@@ -35,23 +35,24 @@ class QuizController extends AbstractController
         // Récupérer le quiz lié au cours
         $quiz = $cours->getQuizzes()->first();
 
-
         if (!$quiz) {
             $this->addFlash('warning', 'Aucun quiz disponible pour ce cours.');
+            return $this->redirectToRoute('app_dashboard');
+        }
+
+        // Vérifier si le quiz est visible
+        if (!$quiz->isVisible()) {
+            $this->addFlash('error', 'Ce quiz n\'est pas disponible pour le moment.');
             return $this->redirectToRoute('app_dashboard');
         }
 
         // Récupérer les questions du quiz avec leurs réponses
         $questions = $em->getRepository(Question::class)->findBy(['quiz' => $quiz]);
 
-        // Définir un temps limite par défaut de 10 minutes (600 secondes) si non défini
-        $timeLimit = $quiz->getTimeLimit() ?? 600;
-
         return $this->render('quiz/quiz.html.twig', [
             'cours' => $cours,
             'quiz' => $quiz,
-            'questions' => $questions,
-            'timeLimit' => $timeLimit
+            'questions' => $questions
         ]);
     }
     #[Route('/quiz/submit/{id}', name: 'app_quiz_submit', methods:['POST'])]
@@ -65,14 +66,17 @@ class QuizController extends AbstractController
             $this->addFlash('error', 'Accès non autorisé à ce quiz.');
             return $this->redirectToRoute('app_dashboard');
         }
-        
-        // Récupérer le temps passé sur le quiz
-        $timeSpent = (int) $request->request->get('timeSpent', 0);
 
         $quiz = $cours->getQuizzes()->first();
 
         if (!$quiz) {
             $this->addFlash('error', 'Aucun quiz trouvé pour ce cours.');
+            return $this->redirectToRoute('app_dashboard');
+        }
+        
+        // Vérifier si le quiz est visible
+        if (!$quiz->isVisible()) {
+            $this->addFlash('error', 'Ce quiz n\'est pas disponible pour le moment.');
             return $this->redirectToRoute('app_dashboard');
         }
 
@@ -108,7 +112,9 @@ class QuizController extends AbstractController
         }
 
         $finalScore = $totalPoints > 0 ? ($score / $totalPoints) * 100 : 0;
-        $passed = $finalScore >= 80;
+        $scoreMinimum = 70; // Définir le score minimum pour réussir (70% par défaut)
+        $passed = $finalScore >= $scoreMinimum;
+        $percentage = round($finalScore, 2);
 
         $quizResult = new QuizResult();
         $quizResult->setUser($user);
@@ -121,13 +127,16 @@ class QuizController extends AbstractController
         $em->persist($quizResult);
         $em->flush();
 
-        if ($passed) {
-            $this->addFlash('success', 'Bravo ! Vous avez réussi le quiz. Vous pouvez maintenant télécharger votre certificat.');
-        } else {
-            $this->addFlash('error', 'Une ou plusieurs réponses sont incorrectes. Réessayez !');
-        }
+        // Toujours afficher le score à l'utilisateur
+        $this->addFlash('info', sprintf('Votre score : %d / %d (%.0f%%)', $score, $totalPoints, $percentage));
 
-        return $this->redirectToRoute('app_quiz_results', ['id' => $quiz->getId()]);
+        if ($passed) {
+            $this->addFlash('success', 'Félicitations ! Vous avez réussi le quiz. Vous pouvez maintenant télécharger votre certificat.');
+            return $this->redirectToRoute('app_quiz_results', ['id' => $quiz->getId()]);
+        } else {
+            $this->addFlash('warning', sprintf('Désolé, vous n\'avez pas atteint le score minimum de %d%% pour obtenir le certificat.', $scoreMinimum));
+            return $this->redirectToRoute('app_quiz_results', ['id' => $quiz->getId()]);
+        }
     }
 
 

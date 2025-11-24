@@ -1,0 +1,151 @@
+{% extends 'base1.html.twig' %}
+
+{% block title %}Ajouter une question - {{ quiz.title }}{% endblock %}
+
+{% block page_title %}Ajouter une question{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .answer-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+        }
+        .add-answer {
+            margin-bottom: 20px;
+        }
+        .collection-actions {
+            margin-top: 10px;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h4>Nouvelle question pour : {{ quiz.title }}</h4>
+                </div>
+                <div class="card-body">
+                    {{ form_start(form) }}
+                        {{ form_row(form.text, {
+                            'attr': {
+                                'class': 'form-control',
+                                'placeholder': 'Entrez votre question ici...'
+                            },
+                            'label': 'Question',
+                            'label_attr': {
+                                'class': 'form-label fw-bold'
+                            }
+                        }) }}
+                        
+                        {{ form_row(form.points, {
+                            'attr': {
+                                'class': 'form-control',
+                                'min': 1,
+                                'value': 1
+                            },
+                            'label': 'Points',
+                            'label_attr': {
+                                'class': 'form-label fw-bold mt-3'
+                            }
+                        }) }}
+                        
+                        {{ form_row(form.type, {
+                            'attr': {
+                                'class': 'form-select'
+                            },
+                            'label': 'Type de question',
+                            'label_attr': {
+                                'class': 'form-label fw-bold mt-3'
+                            }
+                        }) }}
+                        
+                        <div class="mt-4">
+                            <h5>Réponses</h5>
+                            <div id="answers" 
+                                 data-prototype="{{ form_widget(form.answers.vars.prototype)|e('html_attr') }}"
+                                 data-index="{{ form.answers|length > 0 ? form.answers|last.vars.name + 1 : 0 }}">
+                                {% for answer in form.answers %}
+                                    <div class="answer-item">
+                                        {{ form_row(answer.text, {
+                                            'label': 'Réponse ' ~ (loop.index),
+                                            'attr': {
+                                                'class': 'form-control',
+                                                'placeholder': 'Entrez la réponse ici...'
+                                            }
+                                        }) }}
+                                        {{ form_row(answer.isCorrect, {
+                                            'label': 'Bonne réponse',
+                                            'attr': {
+                                                'class': 'form-check-input'
+                                            },
+                                            'label_attr': {
+                                                'class': 'form-check-label'
+                                            }
+                                        }) }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <button type="button" class="btn btn-outline-primary btn-sm mt-2" id="add-answer">
+                                <i class="bi bi-plus-circle"></i> Ajouter une réponse
+                            </button>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between mt-4">
+                            <a href="{{ path('app_quiz_admin_edit', {'id': quiz.id}) }}" class="btn btn-secondary">
+                                <i class="bi bi-arrow-left"></i> Retour
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-check-lg"></i> Enregistrer la question
+                            </button>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const addAnswerButton = document.getElementById('add-answer');
+            const answersContainer = document.getElementById('answers');
+            const answerIndex = answersContainer.dataset.index;
+            
+            addAnswerButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                const prototype = answersContainer.dataset.prototype;
+                const newIndex = answersContainer.dataset.index;
+                const newForm = prototype.replace(/__name__/g, newIndex);
+                
+                const newFormElement = document.createElement('div');
+                newFormElement.classList.add('answer-item');
+                newFormElement.innerHTML = newForm;
+                
+                answersContainer.appendChild(newFormElement);
+                answersContainer.dataset.index = parseInt(newIndex) + 1;
+            });
+            
+            // Gestion de la suppression des réponses
+            answersContainer.addEventListener('click', function(e) {
+                if (e.target.classList.contains('remove-answer')) {
+                    e.preventDefault();
+                    if (confirm('Êtes-vous sûr de vouloir supprimer cette réponse ?')) {
+                        e.target.closest('.answer-item').remove();
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}
+{% endblock %}

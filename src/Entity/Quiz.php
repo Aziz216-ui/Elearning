@@ -42,8 +42,11 @@ class Quiz
     #[ORM\OneToMany(targetEntity: QuizResult::class, mappedBy: 'quiz', orphanRemoval: true)]
     private Collection $quizResults;
 
-    #[ORM\Column]
-    private ?int $timeLimit = null;
+    #[ORM\Column(type: 'boolean')]
+    private bool $isPublished = false;
+
+    #[ORM\Column(type: 'boolean')]
+    private bool $isVisible = true;
 
     public function __construct()
     {
@@ -160,18 +163,28 @@ class Quiz
 
     public function __toString(): string
     {
-        return $this->title ?? 'Nouveau quiz';
+        return $this->title ?? 'Nouveau Quiz';
     }
 
-    public function getTimeLimit(): ?int
+    public function isPublished(): bool
     {
-        return $this->timeLimit;
+        return $this->isPublished;
     }
 
-    public function setTimeLimit(int $timeLimit): static
+    public function setIsPublished(bool $isPublished): static
     {
-        $this->timeLimit = $timeLimit;
+        $this->isPublished = $isPublished;
+        return $this;
+    }
 
+    public function isVisible(): bool
+    {
+        return $this->isVisible;
+    }
+
+    public function setIsVisible(bool $isVisible): static
+    {
+        $this->isVisible = $isVisible;
         return $this;
     }
 }

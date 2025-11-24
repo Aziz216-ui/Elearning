@@ -6,33 +6,58 @@
 <div class="container mt-4">
     <h1>Résultats du quiz : {{ quiz.title }}</h1>
     
+    {# Affichage des messages flash #}
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
+    
     <div class="card mb-4">
         <div class="card-body text-center">
-            <h2 class="mb-4">Votre score</h2>
-            <div class="display-4 mb-3">
-                <span class="badge bg-{{ quizResult.score >= (quizResult.totalPoints * 0.8) ? 'success' : 'danger' }}">
-                    {{ quizResult.score }} / {{ quizResult.totalPoints }} points
-                </span>
+            <h2 class="mb-4">Résumé de votre performance</h2>
+            
+            <div class="row justify-content-center">
+                <div class="col-md-6">
+                    <div class="card mb-4">
+                        <div class="card-body">
+                            <div class="display-4 mb-3">
+                                <span class="badge bg-{{ quizResult.passed ? 'success' : 'danger' }} p-3">
+                                    {{ quizResult.score }} / {{ quizResult.totalPoints }} points
+                                </span>
+                            </div>
+                            <p class="h4">
+                                Score : <strong>{{ (quizResult.score / quizResult.totalPoints * 100)|number_format(0) }}%</strong>
+                            </p>
+                            <p class="text-muted">
+                                Score minimum requis : 70%
+                            </p>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <p class="lead">
-                Vous avez répondu correctement à 
-                <strong>{{ quizResult.score / quiz.totalPoints * 100|number_format(0) }}%</strong> 
-                des questions.
-            </p>
-            {% if quizResult.score >= (quizResult.totalPoints * 0.8) %}
+            
+            {% if quizResult.passed %}
                 <div class="alert alert-success">
-                    <h4 class="alert-heading">Félicitations !</h4>
-                    <p>Vous avez réussi le quiz avec succès.</p>
-                    <div class="mt-3">
-                        <a href="{{ path('app_certificat_pdf', {'id': quizResult.id}) }}" class="btn btn-success">
-                            <i class="fas fa-download me-2"></i>Télécharger votre certificat
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h4 class="alert-heading mb-0">Félicitations !</h4>
+                            <p class="mb-0">Vous avez réussi le quiz avec succès.</p>
+                        </div>
+                        <a href="{{ path('app_certificat_pdf', {'id': quizResult.id}) }}" class="btn btn-success btn-lg">
+                            <i class="fas fa-download me-2"></i>Télécharger le certificat
                         </a>
                     </div>
                 </div>
             {% else %}
                 <div class="alert alert-warning">
                     <h4 class="alert-heading">Presque !</h4>
-                    <p>Vous n'avez pas atteint le score de réussite de 80%. Essayez à nouveau !</p>
+                    <p>Vous n'avez pas atteint le score minimum de 70% pour obtenir le certificat. Vous avez obtenu {{ (quizResult.score / quizResult.totalPoints * 100)|number_format(0) }}%.</p>
+                    <hr>
+                    <p class="mb-0">N'hésitez pas à réviser le cours et à réessayer !</p>
                 </div>
             {% endif %}
         </div>

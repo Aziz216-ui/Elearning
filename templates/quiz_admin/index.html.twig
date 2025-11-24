@@ -19,6 +19,7 @@
                     <th>ID</th>
                     <th>Titre</th>
                     <th>Cours associé</th>
+                    <th>Visibilité</th>
                     <th class="text-end">Actions</th>
                 </tr>
             </thead>
@@ -34,6 +35,15 @@
                             <span class="text-muted">Aucun cours associé</span>
                         {% endif %}
 
+                    </td>
+                    <td>
+                        <form action="{{ path('app_quiz_admin_toggle_visibility', {'id': quiz.id}) }}" method="post" class="d-inline">
+                            <input type="hidden" name="_token" value="{{ csrf_token('toggle_visibility' ~ quiz.id) }}">
+                            <button type="submit" class="btn btn-sm {{ quiz.isVisible ? 'btn-success' : 'btn-secondary' }}">
+                                <i class="fas {{ quiz.isVisible ? 'fa-eye' : 'fa-eye-slash' }}"></i>
+                                {{ quiz.isVisible ? 'Visible' : 'Masqué' }}
+                            </button>
+                        </form>
                     </td>
                     <td class="text-end">
                         <div class="btn-group" role="group">
@@ -56,7 +66,7 @@
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="4" class="text-center">Aucun quiz trouvé</td>
+                    <td colspan="5" class="text-center">Aucun quiz trouvé</td>
                 </tr>
             {% endfor %}
             </tbody>

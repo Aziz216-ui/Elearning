@@ -47,6 +47,19 @@ class QuizType extends AbstractType
                 'by_reference' => false,
                 'label' => 'Questions',
                 'attr' => ['class' => 'questions-collection']
+            ])
+            ->add('isVisible', null, [
+                'label' => 'Rendre visible',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-check-input',
+                    'data-toggle' => 'toggle',
+                    'data-on' => 'Oui',
+                    'data-off' => 'Non',
+                    'data-onstyle' => 'success',
+                    'data-offstyle' => 'secondary'
+                ],
+                'label_attr' => ['class' => 'form-check-label']
             ]);
     }
 

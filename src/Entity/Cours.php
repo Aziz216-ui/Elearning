@@ -6,7 +6,6 @@ use App\Repository\CoursRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use App\Entity\Panier;
 
 #[ORM\Entity(repositoryClass: CoursRepository::class)]
 class Cours
@@ -40,16 +39,9 @@ class Cours
     #[ORM\OneToMany(targetEntity: Quiz::class, mappedBy: 'cours', cascade: ['persist', 'remove'])]
     private Collection $quizzes;
 
-    /**
-     * @var Collection<int, Panier>
-     */
-    #[ORM\OneToMany(mappedBy: 'cours', targetEntity: Panier::class, orphanRemoval: true)]
-    private Collection $paniers;
-
     public function __construct()
     {
         $this->quizzes = new ArrayCollection();
-        $this->paniers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -146,35 +138,6 @@ class Cours
         if ($this->quizzes->removeElement($quiz)) {
             if ($quiz->getCours() === $this) {
                 $quiz->setCours(null);
-            }
-        }
-
-        return $this;
-    }
-
-    /**
-     * @return Collection<int, Panier>
-     */
-    public function getPaniers(): Collection
-    {
-        return $this->paniers;
-    }
-
-    public function addPanier(Panier $panier): static
-    {
-        if (!$this->paniers->contains($panier)) {
-            $this->paniers->add($panier);
-            $panier->setCours($this);
-        }
-
-        return $this;
-    }
-
-    public function removePanier(Panier $panier): static
-    {
-        if ($this->paniers->removeElement($panier)) {
-            if ($panier->getCours() === $this) {
-                $panier->setCours(null);
             }
         }
 
