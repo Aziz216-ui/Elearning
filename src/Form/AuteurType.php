@@ -23,7 +23,6 @@ class AuteurType extends AbstractType
             ->add('nom', TextType::class)
             ->add('prenom', TextType::class)
             ->add('email', EmailType::class)
-            // Champs facultatifs ajoutés
             ->add('specialite', TextType::class, [
                 'required' => false,
                 'label' => 'Spécialité / domaine',

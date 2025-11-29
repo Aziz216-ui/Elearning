@@ -1,4 +1,4 @@
-{{ form_start(form) }}
+{{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'needs-validation'}}) }}
   {% set forceRight = always_right|default(false) %}
   {% set bgRight = background_right|default(false) %}
   <div class="row g-4 align-items-start">
@@ -12,7 +12,15 @@
           {% else %}
             <div class="mb-3">
               {{ form_label(field, null, {'label_attr': {'class': 'form-label'}}) }}
-              {{ form_widget(field, {'attr': {'class': 'form-control'}}) }}
+              {{ form_widget(field, {'attr': {
+                'class': 'form-control' ~ (form_errors(field) ? ' is-invalid' : ''),
+                'aria-describedby': field.vars.id ~ '_help'
+              }}) }}
+              {% if form_errors(field) %}
+                <div class="invalid-feedback d-block">
+                  {{ form_errors(field) }}
+                </div>
+              {% endif %}
             </div>
           {% endif %}
         {% endfor %}
@@ -35,17 +43,38 @@
         {% if form.imageFile is defined %}
           <div class="w-100">
             {{ form_label(form.imageFile, 'Image du cours', {'label_attr': {'class': 'form-label'}}) }}
-            {{ form_widget(form.imageFile, {'attr': {'class': 'form-control'}}) }}
+            {{ form_widget(form.imageFile, {'attr': {
+              'class': 'form-control' ~ (form_errors(form.imageFile) ? ' is-invalid' : '')
+            }}) }}
+            {% if form_errors(form.imageFile) %}
+              <div class="invalid-feedback d-block">
+                {{ form_errors(form.imageFile) }}
+              </div>
+            {% endif %}
           </div>
         {% elseif form.thumbnail is defined %}
           <div class="w-100">
             {{ form_label(form.thumbnail, 'Image du cours', {'label_attr': {'class': 'form-label'}}) }}
-            {{ form_widget(form.thumbnail, {'attr': {'class': 'form-control'}}) }}
+            {{ form_widget(form.thumbnail, {'attr': {
+              'class': 'form-control' ~ (form_errors(form.thumbnail) ? ' is-invalid' : '')
+            }}) }}
+            {% if form_errors(form.thumbnail) %}
+              <div class="invalid-feedback d-block">
+                {{ form_errors(form.thumbnail) }}
+              </div>
+            {% endif %}
           </div>
         {% elseif form.cover is defined %}
           <div class="w-100">
             {{ form_label(form.cover, 'Image du cours', {'label_attr': {'class': 'form-label'}}) }}
-            {{ form_widget(form.cover, {'attr': {'class': 'form-control'}}) }}
+            {{ form_widget(form.cover, {'attr': {
+              'class': 'form-control' ~ (form_errors(form.cover) ? ' is-invalid' : '')
+            }}) }}
+            {% if form_errors(form.cover) %}
+              <div class="invalid-feedback d-block">
+                {{ form_errors(form.cover) }}
+              </div>
+            {% endif %}
           </div>
         {% endif %}
       </div>

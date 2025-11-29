@@ -5,6 +5,7 @@ namespace App\Entity;
     use App\Repository\CoursRepository;
     use Doctrine\DBAL\Types\Types;
     use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
     #[ORM\Entity(repositoryClass: CoursRepository::class)]
     class Cours
@@ -15,12 +16,26 @@ namespace App\Entity;
         private ?int $id = null;
 
         #[ORM\Column(length: 255)]
+        #[Assert\NotBlank(message: "Le titre est obligatoire !")]
+        #[Assert\Length(
+            min: 5,
+            max: 255,
+            minMessage: "Le titre doit contenir au moins {{ limit }} caractères",
+            maxMessage: "Le titre ne peut pas dépasser {{ limit }} caractères"
+        )]
         private ?string $title = null;
 
         #[ORM\Column(type: Types::TEXT)]
+        #[Assert\NotBlank(message: "La description est obligatoire !")]
+        #[Assert\Length(
+            min: 10,
+            minMessage: "La description doit contenir au moins {{ limit }} caractères"
+        )]
         private ?string $description = null;
 
         #[ORM\Column]
+        #[Assert\NotBlank(message: "Le prix est obligatoire !")]
+        #[Assert\Positive(message: "Le prix doit être un nombre positif")]
         private ?float $price = null;
         #[ORM\Column(type: "datetime_immutable", nullable: true)]
         private ?\DateTimeImmutable $duration = null;
@@ -28,6 +43,7 @@ namespace App\Entity;
         
 
         #[ORM\Column(length: 255)]
+        #[Assert\NotBlank(message: "La catégorie est obligatoire !")]
         private ?string $category = null;
 
         #[ORM\Column]

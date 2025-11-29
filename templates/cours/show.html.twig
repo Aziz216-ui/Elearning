@@ -19,7 +19,10 @@
           <div class="row mb-3"><div class="col-4 text-muted small">Description</div><div class="col-8">{{ cour.description }}</div></div>
           <div class="row mb-3"><div class="col-4 text-muted small">Price</div><div class="col-8">{{ cour.price }}</div></div>
           <div class="row mb-3"><div class="col-4 text-muted small">Duration</div><div class="col-8">{% if cour.duration is not null %}{{ cour.duration|date('d/m/Y H:i') }}{% else %}Non défini{% endif %}</div></div>
-          <div class="row mb-0"><div class="col-4 text-muted small">Publié</div><div class="col-8">{% if cour.isPublished %}<span class="badge bg-success">Oui</span>{% else %}<span class="badge bg-secondary">Non</span>{% endif %}</div></div>
+          <div class="row mb-2"><div class="col-4 text-muted small">Publié</div><div class="col-8">{% if cour.isPublished %}<span class="badge bg-success">Oui</span>{% else %}<span class="badge bg-secondary">Non</span>{% endif %}</div></div>
+          {% if cour.auteur is not null %}
+          <div class="row mb-0"><div class="col-4 text-muted small">Auteur a des cours publiés ?</div><div class="col-8">{% if hasPublishedByAuteur %}<span class="badge bg-success">Oui</span>{% else %}<span class="badge bg-secondary">Non</span>{% endif %}</div></div>
+          {% endif %}
         </div>
       </div>
 
@@ -44,8 +47,31 @@
       </div>
       {% endif %}
 
-      <div class="d-flex justify-content-end pt-2">
-        {{ include('cours/_delete_form.html.twig') }}
+      <div class="row">
+        <div class="col-lg-8">
+          <div class="d-flex justify-content-start pt-2">
+            {{ include('cours/_delete_form.html.twig') }}
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="card shadow mb-4">
+            <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Derniers cours publiés</h6></div>
+            <div class="card-body">
+              {% if latest is defined and latest %}
+                <ul class="list-unstyled mb-0">
+                  {% for c in latest %}
+                    <li class="mb-2">
+                      <a href="{{ path('app_cours_show', {id: c.id}) }}">{{ c.title }}</a>
+                      <div class="small text-muted">{{ c.price|number_format(2, ',', ' ') }} € • {{ c.category ?? 'Non classé' }}</div>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                <div class="text-muted small">Aucun cours publié récemment.</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
       </div>
     </div>
 {% endblock %}

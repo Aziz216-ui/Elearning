@@ -1,4 +1,4 @@
-{{ form_start(form) }}
+{{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'needs-validation'}}) }}
   {# Disposition Bootstrap: formulaire à gauche, photo à droite #}
   <div class="row g-4 align-items-start">
     {# Colonne gauche: tous les champs sauf _token et photoFile #}
@@ -11,8 +11,15 @@
           {% else %}
             <div class="mb-3">
               {{ form_label(field, null, {'label_attr': {'class': 'form-label'}}) }}
-              {{ form_widget(field, {'attr': {'class': 'form-control'}}) }}
-              {{ form_errors(field) }}
+              {{ form_widget(field, {'attr': {
+                'class': 'form-control' ~ (form_errors(field) ? ' is-invalid' : ''),
+                'aria-describedby': field.vars.id ~ '_help'
+              }}) }}
+              {% if form_errors(field) %}
+                <div class="invalid-feedback d-block">
+                  {{ form_errors(field) }}
+                </div>
+              {% endif %}
             </div>
           {% endif %}
         {% endfor %}

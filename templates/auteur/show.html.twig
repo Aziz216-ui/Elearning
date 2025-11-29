@@ -21,7 +21,9 @@
               <div class="row mb-3"><div class="col-4 text-muted small">Prénom</div><div class="col-8">{{ auteur.prenom }}</div></div>
               <div class="row mb-3"><div class="col-4 text-muted small">Email</div><div class="col-8">{{ auteur.email }}</div></div>
               <div class="row mb-3"><div class="col-4 text-muted small">Spécialité</div><div class="col-8">{{ auteur.specialite ?? '—' }}</div></div>
-              <div class="row mb-0"><div class="col-4 text-muted small">Bio courte</div><div class="col-8">{{ auteur.bio ?? '—' }}</div></div>
+              <div class="row mb-3"><div class="col-4 text-muted small">Bio courte</div><div class="col-8">{{ auteur.bio ?? '—' }}</div></div>
+              <div class="row mb-3"><div class="col-4 text-muted small">Total cours</div><div class="col-8"><span class="badge badge-info">{{ totalCours ?? auteur.cours|length }}</span></div></div>
+              <div class="row mb-0"><div class="col-4 text-muted small">Possède des cours ?</div><div class="col-8">{% if hasCourses %}<span class="badge badge-success">Oui</span>{% else %}<span class="badge badge-secondary">Non</span>{% endif %}</div></div>
             </div>
           </div>
 
@@ -55,6 +57,20 @@
               {% endif %}
               <div class="fw-semibold">{{ auteur.prenom }} {{ auteur.nom }}</div>
               {% if auteur.specialite %}<div class="text-muted small mt-1">{{ auteur.specialite }}</div>{% endif %}
+            </div>
+          </div>
+          <div class="card shadow mb-4">
+            <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Top auteurs</h6></div>
+            <div class="card-body">
+              {% if topAuthors is defined and topAuthors %}
+                <ol class="mb-0">
+                  {% for row in topAuthors %}
+                    <li>{{ row.auteur.prenom }} {{ row.auteur.nom }} — <span class="badge badge-info">{{ row.nbCours }}</span></li>
+                  {% endfor %}
+                </ol>
+              {% else %}
+                <div class="text-muted small">Aucune donnée</div>
+              {% endif %}
             </div>
           </div>
         </div>

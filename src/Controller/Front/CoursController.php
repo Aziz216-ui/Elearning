@@ -4,6 +4,7 @@ namespace App\Controller\Front;
 
 use App\Entity\Cours;
 use App\Form\CoursType;
+use App\Repository\CoursRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -15,10 +16,51 @@ final class CoursController extends AbstractController
 {
     #[Route(name: 'app_cours_index', methods: ['GET'])]
     #[Route(path: '', name: 'app_home_courses', methods: ['GET'])]
-    public function index(EntityManagerInterface $entityManager): Response
+    public function index(Request $request, CoursRepository $coursRepository): Response
     {
+        $category = $request->query->get('category');
+        $category = ($category !== null && $category !== '') ? (string)$category : null;
+
+        $min = $request->query->get('min');
+        $max = $request->query->get('max');
+        $minF = ($min !== null && $min !== '') ? (float)$min : null;
+        $maxF = ($max !== null && $max !== '') ? (float)$max : null;
+
+        $keyword = $request->query->get('q');
+        $keyword = ($keyword !== null && $keyword !== '') ? (string)$keyword : null;
+
+        $publishedParam = $request->query->get('published'); // '1' | '0' | '' | null
+        $published = ($publishedParam === null || $publishedParam === '') ? null : ($publishedParam === '1');
+
+        $dmin = $request->query->get('dmin'); // ex: 2025-01-01
+        $dmax = $request->query->get('dmax');
+        $durationMin = ($dmin !== null && $dmin !== '') ? new \DateTimeImmutable($dmin) : null;
+        $durationMax = ($dmax !== null && $dmax !== '') ? new \DateTimeImmutable($dmax) : null;
+
+        $sort = strtoupper($request->query->get('sort', 'ASC')) === 'DESC' ? 'DESC' : 'ASC';
+        $sortField = $request->query->get('sortField', 'price');
+
+        $cours = $coursRepository->findAdvanced(
+            $category,
+            $minF,
+            $maxF,
+            $keyword,
+            $published,
+            $durationMin,
+            $durationMax,
+            $sortField,
+            $sort
+        );
+        $range = $coursRepository->getMinMaxPrice($category);
+        $distinctCategories = array_map(static fn($r) => $r['category'], $coursRepository->findDistinctCategories());
+        $statsByCategory = $coursRepository->countByCategory();
+
         return $this->render('cours/index.html.twig', [
-            'cours' => $entityManager->getRepository(Cours::class)->findAll(),
+            'cours' => $cours,
+            'minPrice' => $range['minPrice'] ?? null,
+            'maxPrice' => $range['maxPrice'] ?? null,
+            'distinctCategories' => $distinctCategories,
+            'statsByCategory' => $statsByCategory,
         ]);
     }
 
@@ -43,10 +85,15 @@ final class CoursController extends AbstractController
     }
 
     #[Route('/{id}', name: 'app_cours_show', methods: ['GET'])]
-    public function show(Cours $cour): Response
+    public function show(Cours $cour, CoursRepository $coursRepository): Response
     {
+        $latest = $coursRepository->findLatest(5);
+        $hasPublishedByAuteur = $cour->getAuteur() ? $coursRepository->hasPublishedCourses($cour->getAuteur()->getId()) : false;
+
         return $this->render('cours/show.html.twig', [
             'cour' => $cour,
+            'latest' => $latest,
+            'hasPublishedByAuteur' => $hasPublishedByAuteur,
         ]);
     }
 
