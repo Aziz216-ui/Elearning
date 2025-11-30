@@ -7,10 +7,30 @@
 {% block body %}
 <div class="container mt-4">
     <h1>Gestion des quiz</h1>
+    
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endfor %}
 
     <a href="{{ path('app_quiz_admin_new') }}" class="btn btn-primary mb-3">
         <i class="fas fa-plus"></i> Créer un nouveau quiz
     </a>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <h5 class="card-title">Statistiques</h5>
+            <p class="card-text">
+                <strong>Total des quiz :</strong> {{ quizzes|length }}<br>
+                <strong>Quiz visibles :</strong> {{ quizzes|filter(q => q.isVisible)|length }}<br>
+                <strong>Quiz masqués :</strong> {{ quizzes|filter(q => not q.isVisible)|length }}
+            </p>
+        </div>
+    </div>
 
     <div class="table-responsive">
         <table class="table table-striped">
@@ -19,6 +39,8 @@
                     <th>ID</th>
                     <th>Titre</th>
                     <th>Cours associé</th>
+                    <th>Questions</th>
+                    <th>Points</th>
                     <th>Visibilité</th>
                     <th class="text-end">Actions</th>
                 </tr>
@@ -34,7 +56,12 @@
                         {% else %}
                             <span class="text-muted">Aucun cours associé</span>
                         {% endif %}
-
+                    </td>
+                    <td>
+                        <span class="badge bg-info">{{ quiz.questions|length }}</span>
+                    </td>
+                    <td>
+                        <span class="badge bg-success">{{ quiz.totalPoints }}</span>
                     </td>
                     <td>
                         <form action="{{ path('app_quiz_admin_toggle_visibility', {'id': quiz.id}) }}" method="post" class="d-inline">
@@ -66,7 +93,12 @@
                 </tr>
             {% else %}
                 <tr>
-                    <td colspan="5" class="text-center">Aucun quiz trouvé</td>
+                    <td colspan="7" class="text-center">
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle"></i>
+                            Aucun quiz trouvé. <a href="{{ path('app_quiz_admin_new') }}">Créez votre premier quiz</a>.
+                        </div>
+                    </td>
                 </tr>
             {% endfor %}
             </tbody>

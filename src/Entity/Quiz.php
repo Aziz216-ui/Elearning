@@ -6,6 +6,7 @@ use App\Repository\QuizRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: QuizRepository::class)]
 class Quiz
@@ -16,19 +17,39 @@ class Quiz
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le titre du quiz est obligatoire.")]
+    #[Assert\Length(
+        min: 3,
+        max: 255,
+        minMessage: "Le titre doit contenir au moins {{ limit }} caractères",
+        maxMessage: "Le titre ne peut pas dépasser {{ limit }} caractères"
+    )]
     private string $title = '';
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Assert\NotBlank(message: "La description est obligatoire.")]
+    #[Assert\Length(
+        max: 500,
+        maxMessage: "La description ne peut pas dépasser {{ limit }} caractères"
+    )]
     private ?string $description = null;
 
     #[ORM\ManyToOne(inversedBy: 'quizzes')]
     #[ORM\JoinColumn(nullable: true)]
+    #[Assert\NotNull(message: "Le cours associé est obligatoire.")]
     private ?Cours $cours = null;
-
-
 
     #[ORM\Column(type: 'integer', nullable: true)]
     private ?int $totalPoints = null;
+
+    #[ORM\Column(type: 'integer', nullable: true)]
+    private ?int $timeLimit = null;
+
+    #[ORM\Column(type: 'boolean')]
+    private bool $isPublished = false;
+
+    #[ORM\Column(type: 'boolean')]
+    private bool $isVisible = true;
 
     /**
      * @var Collection<int, Question>
@@ -41,15 +62,6 @@ class Quiz
      */
     #[ORM\OneToMany(targetEntity: QuizResult::class, mappedBy: 'quiz', orphanRemoval: true)]
     private Collection $quizResults;
-
-    #[ORM\Column(type: 'boolean')]
-    private bool $isPublished = false;
-
-    #[ORM\Column(type: 'boolean')]
-    private bool $isVisible = true;
-
-    #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $timeLimit = null;
 
     public function __construct()
     {

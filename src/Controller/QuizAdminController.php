@@ -82,6 +82,79 @@ class QuizAdminController extends AbstractController
                 }
             }
 
+            // Validation personnalisée supplémentaire
+            $errors = [];
+            
+            if ($quiz->getQuestions()->count() === 0) {
+                $errors[] = 'Un quiz doit contenir au moins une question.';
+            }
+
+            foreach ($quiz->getQuestions() as $index => $question) {
+                if (empty($question->getText()) || trim($question->getText()) === '') {
+                    $errors[] = 'La question ' . ($index + 1) . ' doit avoir un énoncé.';
+                }
+
+                if ($question->getAnswers()->count() === 0) {
+                    $errors[] = 'La question ' . ($index + 1) . ' doit avoir au moins une réponse.';
+                }
+
+                // Validation spécifique selon le type
+                if ($question->getType() === 'multiple_choice') {
+                    $hasValidAnswer = false;
+                    $hasCorrectAnswer = false;
+                    
+                    foreach ($question->getAnswers() as $answer) {
+                        if (!empty($answer->getText()) && trim($answer->getText()) !== '') {
+                            $hasValidAnswer = true;
+                            if ($answer->isCorrect()) {
+                                $hasCorrectAnswer = true;
+                            }
+                        }
+                    }
+                    
+                    if (!$hasValidAnswer) {
+                        $errors[] = 'La question ' . ($index + 1) . ' doit avoir au moins une réponse valide.';
+                    }
+                    if (!$hasCorrectAnswer) {
+                        $errors[] = 'La question ' . ($index + 1) . ' doit avoir au moins une réponse correcte.';
+                    }
+                } elseif ($question->getType() === 'true_false') {
+                    $hasTrueFalse = false;
+                    foreach ($question->getAnswers() as $answer) {
+                        if (in_array(strtolower($answer->getText()), ['true', 'false', 'vrai', 'faux'])) {
+                            $hasTrueFalse = true;
+                            break;
+                        }
+                    }
+                    if (!$hasTrueFalse) {
+                        $errors[] = 'La question ' . ($index + 1) . ' doit avoir une réponse Vrai/Faux.';
+                    }
+                } elseif ($question->getType() === 'short_answer') {
+                    $hasShortAnswer = false;
+                    foreach ($question->getAnswers() as $answer) {
+                        if (!empty($answer->getText()) && trim($answer->getText()) !== '') {
+                            $hasShortAnswer = true;
+                            break;
+                        }
+                    }
+                    if (!$hasShortAnswer) {
+                        $errors[] = 'La question ' . ($index + 1) . ' doit avoir une réponse attendue.';
+                    }
+                }
+            }
+
+            // Si il y a des erreurs, les afficher
+            if (!empty($errors)) {
+                foreach ($errors as $error) {
+                    $this->addFlash('error', $error);
+                }
+                return $this->render('quiz_admin/new.html.twig', [
+                    'quiz' => $quiz,
+                    'form' => $form->createView(),
+                    'validation_errors' => $errors
+                ]);
+            }
+
             // calcul total points
             $total = 0;
             foreach ($quiz->getQuestions() as $q) {

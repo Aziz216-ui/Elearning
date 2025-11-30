@@ -164,6 +164,14 @@ class QuizController extends AbstractController
                 $userAnswer->setAnswer($answer);
                 $userAnswer->setIsCorrect($answer && $answer->isCorrect());
                 $em->persist($userAnswer);
+            } else {
+                // Créer une réponse vide pour les questions non répondues
+                $userAnswer = new UserAnswer();
+                $userAnswer->setUser($user);
+                $userAnswer->setQuestion($question);
+                $userAnswer->setAnswer(null); // Pas de réponse sélectionnée
+                $userAnswer->setIsCorrect(false);
+                $em->persist($userAnswer);
             }
         }
 
@@ -241,6 +249,14 @@ class QuizController extends AbstractController
                 $userAnswer->setQuestion($question);
                 $userAnswer->setAnswer($answer);
                 $userAnswer->setIsCorrect($answer && $answer->isCorrect());
+                $em->persist($userAnswer);
+            } else {
+                // Créer une réponse vide pour les questions non répondues
+                $userAnswer = new UserAnswer();
+                $userAnswer->setUser($user);
+                $userAnswer->setQuestion($question);
+                $userAnswer->setAnswer(null); // Pas de réponse sélectionnée
+                $userAnswer->setIsCorrect(false);
                 $em->persist($userAnswer);
             }
         }
