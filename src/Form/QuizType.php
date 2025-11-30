@@ -60,6 +60,27 @@ class QuizType extends AbstractType
                     'data-offstyle' => 'secondary'
                 ],
                 'label_attr' => ['class' => 'form-check-label']
+            ])
+            ->add('isPublished', null, [
+                'label' => 'Publier le quiz',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-check-input',
+                    'data-toggle' => 'toggle',
+                    'data-on' => 'Oui',
+                    'data-off' => 'Non',
+                    'data-onstyle' => 'success',
+                    'data-offstyle' => 'secondary'
+                ],
+                'label_attr' => ['class' => 'form-check-label']
+            ])
+            ->add('timeLimit', IntegerType::class, [
+                'label' => 'Limite de temps (en secondes)',
+                'required' => false,
+                'attr' => [
+                    'class' => 'form-control',
+                    'placeholder' => 'Ex: 1800 pour 30 minutes'
+                ]
             ]);
     }
 

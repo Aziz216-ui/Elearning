@@ -6,8 +6,11 @@ use App\Repository\QuizRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use App\Validator\Constraints as AppAssert;
 
 #[ORM\Entity(repositoryClass: QuizRepository::class)]
+#[AppAssert\ContainsQuestion]
 class Quiz
 {
     #[ORM\Id]
@@ -16,19 +19,31 @@ class Quiz
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le titre du quiz est obligatoire.")]
+    #[Assert\Length(
+        min: 3,
+        max: 255,
+        minMessage: "Le titre doit faire au moins {{ limit }} caractères.",
+        maxMessage: "Le titre ne peut pas dépasser {{ limit }} caractères."
+    )]
     private ?string $title = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 255)]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: "La description ne peut pas dépasser {{ limit }} caractères."
+    )]
+    #[Assert\NotBlank(message: "La description est obligatoire.")]
     private ?string $description = null;
 
     #[ORM\ManyToOne(inversedBy: 'quizzes')]
     #[ORM\JoinColumn(nullable: true)]
+    #[Assert\NotBlank(message: "Le cours associé est obligatoire.")]
     private ?Cours $cours = null;
 
-
-
-    #[ORM\Column(type: 'integer', nullable: true)]
-    private ?int $totalPoints = null;
+    #[ORM\Column(type: 'integer')]
+    #[Assert\PositiveOrZero(message: "Le total des points doit être positif.")]
+    private ?int $totalPoints = 0;
 
     /**
      * @var Collection<int, Question>
@@ -47,6 +62,11 @@ class Quiz
 
     #[ORM\Column(type: 'boolean')]
     private bool $isVisible = true;
+
+    #[ORM\Column(type: 'integer')]
+    #[Assert\Positive(message: "La durée doit être un nombre positif.")]
+    #[Assert\NotBlank(message: "La limite de temps est obligatoire.")]
+    private ?int $timeLimit = null;
 
     public function __construct()
     {
@@ -185,6 +205,17 @@ class Quiz
     public function setIsVisible(bool $isVisible): static
     {
         $this->isVisible = $isVisible;
+        return $this;
+    }
+
+    public function getTimeLimit(): ?int
+    {
+        return $this->timeLimit;
+    }
+
+    public function setTimeLimit(?int $timeLimit): static
+    {
+        $this->timeLimit = $timeLimit;
         return $this;
     }
 }
