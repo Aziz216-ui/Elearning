@@ -1,0 +1,235 @@
+{% extends 'base1.html.twig' %}
+
+{% block title %}Créer un Quiz{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    .card {
+        background: white;
+        border-radius: 16px;
+        box-shadow: 0 10px 30px rgba(15,46,61,0.08);
+        border: 1px solid rgba(25,199,216,0.15);
+        overflow: hidden;
+    }
+
+    .card-header {
+        background: linear-gradient(90deg,var(--primary),var(--primary-hover));
+        color: white;
+        padding: 25px 30px;
+        border: none;
+    }
+
+    .card-header h1 {
+        margin: 0;
+        font-size: 1.8em;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .card-body {
+        padding: 30px;
+    }
+
+    .form-group {
+        margin-bottom: 25px;
+    }
+
+    .form-label {
+        font-weight: 600;
+        color: #333;
+        margin-bottom: 8px;
+        display: block;
+    }
+
+    .form-control, .form-select {
+        border: 2px solid #e0e0e0;
+        border-radius: 8px;
+        padding: 12px 15px;
+        font-size: 1em;
+        transition: all 0.3s;
+        width: 100%;
+    }
+
+    .form-control:focus, .form-select:focus {
+        outline: none;
+        border-color: var(--primary);
+        box-shadow: 0 0 0 3px rgba(25,199,216,0.15);
+    }
+
+    .form-check {
+        margin-bottom: 15px;
+    }
+
+    .form-check-input {
+        width: 20px;
+        height: 20px;
+        margin-right: 10px;
+    }
+
+    .form-check-label {
+        font-weight: 500;
+        color: #333;
+    }
+
+    .btn {
+        padding: 12px 25px;
+        border: none;
+        border-radius: 8px;
+        font-size: 1em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+    }
+
+    .btn-primary {
+        background: linear-gradient(90deg,var(--primary),var(--primary-hover));
+        color: white;
+        box-shadow: 0 10px 20px rgba(25,199,216,0.25);
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
+        color: white;
+    }
+
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        background: #5a6268;
+        color: white;
+    }
+
+    .d-flex {
+        display: flex;
+        gap: 15px;
+        justify-content: flex-end;
+        margin-top: 30px;
+    }
+
+    .alert {
+        padding: 15px 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+    }
+
+    .alert-success {
+        background-color: #d4edda;
+        border-color: #c3e6cb;
+        color: #155724;
+    }
+
+    .info-text {
+        background: #f8f9fa;
+        border-left: 4px solid var(--primary);
+        padding: 15px;
+        margin-bottom: 25px;
+        border-radius: 0 8px 8px 0;
+        color: #666;
+    }
+
+    @media (max-width: 768px) {
+        .container {
+            padding: 10px;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .d-flex {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="card">
+        <div class="card-header">
+            <h1>📝 Créer un Quiz</h1>
+        </div>
+        <div class="card-body">
+            <div class="info-text">
+                <strong>💡 Information :</strong> Ce formulaire vous permet de créer un quiz avec tous les champs de base (titre, description, cours, points, publication, visibilité) mais sans ajouter de questions. Vous pourrez ajouter les questions plus tard.
+            </div>
+
+            {% for flash in app.flashes('success') %}
+                <div class="alert alert-success">
+                    {{ flash }}
+                </div>
+            {% endfor %}
+
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+                
+                <div class="form-group">
+                    {{ form_label(form.title, 'Titre du quiz *') }}
+                    {{ form_widget(form.title, {'attr': {'class': 'form-control', 'placeholder': 'Entrez le titre du quiz'}}) }}
+                    {{ form_errors(form.title) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(form.description, 'Description') }}
+                    {{ form_widget(form.description, {'attr': {'class': 'form-control', 'placeholder': 'Entrez une description détaillée du quiz', 'rows': 4}}) }}
+                    {{ form_errors(form.description) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(form.totalPoints, 'Points totaux *') }}
+                    {{ form_widget(form.totalPoints, {'attr': {'class': 'form-control', 'placeholder': 'Ex: 10'}}) }}
+                    {{ form_errors(form.totalPoints) }}
+                </div>
+
+                <div class="form-group">
+                    {{ form_label(form.cours, 'Cours associé') }}
+                    {{ form_widget(form.cours, {'attr': {'class': 'form-select'}}) }}
+                    {{ form_errors(form.cours) }}
+                </div>
+
+                <div class="form-group">
+                    <div class="form-check">
+                        {{ form_widget(form.isPublished, {'attr': {'class': 'form-check-input'}}) }}
+                        {{ form_label(form.isPublished, 'Publier immédiatement le quiz', {'label_attr': {'class': 'form-check-label'}}) }}
+                    </div>
+                    {{ form_errors(form.isPublished) }}
+                </div>
+
+                <div class="form-group">
+                    <div class="form-check">
+                        {{ form_widget(form.isVisible, {'attr': {'class': 'form-check-input'}}) }}
+                        {{ form_label(form.isVisible, 'Rendre le quiz visible pour les étudiants', {'label_attr': {'class': 'form-check-label'}}) }}
+                    </div>
+                    {{ form_errors(form.isVisible) }}
+                </div>
+
+                <div class="d-flex">
+                    <a href="{{ path('app_quiz_admin_index') }}" class="btn btn-secondary">
+                        ❌ Annuler
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        ✅ Créer le quiz
+                    </button>
+                </div>
+
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

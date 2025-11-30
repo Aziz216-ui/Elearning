@@ -79,8 +79,10 @@ class QuizType extends AbstractType
                 'required' => false,
                 'attr' => [
                     'class' => 'form-control',
-                    'placeholder' => 'Ex: 1800 pour 30 minutes'
-                ]
+                    'placeholder' => 'Ex: 1800 pour 30 minutes',
+                    'min' => '60'
+                ],
+                'help' => 'Laissez vide pour pas de limite de temps'
             ]);
     }
 

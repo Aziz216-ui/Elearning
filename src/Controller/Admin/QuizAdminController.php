@@ -17,7 +17,6 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 
 #[Route('/admin/quiz')]
@@ -34,53 +33,20 @@ class QuizAdminController extends AbstractController
     }
 
     #[Route('/new-simple', name: 'app_quiz_admin_new_simple', methods: ['GET', 'POST'])]
-    public function newSimple(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator): Response
+    public function newSimple(Request $request, EntityManagerInterface $entityManager): Response
     {
         $quiz = new Quiz();
         $form = $this->createForm(QuizSimpleType::class, $quiz);
         $form->handleRequest($request);
 
-        $isSubmitted = $form->isSubmitted();
-        
-        if ($isSubmitted && $form->isValid()) {
-            // Validation des contraintes
-            $errors = $validator->validate($quiz, null, ['Default']);
-            
-            // Validation personnalisée pour les questions
-            if (count($quiz->getQuestions()) === 0) {
-                $this->addFlash('error', 'Vous devez ajouter au moins une question au quiz.');
-                return $this->render('quiz_admin/new_simple.html.twig', [
-                    'quiz' => $quiz,
-                    'form' => $form->createView(),
-                ]);
-            }
-            
-            if (count($errors) > 0) {
-                // Afficher les erreurs de validation
-                foreach ($errors as $error) {
-                    $this->addFlash('error', $error->getMessage());
-                }
-                return $this->render('quiz_admin/new_simple.html.twig', [
-                    'quiz' => $quiz,
-                    'form' => $form->createView(),
-                ]);
-            }
-            
+        if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($quiz);
             $entityManager->flush();
 
-            // Vérifier si l'ID a été généré
-            if ($quiz->getId()) {
-                $this->addFlash('success', 'Quiz créé avec succès ! ID: ' . $quiz->getId());
-            } else {
-                $this->addFlash('error', 'Erreur: Le quiz n\'a pas d\'ID après la sauvegarde.');
-            }
-            
+            $this->addFlash('success', 'Quiz créé avec succès !');
             return $this->redirectToRoute('app_quiz_admin_index');
         } else {
-            // Debug: Afficher les erreurs si le formulaire n'est pas valide
             if ($form->isSubmitted()) {
-                dump($form->getErrors(true));
                 error_log('Form errors: ' . $form->getErrors(true));
                 $this->addFlash('error', 'Formulaire invalide. Vérifiez les champs.');
             }
@@ -93,7 +59,7 @@ class QuizAdminController extends AbstractController
     }
 
     #[Route('/new', name: 'app_quiz_admin_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator): Response
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $quiz = new Quiz();
         // Set default values for new quiz
@@ -103,7 +69,6 @@ class QuizAdminController extends AbstractController
         $form = $this->createForm(QuizType::class, $quiz);
         $form->handleRequest($request);
 
-        // Ne rien faire tant que le formulaire n'est pas soumis et valide
         if ($form->isSubmitted() && $form->isValid()) {
 
             $data = $request->request->all();
@@ -207,109 +172,81 @@ class QuizAdminController extends AbstractController
 
 
     #[Route('/{id}/edit', name: 'app_quiz_admin_edit', methods: ['GET', 'POST'])]
-    public function edit(Request $request, Quiz $quiz, EntityManagerInterface $entityManager, ValidatorInterface $validator): Response
+    public function edit(Request $request, Quiz $quiz, EntityManagerInterface $entityManager): Response
     {
         $form = $this->createForm(QuizType::class, $quiz);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted()) {
-            // Validation personnalisée pour les questions
-            if (count($quiz->getQuestions()) === 0) {
-                $this->addFlash('error', 'Vous devez ajouter au moins une question au quiz.');
-                return $this->render('quiz_admin/new.html.twig', [
-                    'quiz' => $quiz,
-                    'form' => $form,
-                ]);
-            }
-
-            if ($form->isValid()) {
-                // Récupérer les données brutes du formulaire
-                $data = $request->request->all();
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Récupérer les données brutes du formulaire
+            $data = $request->request->all();
+            
+            // Vérifier si nous avons des données de formulaire
+            if (isset($data['quiz']['questions'])) {
+                $questionsData = $data['quiz']['questions'];
                 
-                if (isset($data['quiz']['questions'])) {
-                    $questionsData = $data['quiz']['questions'];
-                    $questionIndex = 0;
-                    
-                    // Parcourir les questions du formulaire
-                    foreach ($questionsData as $questionKey => $questionData) {
-                        if (preg_match('/^q\d+$/', $questionKey)) {
-                            $question = $quiz->getQuestions()[$questionIndex] ?? null;
-                            if ($question) {
-                                // Mettre à jour le texte et les points de la question
-                                if (isset($questionData['text'])) {
-                                    $question->setText($questionData['text']);
-                                }
-                                if (isset($questionData['points'])) {
-                                    $question->setPoints((int)$questionData['points']);
-                                }
-                                
-                                // Traiter les réponses
-                                if (isset($questionData['answers'])) {
-                                    $answerIndex = 0;
-                                    foreach ($questionData['answers'] as $answerKey => $answerData) {
-                                        if (preg_match('/^a\d+$/', $answerKey)) {
-                                            $answer = $question->getAnswers()[$answerIndex] ?? null;
-                                            if ($answer) {
-                                                if (isset($answerData['text'])) {
-                                                    $answer->setText($answerData['text']);
-                                                }
-                                                $answer->setIsCorrect(isset($answerData['isCorrect']));
-                                                $answer->setQuestion($question);
-                                                $answerIndex++;
+                // Parcourir les questions du formulaire
+                foreach ($questionsData as $questionKey => $questionData) {
+                    // Vérifier si c'est une clé valide (commence par 'q' suivi de chiffres)
+                    if (preg_match('/^q\d+$/', $questionKey)) {
+                        $question = $quiz->getQuestions()[$questionKey] ?? null;
+                        if ($question) {
+                            // Mettre à jour le texte et les points de la question
+                            if (isset($questionData['text'])) {
+                                $question->setText($questionData['text']);
+                            }
+                            if (isset($questionData['points'])) {
+                                $question->setPoints($questionData['points']);
+                            }
+                            
+                            // Traiter les réponses
+                            if (isset($questionData['answers'])) {
+                                $answerIndex = 0;
+                                foreach ($questionData['answers'] as $answerKey => $answerData) {
+                                    // Vérifier si c'est une clé valide (commence par 'a' suivi de chiffres)
+                                    if (preg_match('/^a\d+$/', $answerKey)) {
+                                        $answer = $question->getAnswers()[$answerIndex] ?? null;
+                                        if ($answer) {
+                                            if (isset($answerData['text'])) {
+                                                $answer->setText($answerData['text']);
                                             }
+                                            if (isset($answerData['isCorrect'])) {
+                                                $answer->setIsCorrect(true);
+                                            } else {
+                                                $answer->setIsCorrect(false);
+                                            }
+                                            $answer->setQuestion($question);
+                                            $answerIndex++;
                                         }
                                     }
                                 }
-                                
-                                $question->setQuiz($quiz);
-                                $questionIndex++;
                             }
+                            
+                            $question->setQuiz($quiz);
                         }
                     }
                 }
-                
-                // S'assurer qu'il y a au moins une réponse correcte par question
-                $hasError = false;
-                foreach ($quiz->getQuestions() as $question) {
-                    $hasCorrectAnswer = false;
-                    foreach ($question->getAnswers() as $answer) {
-                        if ($answer->isCorrect()) {
-                            $hasCorrectAnswer = true;
-                            break;
-                        }
-                    }
-                    
-                    if (!$hasCorrectAnswer && $question->getAnswers()->count() > 0) {
-                        $question->getAnswers()->first()->setIsCorrect(true);
-                    } elseif ($question->getAnswers()->count() === 0) {
-                        $hasError = true;
-                        $this->addFlash('error', 'Chaque question doit avoir au moins une réponse.');
+            }
+            
+            // S'assurer qu'il y a au moins une réponse correcte par question
+            foreach ($quiz->getQuestions() as $question) {
+                $hasCorrectAnswer = false;
+                foreach ($question->getAnswers() as $answer) {
+                    if ($answer->isCorrect()) {
+                        $hasCorrectAnswer = true;
                         break;
                     }
                 }
                 
-                if ($hasError) {
-                    return $this->render('quiz_admin/new.html.twig', [
-                        'quiz' => $quiz,
-                        'form' => $form->createView(),
-                    ]);
-                }
-                
-                // Calculer le total des points
-                $totalPoints = 0;
-                foreach ($quiz->getQuestions() as $question) {
-                    $totalPoints += $question->getPoints();
-                }
-                $quiz->setTotalPoints($totalPoints);
-
-                try {
-                    $entityManager->flush();
-                    $this->addFlash('success', 'Le quiz a été mis à jour avec succès.');
-                    return $this->redirectToRoute('app_quiz_admin_index');
-                } catch (\Exception $e) {
-                    $this->addFlash('error', 'Une erreur est survenue lors de la mise à jour du quiz : ' . $e->getMessage());
+                if (!$hasCorrectAnswer && $question->getAnswers()->count() > 0) {
+                    $question->getAnswers()->first()->setIsCorrect(true);
                 }
             }
+            
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Le quiz a été mis à jour avec succès.');
+            return $this->redirectToRoute('app_quiz_admin_index');
         }
 
         return $this->render('quiz_admin/new.html.twig', [
@@ -354,9 +291,7 @@ class QuizAdminController extends AbstractController
         
         $form->handleRequest($request);
         
-        $isSubmitted = $form->isSubmitted();
-        
-        if ($isSubmitted && $form->isValid()) {
+        if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->persist($question);
             
             // Mise à jour du total des points du quiz

@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Front;
 
 use App\Entity\Cours;
 use App\Entity\Panier;
@@ -64,6 +64,14 @@ final class DashboardController extends AbstractController
         
         return $this->render('dashboard/mes_cours.html.twig', [
             'panier' => $panier,
+        ]);
+    }
+
+    #[Route('/cours/{id}', name: 'app_cours_show', methods: ['GET'])]
+    public function showCours(Cours $cours): Response
+    {
+        return $this->render('dashboard/cours_show.html.twig', [
+            'cours' => $cours,
         ]);
     }
 

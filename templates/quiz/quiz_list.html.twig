@@ -1,0 +1,75 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Quiz disponibles - {{ cours.title }}{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Quiz disponibles pour {{ cours.title }}</h1>
+        <a href="{{ path('app_mes_cours') }}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left"></i> Retour à mes cours
+        </a>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <h5 class="card-title">{{ cours.title }}</h5>
+            <p class="card-text">{{ cours.description|slice(0, 200) }}...</p>
+            <p class="text-muted">
+                <strong>Ajouté le :</strong> {{ "now"|date('d/m/Y') }}
+            </p>
+        </div>
+    </div>
+
+    {% if quizzes|length > 0 %}
+        <div class="row">
+            {% for quiz in quizzes %}
+                <div class="col-md-6 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <h5 class="card-title">{{ quiz.title }}</h5>
+                                <span class="badge bg-success">
+                                    <i class="fas fa-eye"></i> Visible
+                                </span>
+                            </div>
+                            
+                            <p class="card-text">{{ quiz.description|slice(0, 150) }}...</p>
+                            
+                            <div class="mb-3">
+                                <small class="text-muted">
+                                    <i class="fas fa-question-circle"></i> 
+                                    {{ quiz.questions|length }} questions
+                                    {% if quiz.totalPoints %}
+                                        | <i class="fas fa-star"></i> {{ quiz.totalPoints }} points
+                                    {% endif %}
+                                    {% if quiz.timeLimit %}
+                                        | <i class="fas fa-clock"></i> {{ (quiz.timeLimit // 60) }} min
+                                    {% endif %}
+                                </small>
+                            </div>
+                            
+                            <div class="d-grid gap-2">
+                                <a href="{{ path('app_quiz_start', {'id': quiz.id}) }}" class="btn btn-primary">
+                                    <i class="fas fa-play"></i> Commencer le quiz
+                                </a>
+                                {% if quiz.cours %}
+                                    <a href="{{ path('app_cours_show', {'id': quiz.cours.id}) }}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-info-circle"></i> Détails du cours
+                                    </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <i class="fas fa-info-circle"></i>
+            Aucun quiz n'est actuellement disponible pour ce cours.
+            Les quiz visibles par l'administrateur apparaîtront ici.
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
