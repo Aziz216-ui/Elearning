@@ -1,0 +1,9 @@
+{{ form_start(form, { attr: { novalidate: 'novalidate' } }) }}
+    {{ form_row(form.name) }}
+    {{ form_row(form.description) }}
+    {{ form_row(form.price) }}
+    {{ form_row(form.duration) }}
+    {{ form_row(form.isActive) }}
+    {{ form_row(form.maxCourses) }}
+    <button class="btn btn-primary">{{ button_label|default('Save') }}</button>
+{{ form_end(form) }}

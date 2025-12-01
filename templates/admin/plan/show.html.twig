@@ -1,0 +1,67 @@
+{% extends 'admin/layouts/base1_wrapper.html.twig' %}
+
+{% block title %}Plan {{ plan.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Détails du plan</h1>
+        <div>
+            <a href="{{ path('admin_plan_edit', {id: plan.id}) }}" class="btn btn-primary btn-sm shadow-sm mr-2">
+                <i class="fas fa-edit fa-sm"></i> Éditer
+            </a>
+            <a href="{{ path('admin_plan_index') }}" class="btn btn-secondary btn-sm shadow-sm">
+                <i class="fas fa-arrow-left fa-sm"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    <!-- Plan Details Card -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Plan: {{ plan.name }}</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th class="bg-light" style="width: 30%;">Identifiant</th>
+                            <td>{{ plan.id }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Nom</th>
+                            <td>{{ plan.name }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Description</th>
+                            <td>{{ plan.description }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Prix (DT)</th>
+                            <td>{{ plan.price }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Durée</th>
+                            <td>{{ plan.duration }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Actif</th>
+                            <td>
+                                <span class="badge {{ plan.isActive ? 'badge-success' : 'badge-secondary' }}">
+                                    {{ plan.isActive ? 'Actif' : 'Inactif' }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Max cours</th>
+                            <td>{{ plan.maxCourses ?? '∞' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
