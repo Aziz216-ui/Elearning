@@ -282,36 +282,58 @@ class CoursRepository extends ServiceEntityRepository
         ?string $sortField = 'price',
         string $sortOrder = 'ASC'
     ): array {
-        $qb = $this->createQueryBuilder('c');
+        $em = $this->getEntityManager();
+
+        // Base DQL with LEFT JOIN on auteur to eagerly load and avoid lazy-load exceptions
+        $dql = 'SELECT c, a FROM App\\Entity\\Cours c LEFT JOIN c.auteur a';
+        $conditions = [];
+        $params = [];
 
         if ($category !== null && $category !== '') {
-            $qb->andWhere('c.category = :cat')->setParameter('cat', $category);
+            $conditions[] = 'c.category = :cat';
+            $params['cat'] = $category;
         }
         if ($minPrice !== null) {
-            $qb->andWhere('c.price >= :pmin')->setParameter('pmin', $minPrice);
+            $conditions[] = 'c.price >= :pmin';
+            $params['pmin'] = $minPrice;
         }
         if ($maxPrice !== null) {
-            $qb->andWhere('c.price <= :pmax')->setParameter('pmax', $maxPrice);
+            $conditions[] = 'c.price <= :pmax';
+            $params['pmax'] = $maxPrice;
         }
         if ($keyword !== null && $keyword !== '') {
-            $qb->andWhere('c.title LIKE :kw OR c.description LIKE :kw')->setParameter('kw', '%' . $keyword . '%');
+            $conditions[] = '(c.title LIKE :kw OR c.description LIKE :kw)';
+            $params['kw'] = '%' . $keyword . '%';
         }
         if ($published !== null) {
-            $qb->andWhere('c.isPublished = :pub')->setParameter('pub', $published);
+            $conditions[] = 'c.isPublished = :pub';
+            $params['pub'] = $published;
         }
         if ($durationMin !== null) {
-            $qb->andWhere('c.duration >= :dmin')->setParameter('dmin', $durationMin);
+            $conditions[] = 'c.duration >= :dmin';
+            $params['dmin'] = $durationMin;
         }
         if ($durationMax !== null) {
-            $qb->andWhere('c.duration <= :dmax')->setParameter('dmax', $durationMax);
+            $conditions[] = 'c.duration <= :dmax';
+            $params['dmax'] = $durationMax;
+        }
+
+        if (!empty($conditions)) {
+            $dql .= ' WHERE ' . implode(' AND ', $conditions);
         }
 
         $allowedSort = ['title', 'price', 'duration', 'category', 'id'];
         $sortField = in_array($sortField ?? '', $allowedSort, true) ? $sortField : 'price';
         $sortOrder = strtoupper($sortOrder) === 'DESC' ? 'DESC' : 'ASC';
+        $orderByField = 'c.' . $sortField;
 
-        $qb->orderBy('c.' . $sortField, $sortOrder);
+        $dql .= ' ORDER BY ' . $orderByField . ' ' . $sortOrder;
 
-        return $qb->getQuery()->getResult();
+        $query = $em->createQuery($dql);
+        foreach ($params as $name => $value) {
+            $query->setParameter($name, $value);
+        }
+
+        return $query->getResult();
     }
 }

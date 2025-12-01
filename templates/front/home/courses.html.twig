@@ -6,9 +6,19 @@
   <div class="container py-5">
     <h1 class="mb-4 text-center">Cours</h1>
 
-    {% if cours is empty %}
-      <div class="alert alert-info text-center">Aucun cours disponible pour le moment.</div>
-    {% else %}
+    {# Pills filter: Tous | Nouveauté | Populaire #}
+    {% set currentCategory = currentCategory is defined ? currentCategory : app.request.get('category') %}
+    {% set currentType = currentType is defined ? currentType : (app.request.get('type') ?? 'all') %}
+    <div class="d-flex gap-2 mb-4">
+      <a href="{{ path('app_home_courses', currentCategory ? { category: currentCategory, type: 'all' } : { type: 'all' }) }}"
+         class="btn btn-sm {{ currentType == 'all' ? 'btn-primary' : 'btn-outline-primary' }}">Tous</a>
+      <a href="{{ path('app_home_courses', currentCategory ? { category: currentCategory, type: 'new' } : { type: 'new' }) }}"
+         class="btn btn-sm {{ currentType == 'new' ? 'btn-primary' : 'btn-outline-primary' }}">Nouveauté</a>
+      <a href="{{ path('app_home_courses', currentCategory ? { category: currentCategory, type: 'popular' } : { type: 'popular' }) }}"
+         class="btn btn-sm {{ currentType == 'popular' ? 'btn-primary' : 'btn-outline-primary' }}">Populaire</a>
+    </div>
+
+    {% if cours is defined and cours is not empty %}
       <div class="row row-cols-1 row-cols-md-3 g-4">
         {% for c in cours %}
           <div class="col">
@@ -67,7 +77,7 @@
                 {# Durée (texte) #}
                 <p class="mb-3"><strong>Durée:</strong>
                   {% if c.duration is not null %}
-                    {{ c.duration|date('H:i') }}
+                    {{ c.duration|date('H\\h i') }}
                   {% else %}
                     <span class="text-muted">Non défini</span>
                   {% endif %}
@@ -93,6 +103,8 @@
           </div>
         {% endfor %}
       </div>
+    {% else %}
+      <div class="alert alert-info text-center">Aucun cours disponible pour le moment.</div>
     {% endif %}
   </div>
 {% endblock %}

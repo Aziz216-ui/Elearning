@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="utf-8">
-    <title>E-learning - eLearning HTML Template</title>
+    <title>ELlearning</title>
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta content="" name="keywords">
     <meta content="" name="description">
@@ -30,11 +30,6 @@
     <!-- Template Stylesheet -->
     <link href="{{ asset('front/css/style.css') }}" rel="stylesheet">
     <style>
-      /* Masquer les boutons panier/voir panier dans les cartes sans toucher d'autres fichiers */
-      .card a[href*="app_cart_add"],
-      .card a[href*="app_cart_index"] {
-        display: none !important;
-      }
     </style>
 </head>
 
@@ -45,11 +40,12 @@
     </div>
     <!-- Spinner End -->#}
 
+    {% set currentRoute = app.request.attributes.get('_route') %}
 
     <!-- Navbar Start -->
     <nav class="navbar navbar-expand-lg bg-white navbar-light shadow sticky-top p-0">
         <a href="index.html" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
-            <h2 class="m-0 text-primary"><i class="fa fa-book me-3"></i>EduNexus</h2>
+            <h2 class="m-0 text-primary"><i class="fa fa-book me-3"></i>ELlearning</h2>
         </a>
         <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
             <span class="navbar-toggler-icon"></span>
@@ -72,6 +68,16 @@
                 <a href="{{ path('app_about') }}" class="nav-item nav-link {{ app.request.attributes.get('_route') == 'app_about' ? 'active' : '' }}">About</a>
             </div>
             <div class="d-flex align-items-center">
+                {# Favorites button (left of Cart) #}
+                <a href="{{ path('app_fav_index') }}" class="btn btn-outline-secondary me-3 d-none d-lg-flex align-items-center">
+                    <i class="fa fa-heart me-2"></i>
+                    <span>Favoris</span>
+                    {% set favs = app.session.get('favs') ?? [] %}
+                    {% set favCount = favs|length %}
+                    {% if favCount > 0 %}
+                        <span class="badge bg-danger ms-2">{{ favCount }}</span>
+                    {% endif %}
+                </a>
                 <a href="{{ path('app_cart_index') }}" class="btn btn-outline-primary me-3 d-none d-lg-flex align-items-center">
                     <i class="fa fa-shopping-cart me-2"></i>
                     <span>Panier</span>
@@ -92,6 +98,32 @@
         </div>
     </nav>
     <!-- Navbar End -->
+
+    {# Sub-bar categories: only on public Courses page, now BELOW the navbar #}
+    {% if currentRoute in ['app_home_courses', 'app_home_courses_html'] %}
+      <div class="bg-light border-bottom">
+        <div class="container-fluid px-2 px-lg-3 d-flex justify-content-start flex-wrap align-items-center gap-2 py-2" style="overflow:auto; white-space:nowrap;">
+          {# "Tous" button #}
+          <a href="{{ path('app_home_courses') }}"
+             class="btn btn-sm {{ (app.request.get('category') is empty) ? 'btn-primary' : 'btn-outline-primary' }}">
+            Tous
+          </a>
+          {# Category pills (if provided by controller) #}
+          {% if distinctCategories is defined and distinctCategories %}
+            {% set currentCategory = app.request.get('category') %}
+            {% for cat in distinctCategories %}
+              {% set val = cat %}
+              {% if val is not empty %}
+                <a href="{{ path('app_home_courses', { category: val }) }}"
+                   class="btn btn-sm {{ currentCategory == val ? 'btn-primary' : 'btn-outline-primary' }}">
+                  {{ val }}
+                </a>
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
 
 
     <!-- Header Start -->
