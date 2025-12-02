@@ -10,26 +10,26 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
-final class DashboardController extends AbstractController
+final class PlanController extends AbstractController
 {
-    #[Route('/dashboard', name: 'app_dashboard')]
+    #[Route('/plan', name: 'app_dashboard')]
     public function index(): Response
     {
-        return $this->render('front/dashboard/index.html.twig');
+        return $this->render('front/plan/index.html.twig');
     }
 
-    #[Route('/dashboard/plans', name: 'app_dashboard_plans')]
+    #[Route('/plan/plans', name: 'app_dashboard_plans')]
     public function plans(EntityManagerInterface $entityManager): Response
     {
         $plans = $entityManager->getRepository(Plan::class)
             ->findBy(['isActive' => true], ['price' => 'ASC']);
 
-        return $this->render('front/dashboard/plans.html.twig', [
+        return $this->render('front/plan/plans.html.twig', [
             'plans' => $plans,
         ]);
     }
 
-    #[Route('/dashboard/plans/filter', name: 'app_dashboard_plans_filter')]
+    #[Route('/plan/plans/filter', name: 'app_dashboard_plans_filter')]
     public function plansFilter(Request $request, PlanRepository $planRepository): Response
     {
         $minPrice = $request->query->get('minPrice');
@@ -43,7 +43,7 @@ final class DashboardController extends AbstractController
             $plans = $planRepository->findBy([], ['price' => 'ASC']);
         }
 
-        return $this->render('front/dashboard/plans.html.twig', [
+        return $this->render('front/plan/plans.html.twig', [
             'plans' => $plans,
         ]);
     }
