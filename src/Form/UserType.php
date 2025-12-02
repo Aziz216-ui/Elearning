@@ -22,12 +22,8 @@ class UserType extends AbstractType
             ->add('email', EmailType::class, [
                 'label' => 'Adresse email',
             ])
-            ->add('name', TextType::class, [
-                'label' => 'Nom de famille',
-            ])
-            ->add('lastname', TextType::class, [
-                'label' => 'Prénom',
-            ])
+            ->add('name')
+            ->add('lastname')
             ->add('birthdate', DateType::class, [
                 'label' => 'Date de naissance',
                 'widget' => 'single_text',
@@ -48,7 +44,8 @@ class UserType extends AbstractType
             // Création → mot de passe obligatoire + confirmation
             $builder->add('plainPassword', RepeatedType::class, [
                 'type' => PasswordType::class,
-                'mapped' => false,
+                // mappe sur la propriété plainPassword de l'entité (nous avons défini plainPassword dans User)
+                'mapped' => true,
                 'first_options'  => ['label' => 'Mot de passe'],
                 'second_options' => ['label' => 'Confirmer le mot de passe'],
                 'invalid_message' => 'Les deux mots de passe doivent correspondre.',
@@ -57,7 +54,7 @@ class UserType extends AbstractType
         } else {
             // Édition → mot de passe facultatif
             $builder->add('plainPassword', PasswordType::class, [
-                'mapped' => false,
+                'mapped' => true,
                 'required' => false,
                 'label' => 'Nouveau mot de passe (laisser vide pour ne pas changer)',
                 'attr' => ['autocomplete' => 'new-password'],

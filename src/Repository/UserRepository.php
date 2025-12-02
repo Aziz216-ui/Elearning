@@ -3,6 +3,7 @@
 namespace App\Repository;
 
 use App\Entity\User;
+use App\Entity\Cours;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Security\Core\Exception\UnsupportedUserException;
@@ -14,6 +15,36 @@ use Symfony\Component\Security\Core\User\PasswordUpgraderInterface;
  */
 class UserRepository extends ServiceEntityRepository implements PasswordUpgraderInterface
 {
+    public function findUserByName(string $search): array
+    {
+        return $this->createQueryBuilder('u')
+            ->andWhere('u.name LIKE :search OR u.lastname LIKE :search')
+            ->setParameter('search', '%' . $search . '%')
+            ->getQuery()
+            ->getResult();
+    }
+    public function listUserByName() : array
+    {
+       $qb = $this->createQueryBuilder('u')
+            ->orderBy('u.name', 'ASC');
+            return $qb->getQuery()->getResult();
+    }
+
+    public function showAllCoursesByUser(int $userId): array
+    {
+        // On utilise l'EntityManager pour créer un QueryBuilder qui sélectionne depuis l'entité Cours
+        // (le repository courant est pour User, donc createQueryBuilder('c') renverrait un builder sur User).
+        $qb = $this->getEntityManager()->createQueryBuilder();
+        $qb->select('c')
+            ->from(Cours::class, 'c')
+            ->join('c.user', 'u')
+            ->where('u.id = :userId')
+            ->setParameter('userId', $userId)
+            ->orderBy('c.title', 'ASC');
+
+        return $qb->getQuery()->getResult();
+    }
+
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, User::class);
@@ -58,6 +89,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
 
 
+
     public function countUserBySexe(?string $sexe = null): array
     {
         $conn = $this->getEntityManager()->getConnection();
@@ -82,7 +114,7 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
         return $result->fetchAllAssociative();
     }
 
-    // src/Repository/UserRepository.php
+
 
     public function countUsersByBirthYear(): array
     {
@@ -128,26 +160,6 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
     // src/Repository/UserRepository.php
 
-    public function findUserByName(string $search): array
-    {
-        $qb = $this->createQueryBuilder('u');
-
-        // Utiliser l'ExpressionBuilder pour éviter les erreurs de parsing DQL
-        $expr = $qb->expr();
-        $like = $expr->orX(
-            $expr->like('LOWER(u.name)', ':search'),
-            $expr->like('LOWER(u.lastname)', ':search'),
-            $expr->like("LOWER(CONCAT(u.name, ' ', u.lastname))", ':search'),
-            $expr->like("LOWER(CONCAT(u.lastname, ' ', u.name))", ':search'),
-            $expr->like('LOWER(u.email)', ':search')
-        );
-
-        $qb->where($like)
-            ->setParameter('search', '%' . mb_strtolower($search) . '%')
-            ->orderBy('u.lastname', 'ASC');
-
-        return $qb->getQuery()->getResult();
-    }
 
 
 

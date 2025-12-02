@@ -3,10 +3,13 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
@@ -20,6 +23,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
+    #[Assert\NotBlank( message :"l'email est obligatoire !")]
+    #[Assert\Email( message :"l'email '{{ value }}' est invalide !")]
     private ?string $email = null;
 
     /**
@@ -34,28 +39,45 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
+
+    /**
+     * @var string|null Plain password used for validation (not persisted)
+     */
+    #[Assert\NotBlank(message: 'Le mot de passe est obligatoire.')]
+    #[Assert\Length(min: 6, minMessage: 'Le mot de passe doit contenir au moins {{ limit }} caractères.')]
+    private ?string $plainPassword = null;
+
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank( message :"le nom est obligatoire !")]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank( message :"le nom est obligatoire !")]
     private ?string $lastname = null;
 
     #[ORM\Column]
     private bool $isVerified = false;
 
     #[ORM\Column(type: 'date', nullable: true)]
+    #[Assert\NotBlank(message: "Veuillez entrer une date valide au format AAAA-MM-JJ.")]
     private ?\DateTimeInterface $birthdate = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank( message :"le sexe est obligatoire !")]
     private ?string $sexe = null;
 
     #[ORM\Column(type: 'datetime')]
     private ?\DateTimeInterface $createdAt = null;
 
+    // Relation OneToMany vers Cours (inverse de ManyToOne dans Cours::$user)
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Cours::class, cascade: ['persist'], orphanRemoval: false)]
+    private Collection $courses;
+
     public function __construct()
     {
-        // Initialise la date de création lors de la création d'un nouvel utilisateur
+
         $this->createdAt = new \DateTimeImmutable();
+        $this->courses = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -122,6 +144,19 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
+
+    public function getPlainPassword(): ?string
+    {
+        return $this->plainPassword;
+    }
+
+    public function setPlainPassword(?string $plainPassword): static
+    {
+        $this->plainPassword = $plainPassword;
+
+        return $this;
+    }
+
     #[\Deprecated]
     public function eraseCredentials(): void
     {
@@ -157,15 +192,15 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->birthdate;
     }
 
-    public function setBirthdate(\DateTimeInterface $birthdate): static
-    {
-        // Convertit en DateTimeImmutable si ce n'est pas déjà le cas
-        $this->birthdate = $birthdate instanceof \DateTimeImmutable
-            ? $birthdate
-            : \DateTimeImmutable::createFromMutable($birthdate);
 
+    public function setBirthdate($birthdate): static
+    {
+
+        $this->birthdate = null;
         return $this;
     }
+
+
 
     public function isVerified(): bool
     {
@@ -203,9 +238,46 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
             return $this;
         }
 
-        $this->createdAt = $createdAt instanceof \DateTimeImmutable
-            ? $createdAt
-            : \DateTimeImmutable::createFromMutable($createdAt);
+        if ($createdAt instanceof \DateTimeImmutable) {
+            $this->createdAt = $createdAt;
+            return $this;
+        }
+
+        if ($createdAt instanceof \DateTime) {
+            $this->createdAt = \DateTimeImmutable::createFromMutable($createdAt);
+            return $this;
+        }
+
+        throw new \InvalidArgumentException('createdAt doit être un \DateTimeInterface ou null.');
+    }
+
+    /**
+     * @return Collection|Cours[]
+     */
+    public function getCourses(): Collection
+    {
+        return $this->courses;
+    }
+
+    public function addCourse(Cours $course): static
+    {
+        if (! $this->courses->contains($course)) {
+            $this->courses->add($course);
+            $course->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeCourse(Cours $course): static
+    {
+        if ($this->courses->contains($course)) {
+            $this->courses->removeElement($course);
+            // set the owning side to null (unless already changed)
+            if ($course->getUser() === $this) {
+                $course->setUser(null);
+            }
+        }
 
         return $this;
     }

@@ -18,15 +18,23 @@ final class AdminController extends AbstractController
     public function index(UserRepository $userRepository): Response
     {
         return $this->render('admin/dashboard/index.html.twig', [
-            'users' => $userRepository->findAll(),
+            'users' => $userRepository->listUserByName()
+
         ]);
     }
     #[Route('/admin/users', name: 'admin_user_index', methods: ['GET'])]
     public function users(UserRepository $userRepository): Response
     {
         return $this->render('admin/user/index.html.twig', [
-            'users' => $userRepository->findAll(),
+            'users' => $userRepository->findAll()
         ]);
+    }
+
+    #[Route('/admin/user/{id}/courses', name: 'admin_user_courses', methods: ['GET'])]
+    public function listCoursesByUser($id, UserRepository $userRepository): Response
+    {
+        $courses = $userRepository->showAllCoursesByUser((int) $id);
+        return $this->render('admin/listCoursesByUser.html.twig', ['tab' => $courses]);
     }
 
     #[Route('/admin/user/new', name: 'admin_user_new', methods: ['GET', 'POST'])]
@@ -36,7 +44,8 @@ final class AdminController extends AbstractController
         UserPasswordHasherInterface $passwordHasher
     ): Response {
         $user = new User();
-        $form = $this->createForm(UserType::class, $user);
+        // Laisser UserType gérer les groupes de validation (Default + Registration pour la création)
+        $form = $this->createForm(UserType::class, $user, ['is_edit' => false]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {

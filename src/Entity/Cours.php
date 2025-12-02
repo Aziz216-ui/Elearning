@@ -31,6 +31,10 @@ class Cours
     #[ORM\Column(length: 255)]
     private ?string $category = null;
 
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'courses')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -104,6 +108,19 @@ class Cours
     public function setCategory(string $category): static
     {
         $this->category = $category;
+
+        return $this;
+    }
+
+    // --- relation user accessors ---
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }

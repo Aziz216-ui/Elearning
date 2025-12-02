@@ -1,4 +1,3 @@
-
 {% extends 'base1.html.twig' %}
 
 {% block title %}Créer un utilisateur{% endblock %}
@@ -8,77 +7,96 @@
 <div class="w-full">
     <div class="flex flex-wrap -mx-3">
         <div class="w-full max-w-4xl px-3 mx-auto">
-            <div class="relative flex flex-col min-w-0 break-words bg-white border-0 shadow-xl dark:bg-slate-850 dark:shadow-dark-xl rounded-2xl bg-clip-border">
+             <div class="card-body">
 
                 <div class="flex items-center justify-between p-6 pb-0 border-b-0 rounded-t-2xl">
                     <h6 class="text-lg font-bold dark:text-white">Créer un nouvel utilisateur</h6>
 
-                    <a href="{{ path('admin_user_index') }}"
-                       <button type="button" class="btn btn-danger">Retour </button>
+                    {# Bouton Retour dans l'en-tête #}
+                    <a href="{{ path('admin_user_index') }}">
+                        <button type="button" class="btn btn-danger">Retour</button>
+
                     </a>
 
+
+
+
+
                 </div>
 
-                <div class="flex justify-end gap-4 mt-10 pt-6 border-t border-gray-200">
-                    {{ form_start(form, {attr: {novalidate: 'novalidate', class: 'space-y-6'}}) }}
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-
-                        <div class="flex flex-col gap-6">
-                            {{ form_row(form.email, {
-                                label: 'Adresse email',
-                                label_attr: {class: 'block mb-2 text-sm font-bold text-slate-700 dark:text-white'},
-                                attr: {class: 'w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none dark:bg-slate-800'}
-                            }) }}
-
-                            {{ form_row(form.name, {
-                                label: 'Nom de famille',
-                                label_attr: {class: 'block mb-2 text-sm font-bold text-slate-700 dark:text-white'},
-                                attr: {class: 'w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none dark:bg-slate-800'}
-                            }) }}
-
-                            {{ form_row(form.lastname, {
-                                label: 'Prénom',
-                                label_attr: {class: 'block mb-2 text-sm font-bold text-slate-700 dark:text-white'},
-                                attr: {class: 'w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none dark:bg-slate-800'}
-                            }) }}
-                        </div>
-
-                        <div class="flex flex-col gap-6">
-                            {{ form_row(form.birthdate, {
-                                label: 'Date de naissance',
-                                label_attr: {class: 'block mb-2 text-sm font-bold text-slate-700 dark:text-white'},
-                                attr: {class: 'w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none dark:bg-slate-800'}
-                            }) }}
-
-                            {{ form_row(form.sexe, {
-                                label: 'Sexe',
-                                label_attr: {class: 'block mb-2 text-sm font-bold text-slate-700 dark:text-white'},
-                                attr: {class: 'w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none dark:bg-slate-800'}
-                            }) }}
-
-                            {{ form_row(form.plainPassword, {
-                                label: 'Mot de passe',
-                                label_attr: {class: 'block mb-2 text-sm font-bold text-slate-700 dark:text-white'},
-                                attr: {class: 'w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-blue-500 focus:outline-none dark:bg-slate-800'},
-                                help: 'Minimum 6 caractères'
-                            }) }}
-                        </div>
-                    </div>
-
-                    <div class="flex justify-end gap-4 mt-10 pt-6 border-t border-gray-200">
-                        <button type="submit" class="btn btn-primary px-4 py-2">
-                            Créer l'utilisateur
-                        </button>
-                        <a href="{{ path('admin_user_index') }}" class="px-8 py-3 font-bold text-slate-600 hover:text-slate-800 transition">
-                            Annuler
-                        </a>
-                    </div>
-
-                    {{ form_end(form) }}
+                {# Formulaire : form_start avant les champs #}
+            {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+            <div class="card-footer d-flex justify-content-between p-4">
+                    <button type="submit" class="btn btn-primary">Confirmer</button>
                 </div>
+
+                {# Affichage global des erreurs (contraintes d'entité) #}
+                {% if form.vars.errors|length > 0 %}
+                    <div class="alert alert-danger">
+                        {{ form_errors(form) }}
+                    </div>
+                {% endif %}
+
+
+                <div class="card-body">
+
+                    <div class="mb-3">
+                        {{ form_label(form.email, 'Email address', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.email , {
+                            'attr': {
+                                'class': 'form-control',
+                                'placeholder': 'Enter email',
+                                'id': 'emailInput'
+                            }
+                        }) }}
+                        {{ form_errors(form.email) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.name, 'First Name' , {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.name , { 'attr': { 'class': 'form-control', 'placeholder': 'Enter first name', 'id': 'nameInput' } }) }}
+                        {{ form_errors(form.name) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.lastname, 'Last Name' , {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.lastname , { 'attr': { 'class': 'form-control', 'placeholder': 'Enter last name', 'id': 'lastnameInput' } }) }}
+                        {{ form_errors(form.lastname) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.birthdate, 'Birthdate' , {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.birthdate , { 'attr': { 'class': 'form-control', 'placeholder': 'Enter birthdate', 'id': 'birthdateInput' } }) }}
+                        {{ form_errors(form.birthdate) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.sexe, 'Sexe' , {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.sexe , { 'attr': { 'class': 'form-control', 'placeholder': 'Choisir', 'id': 'sexeInput' } }) }}
+                        {{ form_errors(form.sexe) }}
+                    </div>
+
+                    <div class="mb-3">
+                        {{ form_label(form.plainPassword, 'Password', {'label_attr': {'class': 'form-label'}}) }}
+                        {{ form_widget(form.plainPassword, { 'attr': { 'class': 'form-control', 'placeholder': 'Enter password', 'id': 'passwordInput' } }) }}
+                        {{ form_errors(form.plainPassword) }}
+                    </div>
+
+
+
+                </div>
+
+                {# PIED DE FORMULAIRE: boutons Annuler / Confirmer #}
+
+
+            {{ form_end(form) }}
+
             </div>
+
+
         </div>
     </div>
+
 </div>
+
 {% endblock %}

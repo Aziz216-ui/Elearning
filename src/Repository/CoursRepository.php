@@ -16,6 +16,21 @@ class CoursRepository extends ServiceEntityRepository
         parent::__construct($registry, Cours::class);
     }
 
+    /**
+     * Retourne la liste des cours pour un utilisateur donné
+     *
+     * @return Cours[]
+     */
+    public function findByUserId(int $userId): array
+    {
+        return $this->createQueryBuilder('c')
+            ->andWhere('c.user = :uid')
+            ->setParameter('uid', $userId)
+            ->orderBy('c.title', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
     //    /**
     //     * @return Cours[] Returns an array of Cours objects
     //     */
