@@ -23,26 +23,44 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/admin/quiz')]
 class QuizAdminController extends AbstractController
 {
-#[Route('/', name: 'index', methods: ['GET'])]
+#[Route('/', name: 'app_quiz_admin_index', methods: ['GET'])]
     public function index(Request $request, QuizRepository $quizRepository, EntityManagerInterface $entityManager): Response
     {
-        // Charger tous les quiz pour le rendu initial
+        // Récupération des paramètres de filtrage
         $searchTerm = trim((string) $request->query->get('q', ''));
         $visibility = $request->query->get('visibility');
+        $coursId = $request->query->get('cours');
+        
+        // Gestion de la visibilité
         $isVisible = null;
         if ($visibility === 'visible') $isVisible = true;
         if ($visibility === 'hidden') $isVisible = false;
 
-        $quizzes = $quizRepository->searchByCriteria($searchTerm ?: null, null, $isVisible);
+        // Récupération des cours pour le filtre
+        $coursList = $entityManager->getRepository(Cours::class)->findAll();
+        $selectedCours = null;
+        
+        if ($coursId) {
+            $selectedCours = $entityManager->getRepository(Cours::class)->find($coursId);
+        }
+
+        // Récupération des quiz avec les filtres
+        $quizzes = $quizRepository->searchByCriteria(
+            $searchTerm ?: null, 
+            $selectedCours, 
+            $isVisible
+        );
 
         return $this->render('quiz_admin/index.html.twig', [
             'quizzes' => $quizzes,
             'searchTerm' => $searchTerm,
             'selectedVisibility' => $visibility,
+            'coursList' => $coursList,
+            'selectedCoursId' => $coursId,
         ]);
     }
 
-    #[Route('/results', name: 'results', methods: ['GET'])]
+    #[Route('/results', name: 'app_quiz_admin_results', methods: ['GET'])]
     public function results(Request $request, QuizRepository $quizRepository): Response
     {
         // Endpoint AJAX pour renvoyer uniquement le tableau filtré
@@ -54,9 +72,8 @@ class QuizAdminController extends AbstractController
 
         $quizzes = $quizRepository->searchByCriteria($searchTerm ?: null, null, $isVisible);
 
-        return $this->render('quiz_admin/index.html.twig', [
-            'quizzes' => $quizzes,
-            'ajaxOnly' => true,
+        return $this->render('quiz_admin/_quiz_table.html.twig', [
+            'quizzes' => $quizzes
         ]);
     }
 

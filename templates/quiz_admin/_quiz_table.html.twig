@@ -1,0 +1,36 @@
+{% if quizzes|length > 0 %}
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Titre</th>
+            <th>Cours associé</th>
+            <th>Questions</th>
+            <th>Points</th>
+            <th>Visibilité</th>
+            <th class="text-end">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for quiz in quizzes %}
+        <tr>
+            <td>{{ quiz.id }}</td>
+            <td>{{ quiz.title }}</td>
+            <td>{{ quiz.cours ? quiz.cours.title : 'Aucun cours associé' }}</td>
+            <td>{{ quiz.questions|length }}</td>
+            <td>{{ quiz.totalPoints }}</td>
+            <td>{{ quiz.isVisible ? 'Visible' : 'Masqué' }}</td>
+            <td>
+                <a href="{{ path('app_quiz_admin_edit', {'id': quiz.id}) }}">Modifier</a>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="7" class="text-center">Aucun quiz trouvé.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p>Aucun quiz trouvé.</p>
+{% endif %}

@@ -384,11 +384,11 @@
                 </div>
                 <div class="stat-item">
                     <span class="stat-label">Quiz visibles</span>
-                    <span class="stat-value">{{ quizzes|filter(q => q.visible)|length }}</span>
+                    <span class="stat-value">{{ quizzes|filter(q => q.isVisible)|length }}</span>
                 </div>
                 <div class="stat-item">
                     <span class="stat-label">Quiz masqués</span>
-                    <span class="stat-value">{{ quizzes|filter(q => not q.visible)|length }}</span>
+                    <span class="stat-value">{{ quizzes|filter(q => not q.isVisible)|length }}</span>
                 </div>
             </div>
             <div class="chart-container">
@@ -402,12 +402,12 @@
                     <div class="legend-item">
                         <span class="legend-color visible"></span>
                         <span class="legend-text">Visibles</span>
-                        <span class="legend-value">{{ quizzes|filter(q => q.visible)|length }}</span>
+                        <span class="legend-value">{{ quizzes|filter(q => q.isVisible)|length }}</span>
                     </div>
                     <div class="legend-item">
                         <span class="legend-color masked"></span>
                         <span class="legend-text">Masqués</span>
-                        <span class="legend-value">{{ quizzes|filter(q => not q.visible)|length }}</span>
+                        <span class="legend-value">{{ quizzes|filter(q => not q.isVisible)|length }}</span>
                     </div>
                 </div>
             </div>
@@ -418,6 +418,19 @@
 <div class="search-section" style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
     <form method="get" action="{{ path('app_quiz_admin_index') }}" class="search-form">
         <div style="display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap;">
+            <!-- Filtre par cours -->
+            <div style="min-width: 250px;">
+                <label for="cours" style="display: block; margin-bottom: 5px; font-weight: 500; color: #555;">Filtrer par cours</label>
+                <select name="cours" id="cours" class="form-select" onchange="this.form.submit()" style="width: 100%;">
+                    <option value="">Tous les cours</option>
+                    {% for cours in coursList %}
+                        <option value="{{ cours.id }}" {{ selectedCoursId == cours.id ? 'selected' : '' }}>
+                            {{ cours.title }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
             <!-- Recherche par titre -->
             <div style="flex: 1; min-width: 250px;">
                 <label for="q">Recherche par titre</label>
@@ -444,7 +457,9 @@
     </form>
 
     <!-- Conteneur AJAX -->
-    <div id="quizResults"></div>
+    <div id="quizResults">
+        {% include 'quiz_admin/_quiz_table.html.twig' with {'quizzes': quizzes} %}
+    </div>
 
 </div>
 
@@ -483,48 +498,4 @@ function resetFilters() {
 }
 </script>
 
-
-
-    <div class="table-container">
-{% if quizzes|length > 0 %}
-<table>
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Titre</th>
-            <th>Cours associé</th>
-            <th>Questions</th>
-            <th>Points</th>
-            <th>Visibilité</th>
-            <th class="text-end">Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for quiz in quizzes %}
-        <tr>
-            <td>{{ quiz.id }}</td>
-            <td>{{ quiz.title }}</td>
-            <td>{{ quiz.cours ? quiz.cours.title : 'Aucun cours associé' }}</td>
-            <td>{{ quiz.questions|length }}</td>
-            <td>{{ quiz.totalPoints }}</td>
-            <td>{{ quiz.isVisible ? 'Visible' : 'Masqué' }}</td>
-            <td>
-                <a href="{{ path('app_quiz_admin_edit', {'id': quiz.id}) }}">Modifier</a>
-            </td>
-        </tr>
-        {% else %}
-        <tr>
-            <td colspan="7" class="text-center">Aucun quiz trouvé.</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
-
-
-{% else %}
-<p>Aucun quiz trouvé.</p>
-{% endif %}
-
-    </div>
-</div>
 {% endblock %}

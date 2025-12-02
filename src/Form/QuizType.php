@@ -10,6 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\CheckboxType;
 use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use App\Entity\Cours;
 use Symfony\Component\Form\Extension\Core\Type\CollectionType;
@@ -55,7 +56,7 @@ class QuizType extends AbstractType
                 'label' => 'Questions',
                 'attr' => ['class' => 'questions-collection']
             ])
-            ->add('isVisible', null, [
+            ->add('is_visible', CheckboxType::class, [
                 'label' => 'Rendre visible',
                 'required' => false,
                 'attr' => [
@@ -82,11 +83,12 @@ class QuizType extends AbstractType
                 'label_attr' => ['class' => 'form-check-label']
             ])
             ->add('timeLimit', IntegerType::class, [
-                'label' => 'Limite de temps (en secondes)',
+                'label' => 'Limite de temps (en minutes)',
                 'required' => false,
                 'attr' => [
                     'class' => 'form-control',
-                    'min' => '60'
+                    'min' => '1',
+                    'max' => '120'
                 ],
                 'help' => 'Laissez vide pour pas de limite de temps'
             ]);

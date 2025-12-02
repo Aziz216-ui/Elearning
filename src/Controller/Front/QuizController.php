@@ -16,211 +16,100 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-
-// Importer Dompdf via l'autoloader de Composer
 use Dompdf\Dompdf;
 use Dompdf\Options;
 
+/**
+ * Contrôleur unifié pour la gestion des quiz côté front
+ */
+#[Route('/quiz')]
 class QuizController extends AbstractController
 {
-    #[Route('/quiz/{id}', name: 'app_quiz')]
-    public function quiz(Cours $cours, EntityManagerInterface $em, PanierRepository $panierRepository): Response
+    /**
+     * Affiche la liste des quiz disponibles pour un cours
+     */
+    #[Route('/list/{id}', name: 'app_quiz_list')]
+    public function list(Cours $cours, Request $request, PanierRepository $panierRepository, QuizRepository $quizRepository): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
-
-        // Vérifier si l'utilisateur a le cours dans son panier
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
         $user = $this->getUser();
+
+        // Vérifier si l'utilisateur a accès au cours
         if (!$panierRepository->isCourseInUserPanier($user, $cours)) {
             $this->addFlash('error', 'Vous devez d\'abord ajouter ce cours à votre panier.');
             return $this->redirectToRoute('app_dashboard');
         }
 
-        // Récupérer le quiz lié au cours
-        $quiz = $cours->getQuizzes()->first();
+        // Gestion du tri
+        $sort = $request->query->get('sort');
+        $orderBy = [];
 
-        if (!$quiz) {
-            $this->addFlash('warning', 'Aucun quiz disponible pour ce cours.');
-            return $this->redirectToRoute('app_dashboard');
+        if ($sort === 'points_asc') {
+            $orderBy = ['totalPoints' => 'ASC'];
+        } elseif ($sort === 'points_desc') {
+            $orderBy = ['totalPoints' => 'DESC'];
         }
 
-        // Vérifier si le quiz est visible
-        if (!$quiz->isVisible()) {
-            $this->addFlash('error', 'Ce quiz n\'est pas disponible pour le moment.');
-            return $this->redirectToRoute('app_dashboard');
-        }
-
-        // Récupérer les questions du quiz avec leurs réponses
-        $questions = $em->getRepository(Question::class)->findBy(['quiz' => $quiz]);
-
-        return $this->render('quiz/quiz.html.twig', [
-            'cours' => $cours,
-            'quiz' => $quiz,
-            'questions' => $questions,
-            'timeLimit' => $quiz->getTimeLimit() ?? 1800
-        ]);
-    }
-
-    #[Route('/quiz/start/{id}', name: 'app_quiz_start')]
-    public function startQuiz(Quiz $quiz, EntityManagerInterface $em, PanierRepository $panierRepository): Response
-    {
-        // Autoriser les utilisateurs authentifiés, y compris via "remember me"
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-
-        // Vérifier si l'utilisateur a le cours dans son panier
-        $user = $this->getUser();
-        $cours = $quiz->getCours();
-        
-        if (!$cours || !$panierRepository->isCourseInUserPanier($user, $cours)) {
-            $this->addFlash('error', 'Vous devez d\'abord ajouter ce cours à votre panier.');
-            return $this->redirectToRoute('app_dashboard');
-        }
-
-        // Vérifier si le quiz est visible
-        if (!$quiz->isVisible()) {
-            $this->addFlash('error', 'Ce quiz n\'est pas disponible pour le moment.');
-            return $this->redirectToRoute('app_dashboard');
-        }
-
-        // Récupérer les questions du quiz avec leurs réponses
-        $questions = $em->getRepository(Question::class)->findBy(['quiz' => $quiz]);
-
-        return $this->render('quiz/quiz.html.twig', [
-            'cours' => $cours,
-            'quiz' => $quiz,
-            'questions' => $questions,
-            'timeLimit' => $quiz->getTimeLimit() ?? 1800
-        ]);
-    }
-
-    #[Route('/quiz-list/{id}', name: 'app_quiz_list')]
-    public function quizList(Cours $cours, EntityManagerInterface $em, PanierRepository $panierRepository): Response
-    {
-        // Autoriser les utilisateurs authentifiés, y compris via "remember me"
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-
-        // Vérifier si l'utilisateur a le cours dans son panier
-        $user = $this->getUser();
-        if (!$panierRepository->isCourseInUserPanier($user, $cours)) {
-            $this->addFlash('error', 'Vous devez d\'abord ajouter ce cours à votre panier.');
-            return $this->redirectToRoute('app_dashboard');
-        }
-
-        // Récupérer tous les quiz visibles liés au cours
-        $quizzes = $em->getRepository(Quiz::class)->findBy(['cours' => $cours, 'isVisible' => true]);
+        // Récupérer les quiz visibles pour ce cours
+        $quizzes = $quizRepository->findBy(
+            ['cours' => $cours, 'is_visible' => true],
+            $orderBy
+        );
 
         return $this->render('quiz/quiz_list.html.twig', [
             'cours' => $cours,
-            'quizzes' => $quizzes
+            'quizzes' => $quizzes,
+            'currentSort' => $sort,
         ]);
     }
-    #[Route('/quiz/submit/{id}', name: 'app_quiz_submit', methods:['POST'])]
-    public function submit(Cours $cours, Request $request, EntityManagerInterface $em, PanierRepository $panierRepository)
+
+    /**
+     * Affiche un quiz spécifique pour le passage
+     */
+    #[Route('/start/{id}', name: 'app_quiz_start')]
+    public function start(Quiz $quiz, EntityManagerInterface $em, PanierRepository $panierRepository): Response
     {
-        // Autoriser les utilisateurs authentifiés, y compris via "remember me"
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
         $user = $this->getUser();
-
-        // Vérifier si l'utilisateur a le droit de passer ce quiz
-        if (!$panierRepository->isCourseInUserPanier($user, $cours)) {
-            $this->addFlash('error', 'Accès non autorisé à ce quiz.');
-            return $this->redirectToRoute('app_dashboard');
-        }
-
-        $quiz = $cours->getQuizzes()->first();
-
-        if (!$quiz) {
-            $this->addFlash('error', 'Aucun quiz trouvé pour ce cours.');
-            return $this->redirectToRoute('app_dashboard');
-        }
-        
-        // Vérifier si le quiz est visible
-        if (!$quiz->isVisible()) {
-            $this->addFlash('error', 'Ce quiz n\'est pas disponible pour le moment.');
-            return $this->redirectToRoute('app_dashboard');
-        }
-
-        $questions = $quiz->getQuestions();
-        $score = 0;
-        $totalPoints = 0;
-        $correctAnswers = 0;
-        $totalQuestions = $questions->count();
-
-        $postData = $request->request->all();
-        $answers = $postData['answers'] ?? [];
-
-        foreach ($questions as $question) {
-            $totalPoints += $question->getPoints();
-            $questionId = $question->getId();
-
-            if (isset($answers[$questionId])) {
-                $answerId = $answers[$questionId];
-                $answer = $em->getRepository(Answer::class)->find($answerId);
-
-                if ($answer && $answer->isCorrect()) {
-                    $score += $question->getPoints();
-                    $correctAnswers++;
-                }
-
-                $userAnswer = new UserAnswer();
-                $userAnswer->setUser($user);
-                $userAnswer->setQuestion($question);
-                $userAnswer->setAnswer($answer);
-                $userAnswer->setIsCorrect($answer && $answer->isCorrect());
-                $em->persist($userAnswer);
-            } else {
-                // Créer une réponse vide pour les questions non répondues
-                $userAnswer = new UserAnswer();
-                $userAnswer->setUser($user);
-                $userAnswer->setQuestion($question);
-                $userAnswer->setAnswer(null); // Pas de réponse sélectionnée
-                $userAnswer->setIsCorrect(false);
-                $em->persist($userAnswer);
-            }
-        }
-
-        $finalScore = $totalPoints > 0 ? ($score / $totalPoints) * 100 : 0;
-        $scoreMinimum = 70; // Définir le score minimum pour réussir (70% par défaut)
-        $passed = $finalScore >= $scoreMinimum;
-        $percentage = round($finalScore, 2);
-
-        $quizResult = new QuizResult();
-        $quizResult->setUser($user);
-        $quizResult->setQuiz($quiz);
-        $quizResult->setScore($score);
-        $quizResult->setTotalPoints($totalPoints);
-        $quizResult->setPassed($passed);
-        $quizResult->setCompletedAt(new \DateTimeImmutable());
-
-        $em->persist($quizResult);
-        $em->flush();
-
-        // Toujours afficher le score à l'utilisateur
-        $this->addFlash('info', sprintf('Votre score : %d / %d (%.0f%%)', $score, $totalPoints, $percentage));
-
-        if ($passed) {
-            $this->addFlash('success', 'Félicitations ! Vous avez réussi le quiz. Vous pouvez maintenant télécharger votre certificat.');
-            return $this->redirectToRoute('app_quiz_results', ['id' => $quiz->getId()]);
-        } else {
-            $this->addFlash('warning', sprintf('Désolé, vous n\'avez pas atteint le score minimum de %d%% pour obtenir le certificat.', $scoreMinimum));
-            return $this->redirectToRoute('app_quiz_results', ['id' => $quiz->getId()]);
-        }
-    }
-
-    #[Route('/quiz/submit-specific/{id}', name: 'app_quiz_submit_specific', methods:['POST'])]
-    public function submitSpecificQuiz(Quiz $quiz, Request $request, EntityManagerInterface $em, PanierRepository $panierRepository)
-    {
-        // Autoriser les utilisateurs authentifiés, y compris via "remember me"
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
-        $user = $this->getUser();
-
-        // Vérifier si l'utilisateur a le droit de passer ce quiz
         $cours = $quiz->getCours();
+        
+        // Vérifier les autorisations
         if (!$cours || !$panierRepository->isCourseInUserPanier($user, $cours)) {
             $this->addFlash('error', 'Accès non autorisé à ce quiz.');
             return $this->redirectToRoute('app_dashboard');
         }
-        
-        // Vérifier si le quiz est visible
+
+        if (!$quiz->isVisible()) {
+            $this->addFlash('error', 'Ce quiz n\'est pas disponible pour le moment.');
+            return $this->redirectToRoute('app_dashboard');
+        }
+
+        $questions = $em->getRepository(Question::class)->findBy(['quiz' => $quiz]);
+
+        return $this->render('quiz/quiz.html.twig', [
+            'cours' => $cours,
+            'quiz' => $quiz,
+            'questions' => $questions,
+            'timeLimit' => $quiz->getTimeLimit() ?? 1800
+        ]);
+    }
+
+    /**
+     * Soumettre les réponses d'un quiz
+     */
+    #[Route('/submit/{id}', name: 'app_quiz_submit', methods: ['POST'])]
+    public function submit(Quiz $quiz, Request $request, EntityManagerInterface $em, PanierRepository $panierRepository): Response
+    {
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
+        $user = $this->getUser();
+        $cours = $quiz->getCours();
+
+        // Vérifier les autorisations
+        if (!$cours || !$panierRepository->isCourseInUserPanier($user, $cours)) {
+            $this->addFlash('error', 'Accès non autorisé à ce quiz.');
+            return $this->redirectToRoute('app_dashboard');
+        }
+
         if (!$quiz->isVisible()) {
             $this->addFlash('error', 'Ce quiz n\'est pas disponible pour le moment.');
             return $this->redirectToRoute('app_dashboard');
@@ -235,6 +124,7 @@ class QuizController extends AbstractController
         $postData = $request->request->all();
         $answers = $postData['answers'] ?? [];
 
+        // Traiter chaque question
         foreach ($questions as $question) {
             $totalPoints += $question->getPoints();
             $questionId = $question->getId();
@@ -248,6 +138,7 @@ class QuizController extends AbstractController
                     $correctAnswers++;
                 }
 
+                // Enregistrer la réponse de l'utilisateur
                 $userAnswer = new UserAnswer();
                 $userAnswer->setUser($user);
                 $userAnswer->setQuestion($question);
@@ -259,17 +150,19 @@ class QuizController extends AbstractController
                 $userAnswer = new UserAnswer();
                 $userAnswer->setUser($user);
                 $userAnswer->setQuestion($question);
-                $userAnswer->setAnswer(null); // Pas de réponse sélectionnée
+                $userAnswer->setAnswer(null);
                 $userAnswer->setIsCorrect(false);
                 $em->persist($userAnswer);
             }
         }
 
+        // Calculer le score final
         $finalScore = $totalPoints > 0 ? ($score / $totalPoints) * 100 : 0;
-        $scoreMinimum = 70; // Définir le score minimum pour réussir (70% par défaut)
+        $scoreMinimum = 70; // Score minimum pour réussir (70% par défaut)
         $passed = $finalScore >= $scoreMinimum;
         $percentage = round($finalScore, 2);
 
+        // Enregistrer le résultat du quiz
         $quizResult = new QuizResult();
         $quizResult->setUser($user);
         $quizResult->setQuiz($quiz);
@@ -281,27 +174,35 @@ class QuizController extends AbstractController
         $em->persist($quizResult);
         $em->flush();
 
-        // Toujours afficher le score à l'utilisateur
+        // Afficher les résultats à l'utilisateur
         $this->addFlash('info', sprintf('Votre score : %d / %d (%.0f%%)', $score, $totalPoints, $percentage));
 
         if ($passed) {
-            $this->addFlash('success', 'Félicitations ! Vous avez réussi le quiz. Vous pouvez maintenant télécharger votre certificat.');
-            return $this->redirectToRoute('app_quiz_results', ['id' => $quiz->getId()]);
+            $this->addFlash('success', 'Félicitations ! Vous avez réussi le quiz.');
         } else {
-            $this->addFlash('warning', sprintf('Désolé, vous n\'avez pas atteint le score minimum de %d%% pour obtenir le certificat.', $scoreMinimum));
-            return $this->redirectToRoute('app_quiz_results', ['id' => $quiz->getId()]);
+            $this->addFlash('warning', sprintf('Désolé, vous n\'avez pas atteint le score minimum de %d%%.', $scoreMinimum));
         }
+        
+        return $this->redirectToRoute('app_quiz_results', ['id' => $quiz->getId()]);
     }
 
-
-    #[Route('/quiz/{id}/results', name: 'app_quiz_results', methods: ['GET'])]
+    /**
+     * Affiche les résultats d'un quiz
+     */
+    #[Route('/results/{id}', name: 'app_quiz_results', methods: ['GET'])]
     public function results(Quiz $quiz, EntityManagerInterface $em): Response
     {
-        // Autoriser les utilisateurs authentifiés, y compris via "remember me"
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
         $user = $this->getUser();
         
-        // Récupérer le résultat du quiz pour l'utilisateur actuel
+        // Vérifier que l'utilisateur a le droit de voir ces résultats
+        $cours = $quiz->getCours();
+        if (!$cours) {
+            $this->addFlash('error', 'Quiz invalide.');
+            return $this->redirectToRoute('app_dashboard');
+        }
+
+        // Récupérer le dernier résultat de l'utilisateur pour ce quiz
         $quizResult = $em->getRepository(QuizResult::class)->findOneBy(
             ['user' => $user, 'quiz' => $quiz],
             ['completedAt' => 'DESC']
@@ -309,10 +210,10 @@ class QuizController extends AbstractController
         
         if (!$quizResult) {
             $this->addFlash('error', 'Aucun résultat trouvé pour ce quiz.');
-            return $this->redirectToRoute('app_dashboard');
+            return $this->redirectToRoute('app_quiz_list', ['id' => $cours->getId()]);
         }
         
-        // Récupérer les questions avec les réponses de l'utilisateur
+        // Récupérer les réponses de l'utilisateur
         $questions = $quiz->getQuestions();
         $userAnswers = [];
         
@@ -328,6 +229,7 @@ class QuizController extends AbstractController
         }
         
         return $this->render('quiz/results.html.twig', [
+            'cours' => $cours,
             'quiz' => $quiz,
             'quizResult' => $quizResult,
             'questions' => $questions,
@@ -335,42 +237,49 @@ class QuizController extends AbstractController
         ]);
     }
 
-    #[Route('/certificat/{id}', name: 'app_certificat_pdf')]
-    public function certificat(QuizResult $result): Response
+    /**
+     * Génère et télécharge un certificat PDF pour un quiz réussi
+     */
+    #[Route('/certificat/{id}', name: 'app_quiz_certificate')]
+    public function certificate(QuizResult $result): Response
     {
-        // Vérifier si l'utilisateur actuel est le propriétaire du résultat
-        if ($this->getUser() !== $result->getUser()) {
-            throw $this->createAccessDeniedException('Vous n\'êtes pas autorisé à voir ce certificat.');
+        $user = $this->getUser();
+        
+        // Vérifier les autorisations
+        if ($user !== $result->getUser()) {
+            throw $this->createAccessDeniedException('Accès non autorisé à ce certificat.');
+        }
+
+        if (!$result->isPassed()) {
+            $this->addFlash('error', 'Vous devez réussir le quiz pour obtenir un certificat.');
+            return $this->redirectToRoute('app_quiz_results', ['id' => $result->getQuiz()->getId()]);
         }
 
         try {
-            // Configurer les options Dompdf
+            // Configuration de Dompdf
             $options = new Options();
             $options->set('defaultFont', 'Arial');
             $options->set('isRemoteEnabled', true);
             $options->set('isHtml5ParserEnabled', true);
             
-            // Créer une nouvelle instance Dompdf avec les options
             $dompdf = new Dompdf($options);
 
-            // Générer le HTML pour le certificat
-            $html = $this->renderView('quiz/certificat.html.twig', [
+            // Données pour le template du certificat
+            $data = [
                 'user' => $result->getUser(),
                 'cours' => $result->getQuiz() ? $result->getQuiz()->getCours() : null,
-                'score' => ($result->getScore() / $result->getTotalPoints()) * 100, // Calculer le pourcentage
-                'date' => $result->getCompletedAt() ?: new \DateTimeImmutable()
-            ]);
+                'score' => ($result->getScore() / $result->getTotalPoints()) * 100,
+                'date' => $result->getCompletedAt() ?: new \DateTimeImmutable(),
+                'quiz' => $result->getQuiz()
+            ];
 
-            // Charger le HTML dans Dompdf
+            // Générer le PDF
+            $html = $this->renderView('quiz/certificat.html.twig', $data);
             $dompdf->loadHtml($html);
-
-            // Définir la taille et l'orientation du papier
             $dompdf->setPaper('A4', 'landscape');
-
-            // Rendre le HTML en PDF
             $dompdf->render();
 
-            // Télécharger le PDF généré
+            // Télécharger le PDF
             return new Response(
                 $dompdf->output(),
                 Response::HTTP_OK,
@@ -380,17 +289,15 @@ class QuizController extends AbstractController
                 ]
             );
         } catch (\Exception $e) {
-            // En cas d'erreur avec Dompdf, afficher une page HTML simple
-            $html = $this->renderView('quiz/certificat.html.twig', [
+            // En cas d'erreur, afficher une version HTML
+            $this->addFlash('warning', 'Impossible de générer le PDF. Affichage en HTML.');
+            
+            return $this->render('quiz/certificat.html.twig', [
                 'user' => $result->getUser(),
                 'cours' => $result->getQuiz() ? $result->getQuiz()->getCours() : null,
                 'score' => ($result->getScore() / $result->getTotalPoints()) * 100,
-                'date' => $result->getCompletedAt() ?: new \DateTimeImmutable()
-            ]);
-            
-            return new Response($html, Response::HTTP_OK, [
-                'Content-Type' => 'text/html',
-                'Content-Disposition' => 'inline; filename="certificat-'.$result->getId().'.html"',
+                'date' => $result->getCompletedAt() ?: new \DateTimeImmutable(),
+                'quiz' => $result->getQuiz()
             ]);
         }
     }

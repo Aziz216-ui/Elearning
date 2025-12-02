@@ -3,73 +3,433 @@
 {% block title %}Quiz disponibles - {{ cours.title }}{% endblock %}
 
 {% block body %}
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body {
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        background-color: #f5f5f5;
+        min-height: 100vh;
+        padding: 1.5rem;
+    }
+    .container-quiz {
+        max-width: 1400px;
+        margin: 0 auto;
+    }
+    .header {
+        margin-bottom: 1.5rem;
+    }
+    .header h1 {
+        font-size: 1.875rem;
+        font-weight: bold;
+        color: #1f2937;
+        margin-bottom: 0.5rem;
+    }
+    .back-button {
+        color: #4b5563;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .back-button:hover {
+        color: #111827;
+    }
+    .filter-section {
+        background: #ffffff;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .filter-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 1rem;
+        align-items: flex-end;
+    }
+    .search-group {
+        flex: 1;
+        min-width: 250px;
+    }
+    .sort-group {
+        min-width: 250px;
+    }
+    label {
+        display: block;
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #374151;
+        margin-bottom: 0.25rem;
+    }
+    .search-input {
+        width: 100%;
+        padding: 0.5rem 1rem;
+        border: 1px solid #d1d5db;
+        border-radius: 0.5rem;
+        font-size: 1rem;
+    }
+    .search-input:focus {
+        outline: none;
+        border-color: #4b5563;
+        box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.15);
+    }
+    .sort-buttons {
+        display: flex;
+        gap: 0.5rem;
+    }
+    .sort-btn {
+        flex: 1;
+        padding: 0.5rem 1rem;
+        border: 2px solid #d1d5db;
+        background: white;
+        color: #374151;
+        border-radius: 0.5rem;
+        cursor: pointer;
+        font-weight: 500;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        transition: all 0.3s;
+    }
+    .sort-btn:hover {
+        border-color: #4b5563;
+    }
+    .sort-btn.active {
+        background: #4b5563;
+        color: #ffffff;
+        border-color: #4b5563;
+    }
+    .sort-indicator {
+        margin-top: 0.75rem;
+        font-size: 0.875rem;
+        color: #4b5563;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    .reset-btn {
+        margin-left: auto;
+        color: #6b7280;
+        text-decoration: underline;
+        cursor: pointer;
+        background: none;
+        border: none;
+        font-size: 0.875rem;
+    }
+    .reset-btn:hover {
+        color: #111827;
+    }
+    .course-info {
+        background: #ffffff;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    .course-info h2 {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        margin-bottom: 0.25rem;
+    }
+    .course-description {
+        color: #6b7280;
+        margin-top: 0.25rem;
+    }
+    .course-date {
+        font-size: 0.875rem;
+        color: #9ca3af;
+        margin-top: 0.5rem;
+    }
+    .quiz-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+        gap: 1.5rem;
+    }
+    @media (max-width: 768px) {
+        .quiz-grid {
+            grid-template-columns: 1fr;
+        }
+    }
+    .quiz-card {
+        background: #ffffff;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+        padding: 1.5rem;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .quiz-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+    }
+    .quiz-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.75rem;
+    }
+    .quiz-title {
+        font-size: 1.25rem;
+        font-weight: bold;
+        color: #1f2937;
+    }
+    .visible-badge {
+        background: #e5e7eb;
+        color: #374151;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    .quiz-description {
+        color: #6b7280;
+        margin-bottom: 1rem;
+    }
+    .quiz-stats {
+        display: flex;
+        gap: 0.75rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+    }
+    .stat-badge {
+        padding: 0.5rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        font-weight: 500;
+    }
+    .stat-questions {
+        background: #e5e7eb;
+        color: #374151;
+    }
+    .stat-points {
+        background: #e5e7eb;
+        color: #374151;
+    }
+    .stat-duration {
+        background: #e5e7eb;
+        color: #374151;
+    }
+    .quiz-actions {
+        display: flex;
+        gap: 0.5rem;
+    }
+    .btn-quiz {
+        flex: 1;
+        padding: 0.5rem 1rem;
+        border-radius: 0.5rem;
+        font-weight: 500;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.3s;
+        text-decoration: none;
+        border: none;
+        font-size: 1rem;
+    }
+    .btn-primary-quiz {
+        background: #4b5563;
+        color: #ffffff;
+    }
+    .btn-primary-quiz:hover {
+        background: #111827;
+    }
+    .btn-secondary-quiz {
+        background: #ffffff;
+        color: #374151;
+        border: 1px solid #d1d5db;
+    }
+    .btn-secondary-quiz:hover {
+        border-color: #4b5563;
+        background: #f3f4f6;
+    }
+    .no-results {
+        background: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 3rem;
+        text-align: center;
+    }
+    .no-results p {
+        color: #6b7280;
+        font-size: 1.125rem;
+    }
+    .hidden {
+        display: none;
+    }
+</style>
+
+<div class="container-quiz">
+    <div class="header">
         <h1>Quiz disponibles pour {{ cours.title }}</h1>
-        <a href="{{ path('app_mes_cours') }}" class="btn btn-outline-primary">
-            <i class="fas fa-arrow-left"></i> Retour à mes cours
-        </a>
+        <a href="{{ path('app_mes_cours') }}" class="back-button">← Retour à mes cours</a>
     </div>
 
-    <div class="card mb-4">
-        <div class="card-body">
-            <h5 class="card-title">{{ cours.title }}</h5>
-            <p class="card-text">{{ cours.description|slice(0, 200) }}...</p>
-            <p class="text-muted">
-                <strong>Ajouté le :</strong> {{ "now"|date('d/m/Y') }}
-            </p>
-        </div>
-    </div>
-
-    {% if quizzes|length > 0 %}
-        <div class="row">
-            {% for quiz in quizzes %}
-                <div class="col-md-6 mb-4">
-                    <div class="card h-100">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start mb-3">
-                                <h5 class="card-title">{{ quiz.title }}</h5>
-                                <span class="badge bg-success">
-                                    <i class="fas fa-eye"></i> Visible
-                                </span>
-                            </div>
-                            
-                            <p class="card-text">{{ quiz.description|slice(0, 150) }}...</p>
-                            
-                            <div class="mb-3">
-                                <small class="text-muted">
-                                    <i class="fas fa-question-circle"></i> 
-                                    {{ quiz.questions|length }} questions
-                                    {% if quiz.totalPoints %}
-                                        | <i class="fas fa-star"></i> {{ quiz.totalPoints }} points
-                                    {% endif %}
-                                    {% if quiz.timeLimit %}
-                                        | <i class="fas fa-clock"></i> {{ (quiz.timeLimit // 60) }} min
-                                    {% endif %}
-                                </small>
-                            </div>
-                            
-                            <div class="d-grid gap-2">
-                                <a href="{{ path('app_quiz_start', {'id': quiz.id}) }}" class="btn btn-primary">
-                                    <i class="fas fa-play"></i> Commencer le quiz
-                                </a>
-                                {% if quiz.cours %}
-                                    <a href="{{ path('app_cours_show', {'id': quiz.cours.id}) }}" class="btn btn-outline-secondary">
-                                        <i class="fas fa-info-circle"></i> Détails du cours
-                                    </a>
-                                {% endif %}
-                            </div>
-                        </div>
-                    </div>
+    <div class="filter-section">
+        <div class="filter-controls">
+            <div class="search-group">
+                <label for="searchInput">Filtrer par quiz</label>
+                <input type="text" id="searchInput" class="search-input" placeholder="Rechercher un quiz...">
+            </div>
+            <div class="sort-group">
+                <label>Trier par points</label>
+                <div class="sort-buttons">
+                    <button type="button" class="sort-btn" id="sortAsc">
+                        <span>↑</span>
+                        <span>Croissant</span>
+                    </button>
+                    <button type="button" class="sort-btn" id="sortDesc">
+                        <span>↓</span>
+                        <span>Décroissant</span>
+                    </button>
                 </div>
-            {% endfor %}
+            </div>
         </div>
-    {% else %}
-        <div class="alert alert-info">
-            <i class="fas fa-info-circle"></i>
-            Aucun quiz n'est actuellement disponible pour ce cours.
-            Les quiz visibles par l'administrateur apparaîtront ici.
+        <div class="sort-indicator hidden" id="sortIndicator">
+            <span>↕️</span>
+            <span id="sortText">Tri actif: Points croissant</span>
+            <button type="button" class="reset-btn" id="resetBtn">Réinitialiser</button>
         </div>
-    {% endif %}
+    </div>
+
+    <div class="course-info">
+        <h2>{{ cours.title }}</h2>
+        <p class="course-description">{{ cours.description|default('')|slice(0, 200) }}{% if cours.description|length > 200 %}...{% endif %}</p>
+        <p class="course-date">Ajouté le : {{ "now"|date('d/m/Y') }}</p>
+    </div>
+
+    <div class="quiz-grid" id="quizGrid"></div>
+    <div class="no-results hidden" id="noResults">
+        <p>Aucun quiz trouvé</p>
+    </div>
 </div>
+
+<script>
+    const quizList = [
+        {% for quiz in quizzes %}
+        {
+            id: {{ quiz.id }},
+            title: {{ quiz.title|json_encode|raw }},
+            description: {{ (quiz.description ?? '')|json_encode|raw }},
+            questions: {{ quiz.questions|length }},
+            points: {{ quiz.totalPoints ?? 0 }},
+            duration: {{ (quiz.timeLimit ?? 0) // 60 }},
+            visible: {{ quiz.isVisible ? 'true' : 'false' }}
+        }{% if not loop.last %},{% endif %}
+        {% endfor %}
+    ];
+
+    let sortOrder = 'none';
+    let searchTerm = '';
+
+    const searchInput = document.getElementById('searchInput');
+    const sortAscBtn = document.getElementById('sortAsc');
+    const sortDescBtn = document.getElementById('sortDesc');
+    const resetBtn = document.getElementById('resetBtn');
+    const sortIndicator = document.getElementById('sortIndicator');
+    const sortText = document.getElementById('sortText');
+    const quizGrid = document.getElementById('quizGrid');
+    const noResults = document.getElementById('noResults');
+
+    function getSortedQuizzes() {
+        let sorted = [...quizList];
+
+        if (searchTerm) {
+            sorted = sorted.filter(quiz =>
+                quiz.title.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+        }
+
+        if (sortOrder === 'asc') {
+            sorted.sort((a, b) => a.points - b.points);
+        } else if (sortOrder === 'desc') {
+            sorted.sort((a, b) => b.points - a.points);
+        }
+
+        return sorted;
+    }
+
+    function createQuizCard(quiz) {
+        const urlStart = {{ path('app_quiz_start', {'id': 0})|json_encode|raw }}.replace('0', String(quiz.id));
+        return `
+            <div class="quiz-card">
+                <div class="quiz-header">
+                    <h3 class="quiz-title">${quiz.title}</h3>
+                    ${quiz.visible ? '<span class="visible-badge">👁️ Visible</span>' : ''}
+                </div>
+                <p class="quiz-description">${quiz.description}</p>
+                <div class="quiz-stats">
+                    <span class="stat-badge stat-questions">
+                        ❓ ${quiz.questions} question${quiz.questions !== 1 ? 's' : ''}
+                    </span>
+                    <span class="stat-badge stat-points">
+                        ⭐ ${quiz.points} point${quiz.points !== 1 ? 's' : ''}
+                    </span>
+                    <span class="stat-badge stat-duration">
+                        ⏱️ ${quiz.duration} min
+                    </span>
+                </div>
+                <div class="quiz-actions">
+                    <a href="${urlStart}" class="btn-quiz btn-primary-quiz">
+                        ▶ Commencer le quiz
+                    </a>
+                    <button type="button" class="btn-quiz btn-secondary-quiz" onclick="alert('Détails du quiz #' + ${quiz.id})">
+                        ℹ️ Détails du cours
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderQuizzes() {
+        const sortedQuizzes = getSortedQuizzes();
+
+        if (sortedQuizzes.length === 0) {
+            quizGrid.classList.add('hidden');
+            noResults.classList.remove('hidden');
+        } else {
+            quizGrid.classList.remove('hidden');
+            noResults.classList.add('hidden');
+            quizGrid.innerHTML = sortedQuizzes.map(quiz => createQuizCard(quiz)).join('');
+        }
+
+        if (sortOrder !== 'none') {
+            sortIndicator.classList.remove('hidden');
+            sortText.textContent = `Tri actif: Points ${sortOrder === 'asc' ? 'croissant' : 'décroissant'}`;
+            sortAscBtn.classList.toggle('active', sortOrder === 'asc');
+            sortDescBtn.classList.toggle('active', sortOrder === 'desc');
+        } else {
+            sortIndicator.classList.add('hidden');
+            sortAscBtn.classList.remove('active');
+            sortDescBtn.classList.remove('active');
+        }
+    }
+
+    searchInput.addEventListener('input', (e) => {
+        searchTerm = e.target.value;
+        renderQuizzes();
+    });
+
+    sortAscBtn.addEventListener('click', () => {
+        sortOrder = sortOrder === 'asc' ? 'none' : 'asc';
+        renderQuizzes();
+    });
+
+    sortDescBtn.addEventListener('click', () => {
+        sortOrder = sortOrder === 'desc' ? 'none' : 'desc';
+        renderQuizzes();
+    });
+
+    resetBtn.addEventListener('click', () => {
+        sortOrder = 'none';
+        searchTerm = '';
+        searchInput.value = '';
+        renderQuizzes();
+    });
+
+    document.addEventListener('DOMContentLoaded', renderQuizzes);
+</script>
 {% endblock %}
