@@ -4,7 +4,14 @@
 
 {% block body %}
 <div class="container my-5">
-    <h1 class="mb-4">Mes Abonnements</h1>
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">Mes Abonnements</h1>
+        <div class="btn-group" role="group" aria-label="Filtrer les abonnements">
+            <a href="{{ path('payment_my_subscription') }}" class="btn btn-sm btn-outline-secondary">Tous</a>
+            <a href="{{ path('payment_my_subscription_filter', {status: 'active'}) }}" class="btn btn-sm btn-outline-secondary">Actifs</a>
+            <a href="{{ path('payment_my_subscription_filter', {status: 'canceled'}) }}" class="btn btn-sm btn-outline-secondary">canceled</a>
+        </div>
+    </div>
     
     {% if subscriptions is not empty %}
         {% for subscription in subscriptions %}
@@ -22,7 +29,7 @@
                                         {% if subscription.isActive %}
                                             <span class="badge bg-success">Actif</span>
                                         {% else %}
-                                            <span class="badge bg-secondary">Inactif</span>
+                                            <span class="badge bg-secondary">canceled</span>
                                         {% endif %}
                                     </li>
                                     <li><strong>Date de début :</strong> {{ subscription.startDate|date('d/m/Y') }}</li>
@@ -71,12 +78,21 @@
                                 </div>
                             {% endif %}
                             
-                            {% if subscription.isActive and subscription.autoRenew %}
+                            {% if subscription.autoRenew %}
 
                                 <form method="post" action="{{ path('payment_cancel_subscription', {id: subscription.id}) }}" 
-                                      onsubmit="return confirm('Êtes-vous sûr de vouloir annuler le renouvellement ?');">
-                                    <button type="submit" class="btn btn-outline-danger w-100">
+                                      onsubmit="return confirm('Êtes-vous sûr de vouloir annuler le renouvellement automatique ?');">
+                                    <button type="submit" class="btn btn-outline-danger w-100 mb-2">
                                         Annuler le renouvellement
+                                    </button>
+                                </form>
+                            {% endif %}
+
+                            {% if subscription.isActive %}
+                                <form method="post" action="{{ path('payment_cancel_subscription_full', {id: subscription.id}) }}" 
+                                      onsubmit="return confirm('Êtes-vous sûr de vouloir annuler complètement cet abonnement ?');">
+                                    <button type="submit" class="btn btn-danger w-100">
+                                        Annuler l'abonnement
                                     </button>
                                 </form>
                             {% endif %}

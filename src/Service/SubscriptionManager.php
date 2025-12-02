@@ -63,9 +63,8 @@ class SubscriptionManager
     
     public function cancelSubscription(Subscription $subscription): void
     {
-        // Désactiver le renouvellement automatique et marquer l'abonnement comme annulé
+        // Désactiver le renouvellement automatique et marquer l'abonnement comme inactif
         $subscription->setAutoRenew(false);
-        $subscription->setStatus('canceled');
         $subscription->setEndDate(new \DateTime());
 
         $this->entityManager->flush();

@@ -20,6 +20,43 @@
             <h6 class="m-0 font-weight-bold text-primary">Liste des abonnements</h6>
         </div>
         <div class="card-body">
+            <div class="mb-3">
+                <form class="form-inline" method="get" action="{{ path('admin_subscription_filter') }}">
+                    <div class="form-group mr-3 mb-2">
+                        <label for="status" class="mr-2 small mb-0">Statut</label>
+                        <select id="status" name="status" class="form-control form-control-sm">
+                            <option value="" {{ app.request.query.get('status') is empty ? 'selected' : '' }}>Tous</option>
+                            <option value="active" {{ app.request.query.get('status') == 'active' ? 'selected' : '' }}>Actifs</option>
+                            <option value="canceled" {{ app.request.query.get('status') == 'canceled' ? 'selected' : '' }}>Annulés</option>
+                            <option value="pending" {{ app.request.query.get('status') == 'pending' ? 'selected' : '' }}>En attente</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group mr-3 mb-2">
+                        <label for="autoRenew" class="mr-2 small mb-0">Auto-renouvellement</label>
+                        <select id="autoRenew" name="autoRenew" class="form-control form-control-sm">
+                            <option value="" {{ app.request.query.get('autoRenew') is empty ? 'selected' : '' }}>Tous</option>
+                            <option value="1" {{ app.request.query.get('autoRenew') == '1' ? 'selected' : '' }}>Actif</option>
+                            <option value="2" {{ app.request.query.get('autoRenew') == '2' ? 'selected' : '' }}>Inactif</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group mr-3 mb-2">
+                        <label for="planId" class="mr-2 small mb-0">Plan</label>
+                        <select id="planId" name="planId" class="form-control form-control-sm">
+                            <option value="" {{ app.request.query.get('planId') is empty ? 'selected' : '' }}>Tous</option>
+                            {% for plan in plans %}
+                                <option value="{{ plan.id }}" {{ app.request.query.get('planId') == plan.id ? 'selected' : '' }}>
+                                    {{ plan.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-sm btn-primary mb-2">Filtrer</button>
+                </form>
+            </div>
+
             <div class="table-responsive">
                 <table class="table table-bordered" width="100%" cellspacing="0">
                     <thead>

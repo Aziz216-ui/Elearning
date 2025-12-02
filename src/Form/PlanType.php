@@ -17,7 +17,7 @@ class PlanType extends AbstractType
             ->add('name')
             ->add('description')
             ->add('price', MoneyType::class, [
-                'currency' => 'EUR',
+                'currency' => 'DT',
                 'divisor' => 1,
             ])
             ->add('duration', ChoiceType::class, [

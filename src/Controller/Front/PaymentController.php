@@ -5,6 +5,8 @@ namespace App\Controller\Front;
 use App\Entity\Plan;
 use App\Entity\Payment;
 use App\Entity\User;
+use App\Repository\PlanRepository;
+use App\Repository\SubscriptionRepository;
 use App\Service\PaymeeService;
 use App\Service\SubscriptionManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,7 +22,9 @@ class PaymentController extends AbstractController
     public function __construct(
         private PaymeeService $paymeeService,
         private SubscriptionManager $subscriptionManager,
-        private EntityManagerInterface $entityManager
+        private EntityManagerInterface $entityManager,
+        private PlanRepository $planRepository,
+        private SubscriptionRepository $subscriptionRepository,
     ) {}
 
     #[Route('', name: 'payment_index', methods: ['GET'])]
@@ -34,8 +38,8 @@ class PaymentController extends AbstractController
     #[Route('/plans', name: 'payment_plans')]
     public function plans(): Response
     {
-        $plans = $this->entityManager->getRepository(Plan::class)
-            ->findBy(['isActive' => true], ['price' => 'ASC']);
+        // Plans actifs triés par prix via le repository dédié
+        $plans = $this->planRepository->findAllActiveByPrice();
 
         return $this->render('front/payment/plans.html.twig', [
             'plans' => $plans,
@@ -75,9 +79,33 @@ class PaymentController extends AbstractController
             return $this->redirectToRoute('payment_plans');
         }
 
-        // Récupérer tous les abonnements de l'utilisateur (du plus récent au plus ancien)
-        $subscriptions = $this->entityManager->getRepository(\App\Entity\Subscription::class)
-            ->findBy(['user' => $this->getUser()], ['startDate' => 'DESC']);
+        $subscriptions = $this->subscriptionRepository->findByUser($this->getUser());
+
+        return $this->render('front/payment/my_subscription.html.twig', [
+            'subscriptions' => $subscriptions,
+        ]);
+    }
+
+    #[Route('/my-subscription/filter', name: 'payment_my_subscription_filter')]
+    public function mySubscriptionFilter(Request $request): Response
+    {
+        if (!$this->getUser()) {
+            $this->addFlash('warning', 'Veuillez vous connecter pour voir votre abonnement.');
+            return $this->redirectToRoute('payment_plans');
+        }
+
+        $statusFilter = $request->query->get('status');
+
+        if ($statusFilter === 'active') {
+            // Abonnements actifs uniquement
+            $subscriptions = $this->subscriptionRepository->findActiveByUser($this->getUser());
+        } elseif ($statusFilter === 'canceled') {
+            // Abonnements inactifs uniquement
+            $subscriptions = $this->subscriptionRepository->findInactiveByUser($this->getUser());
+        } else {
+            // Tous les abonnements de l'utilisateur
+            $subscriptions = $this->subscriptionRepository->findByUser($this->getUser());
+        }
 
         return $this->render('front/payment/my_subscription.html.twig', [
             'subscriptions' => $subscriptions,
@@ -106,6 +134,32 @@ class PaymentController extends AbstractController
         } else {
             $this->addFlash('error', 'Cet abonnement n\'est pas actif ou ne se renouvelle pas automatiquement.');
         }
+
+        return $this->redirectToRoute('payment_my_subscription');
+    }
+
+    #[Route('/cancel-subscription-full/{id}', name: 'payment_cancel_subscription_full', methods: ['POST'])]
+    public function cancelSubscriptionFull(\App\Entity\Subscription $subscription): Response
+    {
+        if (!$this->getUser()) {
+            $this->addFlash('warning', 'Veuillez vous connecter pour annuler votre abonnement.');
+            return $this->redirectToRoute('payment_plans');
+        }
+
+        // Sécurité : s'assurer que l'abonnement appartient bien à l'utilisateur connecté
+        if ($subscription->getUser() !== $this->getUser()) {
+            $this->addFlash('error', 'Cet abonnement ne vous appartient pas.');
+            return $this->redirectToRoute('payment_my_subscription');
+        }
+
+        // Annuler totalement l'abonnement : désactiver l'auto-renouvellement et marquer comme annulé
+        $subscription->setAutoRenew(false);
+        $subscription->setStatus('canceled');
+        $subscription->setEndDate(new \DateTime());
+
+        $this->entityManager->flush();
+
+        $this->addFlash('success', 'Votre abonnement a été annulé.');
 
         return $this->redirectToRoute('payment_my_subscription');
     }
