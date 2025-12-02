@@ -46,10 +46,24 @@ class PaymentController extends AbstractController
         ]);
     }
 
-    // Crée une session de paiement et redirige vers PayMee
-     
+    // Affiche la page de détails de paiement pour un plan donné
+    
     #[Route('/checkout/{id}', name: 'payment_checkout')]
     public function checkout(Plan $plan): Response
+    {
+        if (!$this->getUser()) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        return $this->render('front/payment/checkout.html.twig', [
+            'plan' => $plan,
+        ]);
+    }
+
+    // Crée une session de paiement Paymee et redirige vers Paymee
+    
+    #[Route('/paymee/{id}', name: 'payment_paymee')]
+    public function paymee(Plan $plan): Response
     {
         if (!$this->getUser()) {
             return $this->redirectToRoute('app_login');
