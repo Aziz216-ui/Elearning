@@ -95,6 +95,23 @@
             margin-bottom: 25px;
         }
 
+        .form-group.has-error .form-control,
+        .form-group.has-error .form-check-input,
+        .form-group.has-error select {
+            border-color: #dc3545;
+            background-color: #f8d7da;
+        }
+
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+
+        .error-text {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 5px;
+        }
+
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
@@ -348,374 +365,106 @@
                     <h3>📋 Informations Générales</h3>
                 </div>
                 <div class="card-body">
-                    {{ form_start(form, {'attr': {'id': 'quizForm', 'novalidate': 'novalidate'}}) }}
+                    {{ form_start(form, {
+                        attr: {
+                            id: 'quizForm',
+                            class: 'quiz-form needs-validation',
+                            novalidate: 'novalidate'
+                        }
+                    }) }}
                     
-                    <div class="form-group full-width">
-                        {{ form_label(form.title, 'Titre du Quiz') }}
-                        {{ form_widget(form.title, {'attr': {'placeholder': 'Ex: Quiz de Mathématiques - Chapitre 1', 'class': 'form-control'}}) }}
+                    {% set titleHasError = not form.title.vars.valid %}
+                    <div class="form-group full-width {{ titleHasError ? 'has-error' : '' }}">
+                        {{ form_label(form.title, 'Titre du Quiz *') }}
+                        {{ form_widget(form.title, {
+                            'attr': {
+                                'class': 'form-control' ~ (titleHasError ? ' is-invalid' : '')
+                            }
+                        }) }}
+                        <div class="error-text">{{ form_errors(form.title) }}</div>
                     </div>
 
-                    <div class="form-group full-width">
+                    {% set descHasError = not form.description.vars.valid %}
+                    <div class="form-group full-width {{ descHasError ? 'has-error' : '' }}">
                         {{ form_label(form.description, 'Description') }}
-                        {{ form_widget(form.description, {'attr': {'placeholder': 'Décrivez brièvement le contenu et les objectifs de ce quiz...', 'class': 'form-control', 'rows': '3'}}) }}
+                        {{ form_widget(form.description, {
+                            'attr': {
+                                'class': 'form-control' ~ (descHasError ? ' is-invalid' : ''),
+                                'rows': '3'
+                            }
+                        }) }}
+                        <div class="error-text">{{ form_errors(form.description) }}</div>
                     </div>
 
                     <div class="form-row">
-                        <div class="form-group">
+                        {% set coursHasError = not form.cours.vars.valid %}
+                        <div class="form-group {{ coursHasError ? 'has-error' : '' }}">
                             {{ form_label(form.cours, 'Cours Associé') }}
-                            {{ form_widget(form.cours, {'attr': {'class': 'form-control'}}) }}
+                            {{ form_widget(form.cours, {
+                                'attr': {
+                                    'class': 'form-control' ~ (coursHasError ? ' is-invalid' : '')
+                                }
+                            }) }}
+                            <div class="error-text">{{ form_errors(form.cours) }}</div>
                         </div>
 
-                        <div class="form-group">
+                        {% set timeHasError = not form.timeLimit.vars.valid %}
+                        <div class="form-group {{ timeHasError ? 'has-error' : '' }}">
                             {{ form_label(form.timeLimit, 'Limite de temps (minutes)') }}
-                            {{ form_widget(form.timeLimit, {'attr': {'class': 'form-control', 'min': '1', 'max': '120', 'placeholder': '30'}}) }}
+                            {{ form_widget(form.timeLimit, {
+                                'attr': {
+                                    'class': 'form-control' ~ (timeHasError ? ' is-invalid' : ''),
+                                    'min': '1',
+                                    'max': '120'
+                                }
+                            }) }}
+                            <div class="error-text">{{ form_errors(form.timeLimit) }}</div>
                         </div>
                     </div>
 
-                    <div class="form-group">
-                        <div class="form-check">
-                            {{ form_widget(form.isVisible, {'attr': {'class': 'form-check-input'}}) }}
-                            {{ form_label(form.isVisible, 'Rendre visible pour les étudiants', {'label_attr': {'class': 'form-check-label'}}) }}
-                        </div>
+                    {% set visibleHasError = not form.isVisible.vars.valid %}
+                    <div class="form-group {{ visibleHasError ? 'has-error' : '' }}">
+                        {{ form_label(form.isVisible, 'Rendre visible pour les étudiants') }}
+                        {{ form_widget(form.isVisible, {
+                            'attr': {
+                                'class': 'form-check-input' ~ (visibleHasError ? ' is-invalid' : '')
+                            }
+                        }) }}
+                        <div class="error-text">{{ form_errors(form.isVisible) }}</div>
                     </div>
-                </div>
-            </div>
 
-            <!-- Colonne de droite : Questions -->
-            <div class="card">
-                <div class="card-header">
-                    <h3>❓ Questions du Quiz</h3>
-                    <button type="button" class="btn btn-add" onclick="addQuestion()">
-                        ➕ Ajouter une question
-                    </button>
-                </div>
-                <div class="card-body">
-                    <div id="questionsArea" class="questions-container">
-                        <div class="empty-state" id="emptyState">
-                            <div class="empty-icon">📝</div>
-                            <p><strong>Aucune question ajoutée</strong></p>
-                            <small>Cliquez sur "Ajouter une question" pour commencer</small>
+                    <div class="form-group full-width">
+                        <label>Questions du Quiz</label>
+                        <button type="button" class="btn btn-add" onclick="addQuestion()">
+                            ➕ Ajouter une question
+                        </button>
+                        <div id="questionsArea" class="questions-container">
+                            <div class="empty-state" id="emptyState">
+                                <div class="empty-icon">📝</div>
+                                <p><strong>Aucune question ajoutée</strong></p>
+                                <small>Cliquez sur "Ajouter une question" pour commencer</small>
+                            </div>
                         </div>
                     </div>
+
+                    <div class="form-actions">
+                        <a href="{{ path('app_quiz_admin_index') }}" class="btn btn-secondary">❌ Annuler</a>
+                        <button type="submit" class="btn btn-primary">💾 Enregistrer le Quiz</button>
+                    </div>
+
+                    {{ form_end(form) }}
                 </div>
             </div>
         </div>
-
-        <!-- Boutons d'action -->
-        <div class="form-actions">
-            <a href="{{ path('app_quiz_admin_index') }}" class="btn btn-secondary">
-                ❌ Annuler
-            </a>
-            <button type="submit" class="btn btn-primary">
-                💾 Enregistrer le Quiz
-            </button>
-        </div>
-        
-        {{ form_end(form) }}
     </div>
 
     <script>
         let questionCounter = 0;
         let formSubmitted = false;
 
-        document.addEventListener('DOMContentLoaded', function() {
-            const form = document.getElementById('quizForm');
-            
-            // Ajouter l'écouteur d'événement pour la soumission
-            form.addEventListener('submit', function(e) {
-                formSubmitted = true;
-                
-                // Valider le formulaire avant soumission
-                if (!validateForm()) {
-                    e.preventDefault();
-                    showValidationErrors();
-                    return false;
-                }
-            });
-            
-            // Masquer les erreurs lors de la saisie
-            const inputs = form.querySelectorAll('input, select, textarea');
-            inputs.forEach(input => {
-                input.addEventListener('input', function() {
-                    if (formSubmitted) {
-                        clearFieldError(this);
-                    }
-                });
-                
-                input.addEventListener('change', function() {
-                    if (formSubmitted) {
-                        clearFieldError(this);
-                    }
-                });
-            });
-        });
-
-        function validateForm() {
-            const form = document.getElementById('quizForm');
-            let isValid = true;
-            let hasAnyValue = false;
-            
-            // Vérifier si au moins un champ a une valeur
-            const allInputs = form.querySelectorAll('input, select, textarea');
-            allInputs.forEach(input => {
-                if (input.value.trim() && input.value.trim() !== '') {
-                    hasAnyValue = true;
-                }
-            });
-            
-            // Si tous les champs sont vides, considérer comme valide (pas de validation)
-            if (!hasAnyValue) {
-                return true;
-            }
-            
-            // Valider TOUS les champs du formulaire
-            const allRequiredInputs = form.querySelectorAll('input[required], select[required], textarea[required]');
-            allRequiredInputs.forEach(input => {
-                if (!input.value.trim() || input.value.trim() === '') {
-                    isValid = false;
-                }
-            });
-            
-            // Valider le titre
-            const titleInput = form.querySelector('[name="quiz[title]"]');
-            if (!titleInput.value.trim() || titleInput.value.trim().length < 3) {
-                isValid = false;
-            }
-            
-            // Valider la description
-            const descriptionInput = form.querySelector('[name="quiz[description]"]');
-            if (descriptionInput && !descriptionInput.value.trim()) {
-                isValid = false;
-            }
-            
-            // Valider le cours
-            const coursInput = form.querySelector('[name="quiz[cours]"]');
-            if (coursInput && !coursInput.value) {
-                isValid = false;
-            }
-            
-            // Valider la limite de temps
-            const timeLimitInput = form.querySelector('[name="quiz[timeLimit]"]');
-            if (timeLimitInput && (!timeLimitInput.value || timeLimitInput.value < 1)) {
-                isValid = false;
-            }
-            
-            // Valider les points totaux
-            const totalPointsInput = form.querySelector('[name="quiz[totalPoints]"]');
-            if (totalPointsInput && (!totalPointsInput.value || totalPointsInput.value < 1)) {
-                isValid = false;
-            }
-            
-            // Valider qu'il y a au moins une question
-            const questions = form.querySelectorAll('.question-item');
-            if (questions.length === 0) {
-                isValid = false;
-            } else {
-                // Valider chaque question
-                questions.forEach(question => {
-                    const questionText = question.querySelector('input[name*="[text]"]');
-                    const questionType = question.querySelector('select[name*="[type]"]');
-                    
-                    if (!questionText.value.trim()) {
-                        isValid = false;
-                    }
-                    
-                    // Valider les réponses selon le type
-                    if (questionType.value === 'multiple_choice') {
-                        const answers = question.querySelectorAll('.answer-item input[type="text"]');
-                        const checkboxes = question.querySelectorAll('.answer-item input[type="checkbox"]');
-                        let hasValidAnswer = false;
-                        let hasCorrectAnswer = false;
-                        
-                        answers.forEach((answer, index) => {
-                            if (answer.value.trim()) {
-                                hasValidAnswer = true;
-                                if (checkboxes[index] && checkboxes[index].checked) {
-                                    hasCorrectAnswer = true;
-                                }
-                            }
-                        });
-                        
-                        if (!hasValidAnswer || !hasCorrectAnswer) {
-                            isValid = false;
-                        }
-                    } else if (questionType.value === 'true_false') {
-                        const radioButtons = question.querySelectorAll('input[type="radio"]');
-                        let hasSelection = false;
-                        radioButtons.forEach(radio => {
-                            if (radio.checked) hasSelection = true;
-                        });
-                        if (!hasSelection) isValid = false;
-                    } else if (questionType.value === 'short_answer') {
-                        const shortAnswer = question.querySelector('input[name*="[correct_answer]"]');
-                        if (!shortAnswer.value.trim()) {
-                            isValid = false;
-                        }
-                    }
-                });
-            }
-            
-            return isValid;
-        }
-
-        function showValidationErrors() {
-            const form = document.getElementById('quizForm');
-            
-            // Effacer les anciennes erreurs
-            clearAllErrors();
-            
-            // Valider et afficher les erreurs
-            const errors = [];
-            
-            // Valider TOUS les champs du formulaire
-            const allInputs = form.querySelectorAll('input, select, textarea');
-            allInputs.forEach(input => {
-                if (input.hasAttribute('required') && (!input.value.trim() || input.value.trim() === '')) {
-                    showFieldError(input, 'Ce champ est obligatoire');
-                    errors.push(`${input.previousElementSibling?.textContent || 'Champ'} est obligatoire`);
-                }
-            });
-            
-            // Valider le titre
-            const titleInput = form.querySelector('[name="quiz[title]"]');
-            if (!titleInput.value.trim()) {
-                showFieldError(titleInput, 'Le titre du quiz est obligatoire');
-                errors.push('Le titre du quiz est obligatoire');
-            } else if (titleInput.value.trim().length < 3) {
-                showFieldError(titleInput, 'Le titre doit contenir au moins 3 caractères');
-                errors.push('Le titre doit contenir au moins 3 caractères');
-            }
-            
-            // Valider la description
-            const descriptionInput = form.querySelector('[name="quiz[description]"]');
-            if (descriptionInput && !descriptionInput.value.trim()) {
-                showFieldError(descriptionInput, 'La description est obligatoire');
-                errors.push('La description est obligatoire');
-            }
-            
-            // Valider le cours
-            const coursInput = form.querySelector('[name="quiz[cours]"]');
-            if (coursInput && !coursInput.value) {
-                showFieldError(coursInput, 'Le cours associé est obligatoire');
-                errors.push('Le cours associé est obligatoire');
-            }
-            
-            // Valider la limite de temps
-            const timeLimitInput = form.querySelector('[name="quiz[timeLimit]"]');
-            if (timeLimitInput && (!timeLimitInput.value || timeLimitInput.value < 1)) {
-                showFieldError(timeLimitInput, 'La limite de temps doit être d\'au moins 1 minute');
-                errors.push('La limite de temps doit être d\'au moins 1 minute');
-            }
-            
-            // Valider les points totaux
-            const totalPointsInput = form.querySelector('[name="quiz[totalPoints]"]');
-            if (totalPointsInput && (!totalPointsInput.value || totalPointsInput.value < 1)) {
-                showFieldError(totalPointsInput, 'Les points totaux doivent être d\'au moins 1');
-                errors.push('Les points totaux doivent être d\'au moins 1');
-            }
-            
-            // Valider les questions
-            const questions = form.querySelectorAll('.question-item');
-            if (questions.length === 0) {
-                // Pas de message global d'erreur
-            } else {
-                questions.forEach((question, index) => {
-                    const questionText = question.querySelector('input[name*="[text]"]');
-                    const questionType = question.querySelector('select[name*="[type]"]');
-                    
-                    if (!questionText.value.trim()) {
-                        showFieldError(questionText, `L'énoncé de la question ${index + 1} est obligatoire`);
-                        errors.push(`L'énoncé de la question ${index + 1} est obligatoire`);
-                    }
-                    
-                    // Valider les réponses selon le type
-                    if (questionType.value === 'multiple_choice') {
-                        const answers = question.querySelectorAll('.answer-item input[type="text"]');
-                        const checkboxes = question.querySelectorAll('.answer-item input[type="checkbox"]');
-                        let hasValidAnswer = false;
-                        let hasCorrectAnswer = false;
-                        
-                        answers.forEach((answer, answerIndex) => {
-                            if (answer.value.trim()) {
-                                hasValidAnswer = true;
-                                if (checkboxes[answerIndex] && checkboxes[answerIndex].checked) {
-                                    hasCorrectAnswer = true;
-                                }
-                            }
-                        });
-                        
-                        if (!hasValidAnswer) {
-                            showFieldError(question.querySelector('.answers-container'), 
-                                          `La question ${index + 1} doit avoir au moins une réponse`);
-                            errors.push(`La question ${index + 1} doit avoir au moins une réponse`);
-                        } else if (!hasCorrectAnswer) {
-                            showFieldError(question.querySelector('.answers-container'), 
-                                          `La question ${index + 1} doit avoir au moins une réponse correcte`);
-                            errors.push(`La question ${index + 1} doit avoir au moins une réponse correcte`);
-                        }
-                    } else if (questionType.value === 'true_false') {
-                        const radioButtons = question.querySelectorAll('input[type="radio"]');
-                        let hasSelection = false;
-                        radioButtons.forEach(radio => {
-                            if (radio.checked) hasSelection = true;
-                        });
-                        if (!hasSelection) {
-                            showFieldError(question.querySelector('.answers-container'), 
-                                          `La question ${index + 1} doit avoir une réponse sélectionnée`);
-                            errors.push(`La question ${index + 1} doit avoir une réponse sélectionnée`);
-                        }
-                    } else if (questionType.value === 'short_answer') {
-                        const shortAnswer = question.querySelector('input[name*="[correct_answer]"]');
-                        if (!shortAnswer.value.trim()) {
-                            showFieldError(shortAnswer, `La réponse attendue pour la question ${index + 1} est obligatoire`);
-                            errors.push(`La réponse attendue pour la question ${index + 1} est obligatoire`);
-                        }
-                    }
-                });
-            }
-        }
-
-        function showFieldError(field, message) {
-            clearFieldError(field);
-            
-            field.style.borderColor = '#ef4444';
-            field.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
-            
-            const errorDiv = document.createElement('div');
-            errorDiv.className = 'field-error';
-            errorDiv.style.cssText = `
-                color: #ef4444;
-                font-size: 0.875em;
-                margin-top: 5px;
-                font-weight: 500;
-            `;
-            errorDiv.textContent = message;
-            
-            field.parentNode.appendChild(errorDiv);
-        }
-
-        function clearFieldError(field) {
-            field.style.borderColor = '';
-            field.style.boxShadow = '';
-            
-            const existingError = field.parentNode.querySelector('.field-error');
-            if (existingError) {
-                existingError.remove();
-            }
-        }
-
-        function clearAllErrors() {
-            // Effacer les erreurs de champs
-            document.querySelectorAll('.field-error').forEach(error => error.remove());
-            document.querySelectorAll('[style*="border-color: rgb(239, 68, 68)"]').forEach(field => {
-                field.style.borderColor = '';
-                field.style.boxShadow = '';
-            });
-        }
-
         function addQuestion() {
             questionCounter++;
-            const questionId = 'q' + Date.now();
+            const questionId = Date.now();
             const questionsArea = document.getElementById('questionsArea');
             
             // Supprimer l'état vide s'il existe
@@ -736,27 +485,27 @@
                 </div>
                 <div class="form-group">
                     <label>Énoncé de la question *</label>
-                    <input type="text" name="questions[${questionId}][text]" 
+                    <input type="text" name="quiz[questions][${questionId}][text]" 
                            placeholder="Entrez votre question..." class="form-control">
                 </div>
                 <div class="form-group">
                     <label>Type de question *</label>
-                    <select name="questions[${questionId}][type]" onchange="updateQuestionType(this)" class="form-control">
-                        <option value="multiple_choice">Choix multiple</option>
-                        <option value="true_false">Vrai/Faux</option>
-                        <option value="short_answer">Réponse courte</option>
+                    <select name="quiz[questions][${questionId}][type]" onchange="updateQuestionType(this)" class="form-control">
+                        <option value="multiple">Choix multiple</option>
+                        <option value="boolean">Vrai/Faux</option>
+                        <option value="text">Réponse courte</option>
                     </select>
                 </div>
                 <div class="answers-container" id="answers-${questionId}">
                     <div class="answer-item">
-                        <input type="text" name="questions[${questionId}][answers][0][text]" placeholder="Réponse 1" class="form-control">
-                        <input type="checkbox" name="questions[${questionId}][answers][0][correct]" value="1">
+                        <input type="text" name="quiz[questions][${questionId}][answers][0][text]" placeholder="Réponse 1" class="form-control">
+                        <input type="checkbox" name="quiz[questions][${questionId}][answers][0][isCorrect]" value="1">
                         <span>Correcte</span>
                         <button type="button" class="btn-remove" onclick="removeAnswer(this)">×</button>
                     </div>
                     <div class="answer-item">
-                        <input type="text" name="questions[${questionId}][answers][1][text]" placeholder="Réponse 2" class="form-control">
-                        <input type="checkbox" name="questions[${questionId}][answers][1][correct]" value="1">
+                        <input type="text" name="quiz[questions][${questionId}][answers][1][text]" placeholder="Réponse 2" class="form-control">
+                        <input type="checkbox" name="quiz[questions][${questionId}][answers][1][isCorrect]" value="1">
                         <span>Correcte</span>
                         <button type="button" class="btn-remove" onclick="removeAnswer(this)">×</button>
                     </div>
@@ -766,27 +515,11 @@
                 </button>
                 <div class="form-group" style="margin-top: 15px;">
                     <label>Points pour cette question</label>
-                    <input type="number" name="questions[${questionId}][points]" value="1" min="1" class="form-control">
+                    <input type="number" name="quiz[questions][${questionId}][points]" value="1" min="1" class="form-control">
                 </div>
             `;
             
             questionsArea.appendChild(questionDiv);
-            
-            // Ajouter les écouteurs d'événements pour les nouveaux champs
-            const newInputs = questionDiv.querySelectorAll('input, select');
-            newInputs.forEach(input => {
-                input.addEventListener('input', function() {
-                    if (formSubmitted) {
-                        clearFieldError(this);
-                    }
-                });
-                
-                input.addEventListener('change', function() {
-                    if (formSubmitted) {
-                        clearFieldError(this);
-                    }
-                });
-            });
         }
 
         function addAnswer(questionId) {
@@ -796,22 +529,14 @@
             const answerDiv = document.createElement('div');
             answerDiv.className = 'answer-item';
             answerDiv.innerHTML = `
-                <input type="text" name="questions[${questionId}][answers][${answerIndex}][text]" 
+                <input type="text" name="quiz[questions][${questionId}][answers][${answerIndex}][text]" 
                        placeholder="Réponse ${answerIndex + 1}" class="form-control">
-                <input type="checkbox" name="questions[${questionId}][answers][${answerIndex}][correct]" value="1">
+                <input type="checkbox" name="quiz[questions][${questionId}][answers][${answerIndex}][isCorrect]" value="1">
                 <span>Correcte</span>
                 <button type="button" class="btn-remove" onclick="removeAnswer(this)">×</button>
             `;
             
             answersContainer.appendChild(answerDiv);
-            
-            // Ajouter l'écouteur d'événements pour le nouveau champ
-            const newInput = answerDiv.querySelector('input[type="text"]');
-            newInput.addEventListener('input', function() {
-                if (formSubmitted) {
-                    clearFieldError(this);
-                }
-            });
         }
 
         function removeAnswer(button) {
@@ -837,7 +562,7 @@
             const questionItem = select.closest('.question-item');
             const answersContainer = questionItem.querySelector('.answers-container');
             
-            if (select.value === 'true_false') {
+            if (select.value === 'boolean') {
                 answersContainer.innerHTML = `
                     <div class="answer-item">
                         <input type="radio" name="${select.name.replace('[type]', '[correct_answer]')}" value="true">
@@ -848,30 +573,30 @@
                         <span>Faux</span>
                     </div>
                 `;
-            } else if (select.value === 'short_answer') {
+            } else if (select.value === 'text') {
                 answersContainer.innerHTML = `
                     <div class="answer-item">
                         <input type="text" name="${select.name.replace('[type]', '[correct_answer]')}" 
                                placeholder="Réponse attendue" class="form-control">
                     </div>
                 `;
-            } else {
-                // Remettre les champs de réponse par défaut pour choix multiple
-                const questionId = questionItem.dataset.questionId;
-                answersContainer.innerHTML = `
-                    <div class="answer-item">
-                        <input type="text" name="questions[${questionId}][answers][0][text]" placeholder="Réponse 1" class="form-control">
-                        <input type="checkbox" name="questions[${questionId}][answers][0][correct]" value="1">
-                        <span>Correcte</span>
-                        <button type="button" class="btn-remove" onclick="removeAnswer(this)">×</button>
-                    </div>
-                    <div class="answer-item">
-                        <input type="text" name="questions[${questionId}][answers][1][text]" placeholder="Réponse 2" class="form-control">
-                        <input type="checkbox" name="questions[${questionId}][answers][1][correct]" value="1">
-                        <span>Correcte</span>
-                        <button type="button" class="btn-remove" onclick="removeAnswer(this)">×</button>
-                    </div>
-                `;
+                } else {
+                    // Remettre les champs de réponse par défaut pour choix multiple
+                    const questionId = questionItem.dataset.questionId;
+                    answersContainer.innerHTML = `
+                        <div class="answer-item">
+                            <input type="text" name="quiz[questions][${questionId}][answers][0][text]" placeholder="Réponse 1" class="form-control">
+                            <input type="checkbox" name="quiz[questions][${questionId}][answers][0][isCorrect]" value="1">
+                            <span>Correcte</span>
+                            <button type="button" class="btn-remove" onclick="removeAnswer(this)">×</button>
+                        </div>
+                        <div class="answer-item">
+                            <input type="text" name="quiz[questions][${questionId}][answers][1][text]" placeholder="Réponse 2" class="form-control">
+                            <input type="checkbox" name="quiz[questions][${questionId}][answers][1][isCorrect]" value="1">
+                            <span>Correcte</span>
+                            <button type="button" class="btn-remove" onclick="removeAnswer(this)">×</button>
+                        </div>
+                    `;
             }
         }
     </script>

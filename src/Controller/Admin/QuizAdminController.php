@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use App\Entity\Quiz;
 use App\Entity\Question;        // <-- AJOUTE CECI
 use App\Entity\Answer;          // <-- AJOUTE CECI
+use App\Entity\Cours;
 use App\Form\QuizType;
 use App\Form\QuizSimpleType;
 use App\Form\QuestionType;
@@ -22,15 +23,45 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/admin/quiz')]
 class QuizAdminController extends AbstractController
 {
-    #[Route('/', name: 'app_quiz_admin_index', methods: ['GET'])]
-    public function index(QuizRepository $quizRepository): Response
+#[Route('/', name: 'index', methods: ['GET'])]
+    public function index(Request $request, QuizRepository $quizRepository, EntityManagerInterface $entityManager): Response
     {
-        $quizzes = $quizRepository->findAll();
+        // Charger tous les quiz pour le rendu initial
+        $searchTerm = trim((string) $request->query->get('q', ''));
+        $visibility = $request->query->get('visibility');
+        $isVisible = null;
+        if ($visibility === 'visible') $isVisible = true;
+        if ($visibility === 'hidden') $isVisible = false;
+
+        $quizzes = $quizRepository->searchByCriteria($searchTerm ?: null, null, $isVisible);
 
         return $this->render('quiz_admin/index.html.twig', [
             'quizzes' => $quizzes,
+            'searchTerm' => $searchTerm,
+            'selectedVisibility' => $visibility,
         ]);
     }
+
+    #[Route('/results', name: 'results', methods: ['GET'])]
+    public function results(Request $request, QuizRepository $quizRepository): Response
+    {
+        // Endpoint AJAX pour renvoyer uniquement le tableau filtré
+        $searchTerm = trim((string) $request->query->get('q', ''));
+        $visibility = $request->query->get('visibility');
+        $isVisible = null;
+        if ($visibility === 'visible') $isVisible = true;
+        if ($visibility === 'hidden') $isVisible = false;
+
+        $quizzes = $quizRepository->searchByCriteria($searchTerm ?: null, null, $isVisible);
+
+        return $this->render('quiz_admin/index.html.twig', [
+            'quizzes' => $quizzes,
+            'ajaxOnly' => true,
+        ]);
+    }
+
+
+    
 
     #[Route('/new-simple', name: 'app_quiz_admin_new_simple', methods: ['GET', 'POST'])]
     public function newSimple(Request $request, EntityManagerInterface $entityManager): Response
@@ -62,106 +93,33 @@ class QuizAdminController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $quiz = new Quiz();
-        // Set default values for new quiz
+        // valeurs par défaut
         $quiz->setIsVisible(true);
         $quiz->setIsPublished(false);
-        
+
         $form = $this->createForm(QuizType::class, $quiz);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            // au moins une question
 
-            $data = $request->request->all();
 
-            // Les champs dynamiques des questions sont postés au niveau racine sous "questions[...]"
-            $questionsData = $data['questions'] ?? null;
-            if (is_array($questionsData)) {
-                foreach ($questionsData as $qKey => $qData) {
-                    $question = new Question();
-                    $question->setQuiz($quiz);
-
-                    // Texte et points
-                    $question->setText($qData['text'] ?? '');
-                    $question->setPoints(isset($qData['points']) ? (int) $qData['points'] : 1);
-
-                    $type = $qData['type'] ?? 'multiple_choice';
-
-                    // Gérer selon le type
-                    switch ($type) {
-                        case 'true_false':
-                            $question->setType('boolean');
-                            $correct = $qData['correct_answer'] ?? null;
-
-                            $answerTrue = new Answer();
-                            $answerTrue->setText('Vrai');
-                            $answerTrue->setIsCorrect($correct === 'true');
-                            $answerTrue->setQuestion($question);
-                            $question->addAnswer($answerTrue);
-                            $entityManager->persist($answerTrue);
-
-                            $answerFalse = new Answer();
-                            $answerFalse->setText('Faux');
-                            $answerFalse->setIsCorrect($correct === 'false');
-                            $answerFalse->setQuestion($question);
-                            $question->addAnswer($answerFalse);
-                            $entityManager->persist($answerFalse);
-                            break;
-
-                        case 'short_answer':
-                            $question->setType('text');
-                            $expected = $qData['correct_answer'] ?? '';
-                            if ($expected !== '') {
-                                $a = new Answer();
-                                $a->setText($expected);
-                                $a->setIsCorrect(true);
-                                $a->setQuestion($question);
-                                $question->addAnswer($a);
-                                $entityManager->persist($a);
-                            }
-                            break;
-
-                        case 'multiple_choice':
-                        default:
-                            $question->setType('multiple');
-                            if (isset($qData['answers']) && is_array($qData['answers'])) {
-                                $hasCorrect = false;
-                                foreach ($qData['answers'] as $aData) {
-                                    $answer = new Answer();
-                                    $answer->setText($aData['text'] ?? '');
-                                    // Le template utilise "correct" (pas isCorrect)
-                                    $answer->setIsCorrect(isset($aData['correct']));
-                                    $answer->setQuestion($question);
-                                    $question->addAnswer($answer);
-                                    $entityManager->persist($answer);
-                                    if ($answer->isCorrect()) {
-                                        $hasCorrect = true;
-                                    }
-                                }
-                                // Si aucune réponse correcte cochée, forcer la première
-                                if (!$hasCorrect && $question->getAnswers()->count() > 0) {
-                                    $question->getAnswers()->first()->setIsCorrect(true);
-                                }
-                            }
-                            break;
-                    }
-
-                    $quiz->addQuestion($question);
-                    $entityManager->persist($question);
-                }
-            }
-
-            // calcul total points
+            // total des points
             $total = 0;
             foreach ($quiz->getQuestions() as $q) {
-                $total += $q->getPoints();
+                $total += (int) $q->getPoints();
             }
             $quiz->setTotalPoints($total);
 
-            $entityManager->persist($quiz);
-            $entityManager->flush();
+            try {
+                $entityManager->persist($quiz);
+                $entityManager->flush();
 
-            $this->addFlash('success', 'Quiz créé avec succès.');
-            return $this->redirectToRoute('app_quiz_admin_index');
+                $this->addFlash('success', 'Quiz créé avec succès.');
+                return $this->redirectToRoute('app_quiz_admin_index');
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Une erreur est survenue lors de la création du quiz: ' . $e->getMessage());
+            }
         }
 
         return $this->render('quiz_admin/new.html.twig', [
@@ -169,7 +127,6 @@ class QuizAdminController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
-
 
     #[Route('/{id}/edit', name: 'app_quiz_admin_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Quiz $quiz, EntityManagerInterface $entityManager): Response
@@ -180,51 +137,60 @@ class QuizAdminController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             // Récupérer les données brutes du formulaire
             $data = $request->request->all();
-            
+
             // Vérifier si nous avons des données de formulaire
-            if (isset($data['quiz']['questions'])) {
+            if (isset($data['quiz']['questions']) && is_array($data['quiz']['questions'])) {
                 $questionsData = $data['quiz']['questions'];
-                
+
                 // Parcourir les questions du formulaire
                 foreach ($questionsData as $questionKey => $questionData) {
-                    // Vérifier si c'est une clé valide (commence par 'q' suivi de chiffres)
-                    if (preg_match('/^q\d+$/', $questionKey)) {
-                        $question = $quiz->getQuestions()[$questionKey] ?? null;
-                        if ($question) {
-                            // Mettre à jour le texte et les points de la question
-                            if (isset($questionData['text'])) {
-                                $question->setText($questionData['text']);
+                    $question = null;
+
+                    // Resolver des clés: numeric index, q-prefixed, or id provided
+                    if (is_numeric($questionKey)) {
+                        $question = $quiz->getQuestions()->get((int)$questionKey);
+                    } elseif (is_string($questionKey) && preg_match('/^q(\d+)$/', $questionKey, $m)) {
+                        $question = $quiz->getQuestions()->get((int)$m[1]);
+                    } elseif (isset($questionData['id']) && is_numeric($questionData['id'])) {
+                        $question = $entityManager->getRepository(Question::class)->find((int)$questionData['id']);
+                    }
+
+                    if (!$question) {
+                        // Pas de question existante à mettre à jour
+                        continue;
+                    }
+
+                    // Mettre à jour le texte et les points de la question
+                    if (isset($questionData['text'])) {
+                        $question->setText($questionData['text']);
+                    }
+                    if (isset($questionData['points'])) {
+                        $question->setPoints((int)$questionData['points']);
+                    }
+
+                    // Traiter les réponses si présentes
+                    if (isset($questionData['answers']) && is_array($questionData['answers'])) {
+                        foreach ($questionData['answers'] as $answerKey => $answerData) {
+                            $answer = null;
+                            if (is_numeric($answerKey)) {
+                                $answer = $question->getAnswers()->get((int)$answerKey);
+                            } elseif (isset($answerData['id']) && is_numeric($answerData['id'])) {
+                                $answer = $entityManager->getRepository(Answer::class)->find((int)$answerData['id']);
                             }
-                            if (isset($questionData['points'])) {
-                                $question->setPoints($questionData['points']);
+
+                            if (!$answer) {
+                                continue; // nothing to update
                             }
-                            
-                            // Traiter les réponses
-                            if (isset($questionData['answers'])) {
-                                $answerIndex = 0;
-                                foreach ($questionData['answers'] as $answerKey => $answerData) {
-                                    // Vérifier si c'est une clé valide (commence par 'a' suivi de chiffres)
-                                    if (preg_match('/^a\d+$/', $answerKey)) {
-                                        $answer = $question->getAnswers()[$answerIndex] ?? null;
-                                        if ($answer) {
-                                            if (isset($answerData['text'])) {
-                                                $answer->setText($answerData['text']);
-                                            }
-                                            if (isset($answerData['isCorrect'])) {
-                                                $answer->setIsCorrect(true);
-                                            } else {
-                                                $answer->setIsCorrect(false);
-                                            }
-                                            $answer->setQuestion($question);
-                                            $answerIndex++;
-                                        }
-                                    }
-                                }
+
+                            if (isset($answerData['text'])) {
+                                $answer->setText($answerData['text']);
                             }
-                            
-                            $question->setQuiz($quiz);
+                            $answer->setIsCorrect(isset($answerData['isCorrect']) && $answerData['isCorrect'] !== '0');
+                            $answer->setQuestion($question);
                         }
                     }
+
+                    $question->setQuiz($quiz);
                 }
             }
             

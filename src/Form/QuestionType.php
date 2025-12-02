@@ -19,7 +19,9 @@ class QuestionType extends AbstractType
         $builder
             ->add('text', TextType::class, [
                 'label' => 'Question',
-                'attr' => ['class' => 'form-control']
+                'attr' => [
+                    'class' => 'form-control'
+                ]
             ])
             ->add('type', ChoiceType::class, [
                 'label' => 'Type de question',
@@ -32,7 +34,11 @@ class QuestionType extends AbstractType
             ])
             ->add('points', IntegerType::class, [
                 'label' => 'Points',
-                'attr' => ['class' => 'form-control']
+                'attr' => [
+                    'class' => 'form-control',
+                    'min' => '1',
+                    'max' => '100'
+                ]
             ])
             ->add('answers', CollectionType::class, [
                 'entry_type' => AnswerType::class,

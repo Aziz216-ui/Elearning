@@ -21,22 +21,29 @@ class QuizType extends AbstractType
         $builder
             ->add('title', TextType::class, [
                 'label' => 'Titre du quiz',
-                'attr' => ['class' => 'form-control']
+                'attr' => [
+                    'class' => 'form-control'
+                ]
             ])
             ->add('description', TextareaType::class, [
                 'label' => 'Description',
-                'required' => false,
-                'attr' => ['class' => 'form-control', 'rows' => 4]
+                'required' => true,
+                'attr' => [
+                    'class' => 'form-control',
+                    'rows' => 4
+                ]
             ])
             ->add('totalPoints', IntegerType::class, [
                 'label' => 'Points totaux',
-                'attr' => ['class' => 'form-control']
+                'attr' => [
+                    'class' => 'form-control'
+                ]
             ])
             ->add('cours', EntityType::class, [
                 'class' => Cours::class,
                 'choice_label' => 'title',
                 'placeholder' => 'Sélectionnez un cours',
-                'required' => false, // Rendre le champ optionnel
+                'required' => true,
                 'attr' => ['class' => 'form-select']
             ])
             ->add('questions', CollectionType::class, [
@@ -79,7 +86,6 @@ class QuizType extends AbstractType
                 'required' => false,
                 'attr' => [
                     'class' => 'form-control',
-                    'placeholder' => 'Ex: 1800 pour 30 minutes',
                     'min' => '60'
                 ],
                 'help' => 'Laissez vide pour pas de limite de temps'

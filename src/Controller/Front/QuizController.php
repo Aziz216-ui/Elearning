@@ -63,7 +63,8 @@ class QuizController extends AbstractController
     #[Route('/quiz/start/{id}', name: 'app_quiz_start')]
     public function startQuiz(Quiz $quiz, EntityManagerInterface $em, PanierRepository $panierRepository): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        // Autoriser les utilisateurs authentifiés, y compris via "remember me"
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 
         // Vérifier si l'utilisateur a le cours dans son panier
         $user = $this->getUser();
@@ -94,7 +95,8 @@ class QuizController extends AbstractController
     #[Route('/quiz-list/{id}', name: 'app_quiz_list')]
     public function quizList(Cours $cours, EntityManagerInterface $em, PanierRepository $panierRepository): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        // Autoriser les utilisateurs authentifiés, y compris via "remember me"
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
 
         // Vérifier si l'utilisateur a le cours dans son panier
         $user = $this->getUser();
@@ -114,7 +116,8 @@ class QuizController extends AbstractController
     #[Route('/quiz/submit/{id}', name: 'app_quiz_submit', methods:['POST'])]
     public function submit(Cours $cours, Request $request, EntityManagerInterface $em, PanierRepository $panierRepository)
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        // Autoriser les utilisateurs authentifiés, y compris via "remember me"
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
         $user = $this->getUser();
 
         // Vérifier si l'utilisateur a le droit de passer ce quiz
@@ -206,7 +209,8 @@ class QuizController extends AbstractController
     #[Route('/quiz/submit-specific/{id}', name: 'app_quiz_submit_specific', methods:['POST'])]
     public function submitSpecificQuiz(Quiz $quiz, Request $request, EntityManagerInterface $em, PanierRepository $panierRepository)
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        // Autoriser les utilisateurs authentifiés, y compris via "remember me"
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
         $user = $this->getUser();
 
         // Vérifier si l'utilisateur a le droit de passer ce quiz
@@ -293,7 +297,8 @@ class QuizController extends AbstractController
     #[Route('/quiz/{id}/results', name: 'app_quiz_results', methods: ['GET'])]
     public function results(Quiz $quiz, EntityManagerInterface $em): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        // Autoriser les utilisateurs authentifiés, y compris via "remember me"
+        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
         $user = $this->getUser();
         
         // Récupérer le résultat du quiz pour l'utilisateur actuel

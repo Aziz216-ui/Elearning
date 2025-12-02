@@ -24,9 +24,9 @@ class Quiz
         minMessage: "Le titre doit contenir au moins {{ limit }} caractères",
         maxMessage: "Le titre ne peut pas dépasser {{ limit }} caractères"
     )]
-    private string $title = '';
+    private ?string $title = null;
 
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(length: 500, nullable: false)]
     #[Assert\NotBlank(message: "La description est obligatoire.")]
     #[Assert\Length(
         max: 500,
@@ -35,7 +35,7 @@ class Quiz
     private ?string $description = null;
 
     #[ORM\ManyToOne(inversedBy: 'quizzes')]
-    #[ORM\JoinColumn(nullable: true)]
+    #[ORM\JoinColumn(nullable: false)]
     #[Assert\NotNull(message: "Le cours associé est obligatoire.")]
     private ?Cours $cours = null;
 
@@ -49,7 +49,7 @@ class Quiz
     private bool $isPublished = false;
 
     #[ORM\Column(type: 'boolean')]
-    private bool $isVisible = true;
+    private ?bool $is_visible = true;
 
     /**
      * @var Collection<int, Question>
@@ -74,12 +74,12 @@ class Quiz
         return $this->id;
     }
 
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }
 
-    public function setTitle(string $title): static
+    public function setTitle(?string $title): static
     {
         $this->title = $title;
         return $this;
@@ -194,12 +194,12 @@ class Quiz
 
     public function isVisible(): bool
     {
-        return $this->isVisible;
+        return $this->is_visible ?? true;
     }
 
-    public function setIsVisible(bool $isVisible): static
+    public function setIsVisible(?bool $is_visible): static
     {
-        $this->isVisible = $isVisible;
+        $this->is_visible = $is_visible;
         return $this;
     }
 

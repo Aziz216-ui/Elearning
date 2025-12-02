@@ -6,103 +6,525 @@
 
 {% block body %}
 <div class="container mt-4">
-    <h1>Gestion des quiz</h1>
-    
     {% for label, messages in app.flashes %}
-        {% for message in messages %}
-            <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
-                {{ message }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            </div>
-        {% endfor %}
+    {% for message in messages %}
+    <div class="alert alert-{{ label }} alert-dismissible fade show" role="alert">
+        {{ message }}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+    {% endfor %}
     {% endfor %}
 
-    <a href="{{ path('app_quiz_admin_new') }}" class="btn btn-primary mb-3">
-        <i class="fas fa-plus"></i> Créer un nouveau quiz
-    </a>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <div class="card mb-3">
-        <div class="card-body">
-            <h5 class="card-title">Statistiques</h5>
-            <p class="card-text">
-                <strong>Total des quiz :</strong> {{ quizzes|length }}<br>
-                <strong>Quiz visibles :</strong> {{ quizzes|filter(q => q.isVisible)|length }}<br>
-                <strong>Quiz masqués :</strong> {{ quizzes|filter(q => not q.isVisible)|length }}
-            </p>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #f5f5f5;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .header-section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-primary-custom {
+            background-color: #4a90e2;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: background-color 0.2s;
+            text-decoration: none;
+        }
+
+        .btn-primary-custom:hover {
+            background-color: #357abd;
+            color: white;
+        }
+
+        .stats-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 6px;
+            margin-top: 20px;
+        }
+
+        .stats-card h3 {
+            color: #555;
+            font-size: 16px;
+            margin-bottom: 12px;
+        }
+
+        .stats-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            align-items: center;
+        }
+
+        @media (max-width: 768px) {
+            .stats-content {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .stats-numbers {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .stat-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 15px;
+            background: white;
+            border-radius: 6px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .stat-value {
+            color: #333;
+            font-size: 22px;
+            font-weight: 700;
+        }
+
+        .chart-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .chart-wrapper {
+            position: relative;
+            width: 200px;
+            height: 200px;
+        }
+
+        .chart-center-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+        }
+
+        .chart-total {
+            font-size: 36px;
+            font-weight: 700;
+            color: #333;
+            line-height: 1;
+        }
+
+        .chart-label {
+            font-size: 12px;
+            color: #666;
+            margin-top: 4px;
+        }
+
+        .chart-legend {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 14px;
+        }
+
+        .legend-color {
+            width: 16px;
+            height: 16px;
+            border-radius: 3px;
+        }
+
+        .legend-color.visible {
+            background-color: #28a745;
+        }
+
+        .legend-color.masked {
+            background-color: #dc3545;
+        }
+
+        .legend-text {
+            color: #666;
+        }
+
+        .legend-value {
+            font-weight: 600;
+            color: #333;
+            margin-left: auto;
+        }
+
+        .filters-section {
+            background: white;
+            padding: 25px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        .filters-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .filters-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .filter-group label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .filter-group input,
+        .filter-group select {
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s;
+        }
+
+        .filter-group input:focus,
+        .filter-group select:focus {
+            outline: none;
+            border-color: #4a90e2;
+        }
+
+        .btn-reset {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 14px;
+            align-self: flex-end;
+            transition: background-color 0.2s;
+        }
+
+        .btn-reset:hover {
+            background-color: #5a6268;
+        }
+
+        .table-container {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: #f8f9fa;
+        }
+
+        th {
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: #555;
+            font-size: 13px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.2s;
+        }
+
+        tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        td {
+            padding: 15px;
+            color: #333;
+            font-size: 14px;
+        }
+
+        .badge-custom {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .badge-visible {
+            background-color: #d4edda;
+            color: #155724;
+        }
+
+        .badge-masked {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+
+        .icon-circle {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .icon-visible {
+            background-color: #28a745;
+        }
+
+        .icon-masked {
+            background-color: #dc3545;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-action {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: opacity 0.2s;
+        }
+
+        .btn-action:hover {
+            opacity: 0.85;
+        }
+
+        .btn-edit {
+            background-color: #ffc107;
+            color: #333;
+        }
+
+        .btn-delete {
+            background-color: #dc3545;
+            color: white;
+        }
+
+        .no-results {
+            padding: 40px;
+            text-align: center;
+            color: #999;
+        }
+    </style>
+
+    <div class="header-section">
+        <h1>Gestion des quiz</h1>
+        <a href="{{ path('app_quiz_admin_new') }}" class="btn-primary-custom">
+            <span>+</span> Créer un nouveau quiz
+        </a>
+    </div>
+
+    <div class="stats-card">
+        <h3>Statistiques</h3>
+        <div class="stats-content">
+            <div class="stats-numbers">
+                <div class="stat-item">
+                    <span class="stat-label">Total des quiz</span>
+                    <span class="stat-value">{{ quizzes|length }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Quiz visibles</span>
+                    <span class="stat-value">{{ quizzes|filter(q => q.visible)|length }}</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Quiz masqués</span>
+                    <span class="stat-value">{{ quizzes|filter(q => not q.visible)|length }}</span>
+                </div>
+            </div>
+            <div class="chart-container">
+                <div class="chart-wrapper">
+                    <div class="chart-center-text">
+                        <span class="chart-total">{{ quizzes|length }}</span>
+                        <span class="chart-label">Quiz au total</span>
+                    </div>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <span class="legend-color visible"></span>
+                        <span class="legend-text">Visibles</span>
+                        <span class="legend-value">{{ quizzes|filter(q => q.visible)|length }}</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color masked"></span>
+                        <span class="legend-text">Masqués</span>
+                        <span class="legend-value">{{ quizzes|filter(q => not q.visible)|length }}</span>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 
-    <div class="table-responsive">
-        <table class="table table-striped">
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Titre</th>
-                    <th>Cours associé</th>
-                    <th>Questions</th>
-                    <th>Points</th>
-                    <th>Visibilité</th>
-                    <th class="text-end">Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-            {% for quiz in quizzes %}
-                <tr>
-                    <td>{{ quiz.id }}</td>
-                    <td>{{ quiz.title }}</td>
-                    <td>
-                        {% if quiz.cours is defined and quiz.cours is not null %}
-                            {{ quiz.cours.title }}
-                        {% else %}
-                            <span class="text-muted">Aucun cours associé</span>
-                        {% endif %}
-                    </td>
-                    <td>
-                        <span class="badge bg-info">{{ quiz.questions|length }}</span>
-                    </td>
-                    <td>
-                        <span class="badge bg-success">{{ quiz.totalPoints }}</span>
-                    </td>
-                    <td>
-                        <form action="{{ path('app_quiz_admin_toggle_visibility', {'id': quiz.id}) }}" method="post" class="d-inline">
-                            <input type="hidden" name="_token" value="{{ csrf_token('toggle_visibility' ~ quiz.id) }}">
-                            <button type="submit" class="btn btn-sm {{ quiz.isVisible ? 'btn-success' : 'btn-secondary' }}">
-                                <i class="fas {{ quiz.isVisible ? 'fa-eye' : 'fa-eye-slash' }}"></i>
-                                {{ quiz.isVisible ? 'Visible' : 'Masqué' }}
-                            </button>
-                        </form>
-                    </td>
-                    <td class="text-end">
-                        <div class="btn-group" role="group">
-                            <a href="{{ path('app_quiz_admin_edit', {'id': quiz.id}) }}"
-                               class="btn btn-warning btn-sm"
-                               title="Modifier">
-                                <i class="fas fa-edit"></i> Modifier
-                            </a>
-                            <form method="post"
-                                  action="{{ path('app_quiz_admin_delete', {'id': quiz.id}) }}"
-                                  onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce quiz ?');"
-                                  class="d-inline">
-                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ quiz.id) }}">
-                                <button class="btn btn-danger btn-sm" title="Supprimer">
-                                    <i class="fas fa-trash"></i> Supprimer
-                                </button>
-                            </form>
-                        </div>
-                    </td>
-                </tr>
-            {% else %}
-                <tr>
-                    <td colspan="7" class="text-center">
-                        <div class="alert alert-info">
-                            <i class="fas fa-info-circle"></i>
-                            Aucun quiz trouvé. <a href="{{ path('app_quiz_admin_new') }}">Créez votre premier quiz</a>.
-                        </div>
-                    </td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+    <!-- Formulaire de recherche -->
+<div class="search-section" style="background: white; padding: 20px; border-radius: 8px; margin: 20px 0;">
+    <form method="get" action="{{ path('app_quiz_admin_index') }}" class="search-form">
+        <div style="display: flex; gap: 15px; margin-bottom: 15px; flex-wrap: wrap;">
+            <!-- Recherche par titre -->
+            <div style="flex: 1; min-width: 250px;">
+                <label for="q">Recherche par titre</label>
+                <input type="text" id="q" name="q" value="{{ searchTerm }}" placeholder="Entrez un mot-clé...">
+            </div>
+
+            <!-- Filtre par visibilité -->
+            <div style="min-width: 180px;">
+                <label for="visibility">Visibilité</label>
+                <select id="visibility" name="visibility">
+                    <option value="">Tous</option>
+                    <option value="visible" {{ selectedVisibility == 'visible' ? 'selected' : '' }}>Visibles</option>
+                    <option value="hidden" {{ selectedVisibility == 'hidden' ? 'selected' : '' }}>Masqués</option>
+                </select>
+            </div>
+            
+            <!-- Bouton de réinitialisation -->
+            <div style="min-width: 120px; display: flex; align-items: flex-end;">
+                <button type="button" class="btn-reset" onclick="resetFilters()">
+                    Réinitialiser
+                </button>
+            </div>
+        </div>
+    </form>
+
+    <!-- Conteneur AJAX -->
+    <div id="quizResults"></div>
+
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.querySelector('.search-form');
+    const searchInput = document.getElementById('q');
+    const visibilitySelect = document.getElementById('visibility');
+    const resultsDiv = document.getElementById('quizResults');
+
+    function fetchQuizzes() {
+        const params = new URLSearchParams(new FormData(form)).toString();
+        fetch('{{ path("app_quiz_admin_results") }}?' + params)
+            .then(response => response.text())
+            .then(html => resultsDiv.innerHTML = html)
+            .catch(err => console.error(err));
+    }
+
+    searchInput.addEventListener('keyup', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            fetchQuizzes();
+        }
+    });
+
+    visibilitySelect.addEventListener('change', fetchQuizzes);
+});
+
+function resetFilters() {
+    // Reset the form fields
+    document.getElementById('q').value = '';
+    document.getElementById('visibility').value = '';
+    
+    // Redirect to the index page without parameters
+    window.location.href = '{{ path("app_quiz_admin_index") }}';
+}
+</script>
+
+
+
+    <div class="table-container">
+{% if quizzes|length > 0 %}
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Titre</th>
+            <th>Cours associé</th>
+            <th>Questions</th>
+            <th>Points</th>
+            <th>Visibilité</th>
+            <th class="text-end">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for quiz in quizzes %}
+        <tr>
+            <td>{{ quiz.id }}</td>
+            <td>{{ quiz.title }}</td>
+            <td>{{ quiz.cours ? quiz.cours.title : 'Aucun cours associé' }}</td>
+            <td>{{ quiz.questions|length }}</td>
+            <td>{{ quiz.totalPoints }}</td>
+            <td>{{ quiz.isVisible ? 'Visible' : 'Masqué' }}</td>
+            <td>
+                <a href="{{ path('app_quiz_admin_edit', {'id': quiz.id}) }}">Modifier</a>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="7" class="text-center">Aucun quiz trouvé.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+{% else %}
+<p>Aucun quiz trouvé.</p>
+{% endif %}
+
     </div>
 </div>
 {% endblock %}

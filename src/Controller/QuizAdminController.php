@@ -20,6 +20,37 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/admin/quiz')]
 class QuizAdminController extends AbstractController
 {
+    #[Route('/results', name: 'app_quiz_admin_results', methods: ['GET'])]
+    public function results(Request $request, QuizRepository $quizRepository): Response
+    {
+        $searchTerm = $request->query->get('q', '');
+        $visibility = $request->query->get('visibility', '');
+        
+        // Build query
+        $qb = $quizRepository->createQueryBuilder('q');
+        
+        // Add search filter
+        if (!empty($searchTerm)) {
+            $qb->andWhere('q.title LIKE :searchTerm')
+               ->setParameter('searchTerm', '%' . $searchTerm . '%');
+        }
+        
+        // Add visibility filter
+        if ($visibility === 'visible') {
+            $qb->andWhere('q.is_visible = :visible')
+               ->setParameter('visible', true);
+        } elseif ($visibility === 'hidden') {
+            $qb->andWhere('q.is_visible = :visible')
+               ->setParameter('visible', false);
+        }
+        
+        $quizzes = $qb->getQuery()->getResult();
+        
+        return $this->render('quiz_admin/_results.html.twig', [
+            'quizzes' => $quizzes,
+        ]);
+    }
+
     #[Route('/', name: 'app_quiz_admin_index', methods: ['GET'])]
     public function index(QuizRepository $quizRepository): Response
     {
@@ -34,147 +65,156 @@ class QuizAdminController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $quiz = new Quiz();
+        // Set default values for new quiz
+        $quiz->setIsVisible(true);
+        $quiz->setIsPublished(false);
+        
         $form = $this->createForm(QuizType::class, $quiz);
+        
+        // Handle form submission
         $form->handleRequest($request);
+        
+        // Get raw POST data to check for questions
+        $data = $request->request->all();
 
-        if ($form->isSubmitted() && $form->isValid()) {
+        // Log the entire request data for debugging
+        error_log('===== REQUEST DATA =====');
+        error_log(print_r($data, true));
 
-            $data = $request->request->all();
-
-            // Vérifier si nous avons des données de questions
-            if (isset($data['questions'])) {
-                foreach ($data['questions'] as $qKey => $qData) {
-                    // Accepter toutes les clés de questions (pas seulement celles qui commencent par q)
-                    if (!is_array($qData) || !isset($qData['text'])) continue;
-
-                    $question = new Question();
-                    $question->setQuiz($quiz);
-
-                    if (isset($qData['text'])) $question->setText($qData['text']);
-                    if (isset($qData['points'])) $question->setPoints((int)$qData['points']);
-
-                    $question->setType($qData['type'] ?? 'multiple');
-
-                    // ---- Réponses ----
-                    if (isset($qData['answers'])) {
-                        $hasCorrect = false;
-
-                        foreach ($qData['answers'] as $aKey => $aData) {
-                            if (!is_array($aData) || !isset($aData['text'])) continue;
-
-                            $answer = new Answer();
-                            $answer->setText($aData['text'] ?? '');
-                            // Corriger le nom du champ : 'correct' au lieu de 'isCorrect'
-                            $answer->setIsCorrect(isset($aData['correct']));
-                            $question->addAnswer($answer);
-
-                            if ($answer->isCorrect()) {
-                                $hasCorrect = true;
-                            }
-                        }
-
-                        if (!$hasCorrect && $question->getAnswers()->count() > 0) {
-                            $question->getAnswers()->first()->setIsCorrect(true);
-                        }
-                    }
-
-                    $quiz->addQuestion($question);
+        // Handle both formats: direct 'questions', 'quiz[questions]', and form submission format
+        $questionsData = [];
+        
+        // First check if we have the expected quiz[questions] structure
+        if (isset($data['quiz'])) {
+            // Look for any keys that contain 'questions' in the quiz data
+            foreach ($data['quiz'] as $key => $value) {
+                if (strpos($key, 'questions') !== false && is_array($value)) {
+                    $questionsData = $value;
+                    error_log('Found questions data in quiz[' . $key . '] with ' . count($value) . ' questions');
+                    break;
                 }
             }
-
-            // Validation personnalisée supplémentaire
-            $errors = [];
             
-            if ($quiz->getQuestions()->count() === 0) {
-                $errors[] = 'Un quiz doit contenir au moins une question.';
+            // If no questions array found, try to reconstruct from individual fields
+            if (empty($questionsData)) {
+                error_log('No questions array found, trying to reconstruct from individual fields...');
+                $questionsData = $this->reconstructQuestionsFromFields($data['quiz']);
             }
-
-            foreach ($quiz->getQuestions() as $index => $question) {
-                if (empty($question->getText()) || trim($question->getText()) === '') {
-                    $errors[] = 'La question ' . ($index + 1) . ' doit avoir un énoncé.';
-                }
-
-                if ($question->getAnswers()->count() === 0) {
-                    $errors[] = 'La question ' . ($index + 1) . ' doit avoir au moins une réponse.';
-                }
-
-                // Validation spécifique selon le type
-                if ($question->getType() === 'multiple_choice') {
-                    $hasValidAnswer = false;
-                    $hasCorrectAnswer = false;
-                    
-                    foreach ($question->getAnswers() as $answer) {
-                        if (!empty($answer->getText()) && trim($answer->getText()) !== '') {
-                            $hasValidAnswer = true;
-                            if ($answer->isCorrect()) {
-                                $hasCorrectAnswer = true;
-                            }
-                        }
-                    }
-                    
-                    if (!$hasValidAnswer) {
-                        $errors[] = 'La question ' . ($index + 1) . ' doit avoir au moins une réponse valide.';
-                    }
-                    if (!$hasCorrectAnswer) {
-                        $errors[] = 'La question ' . ($index + 1) . ' doit avoir au moins une réponse correcte.';
-                    }
-                } elseif ($question->getType() === 'true_false') {
-                    $hasTrueFalse = false;
-                    foreach ($question->getAnswers() as $answer) {
-                        if (in_array(strtolower($answer->getText()), ['true', 'false', 'vrai', 'faux'])) {
-                            $hasTrueFalse = true;
-                            break;
-                        }
-                    }
-                    if (!$hasTrueFalse) {
-                        $errors[] = 'La question ' . ($index + 1) . ' doit avoir une réponse Vrai/Faux.';
-                    }
-                } elseif ($question->getType() === 'short_answer') {
-                    $hasShortAnswer = false;
-                    foreach ($question->getAnswers() as $answer) {
-                        if (!empty($answer->getText()) && trim($answer->getText()) !== '') {
-                            $hasShortAnswer = true;
-                            break;
-                        }
-                    }
-                    if (!$hasShortAnswer) {
-                        $errors[] = 'La question ' . ($index + 1) . ' doit avoir une réponse attendue.';
-                    }
-                }
-            }
-
-            // Si il y a des erreurs, les afficher
-            if (!empty($errors)) {
-                foreach ($errors as $error) {
-                    $this->addFlash('error', $error);
-                }
-                return $this->render('quiz_admin/new.html.twig', [
-                    'quiz' => $quiz,
-                    'form' => $form->createView(),
-                    'validation_errors' => $errors
-                ]);
-            }
-
-            // calcul total points
-            $total = 0;
-            foreach ($quiz->getQuestions() as $q) {
-                $total += $q->getPoints();
-            }
-            $quiz->setTotalPoints($total);
-
-            $entityManager->persist($quiz);
-            $entityManager->flush();
-
-            $this->addFlash('success', 'Quiz créé avec succès.');
-            return $this->redirectToRoute('app_quiz_admin_index');
+        }
+        
+        // Fallback to other formats
+        if (empty($questionsData) && isset($data['questions'])) {
+            $questionsData = $data['questions'];
+        } elseif (empty($questionsData) && isset($data['quiz']['questions'])) {
+            $questionsData = $data['quiz']['questions'];
         }
 
+        // Check if form is submitted
+        if ($form->isSubmitted()) {
+            // Debug: Log the raw request data
+            error_log('Raw POST data: ' . print_r($data, true));
+            error_log('Questions data: ' . print_r($questionsData, true));
+
+            // Ensure title is not null
+            if ($quiz->getTitle() === null || $quiz->getTitle() === '') {
+                $quiz->setTitle(''); // Set empty string instead of null
+            }
+
+            // Try direct field extraction if questionsData is empty
+            if (empty($questionsData)) {
+                error_log('Questions data empty, trying direct extraction...');
+                $questionsData = $this->extractQuestionsDirectly($data);
+            }
+
+            // Process questions from raw POST data first
+            if (is_array($questionsData) && count($questionsData) > 0) {
+                error_log('Processing questions...');
+                error_log('Questions data: ' . print_r($questionsData, true));
+
+                // Process each question
+                foreach ($questionsData as $qId => $qData) {
+                    try {
+                        error_log("Processing question: " . print_r($qData, true));
+
+                        $question = new Question();
+                        $question->setQuiz($quiz);
+                        $question->setText($qData['text'] ?? '');
+                        $question->setPoints(isset($qData['points']) ? (int)$qData['points'] : 1);
+
+                        $type = $qData['type'] ?? 'multiple';
+                        $question->setType($type);
+
+                        error_log("Question type: " . $type);
+
+                        // Process answers based on question type
+                        if ($type === 'boolean') {
+                            $this->processTrueFalseQuestion($question, $qData, $entityManager);
+                        } elseif ($type === 'text') {
+                            $this->processShortAnswerQuestion($question, $qData, $entityManager);
+                        } else {
+                            $this->processMultipleChoiceQuestion($question, $qData, $entityManager);
+                        }
+
+                        $entityManager->persist($question);
+                        $quiz->addQuestion($question);
+
+                        error_log("Question added successfully");
+                    } catch (\Exception $e) {
+                        error_log("Error processing question: " . $e->getMessage());
+                        error_log($e->getTraceAsString());
+                    }
+                }
+
+                error_log('Questions after processing: ' . $quiz->getQuestions()->count());
+            } else {
+                // Temporary debug: show what we actually received
+                error_log('No questions found in POST data. Full data structure:');
+                error_log(print_r($data, true));
+                
+                // Check if there are any question-like fields
+                foreach ($data as $key => $value) {
+                    if (is_string($key) && strpos($key, 'question') !== false) {
+                        error_log('Found question-like field: ' . $key);
+                    }
+                    if (is_array($value)) {
+                        foreach ($value as $subKey => $subValue) {
+                            if (is_string($subKey) && strpos($subKey, 'question') !== false) {
+                                error_log('Found question-like subfield: ' . $key . '->' . $subKey);
+                            }
+                        }
+                    }
+                }
+            }
+
+            // Now validate the form with the processed questions
+            if ($form->isValid()) {
+                // Check if we have any questions after processing
+
+
+                // Calculate total points
+                $total = 0;
+                foreach ($quiz->getQuestions() as $q) {
+                    $total += $q->getPoints();
+                }
+                $quiz->setTotalPoints($total);
+
+                try {
+                    $entityManager->persist($quiz);
+                    $entityManager->flush();
+
+                    $this->addFlash('success', 'Quiz créé avec succès.');
+                    return $this->redirectToRoute('app_quiz_admin_index');
+                } catch (\Exception $e) {
+                    $this->addFlash('error', 'Une erreur est survenue lors de la création du quiz: ' . $e->getMessage());
+                }
+            }
+        }
+        
         return $this->render('quiz_admin/new.html.twig', [
             'quiz' => $quiz,
             'form' => $form->createView(),
         ]);
     }
-
 
     #[Route('/{id}/edit', name: 'app_quiz_admin_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Quiz $quiz, EntityManagerInterface $entityManager): Response
@@ -221,7 +261,13 @@ class QuizAdminController extends AbstractController
 
                             $answer = new Answer();
                             $answer->setText($aData['text'] ?? '');
-                            $answer->setIsCorrect(isset($aData['correct']));
+                            $isCorrectVal = null;
+                            if (isset($aData['isCorrect'])) {
+                                $isCorrectVal = $aData['isCorrect'];
+                            } elseif (isset($aData['correct'])) {
+                                $isCorrectVal = $aData['correct'];
+                            }
+                            $answer->setIsCorrect($isCorrectVal !== null && $isCorrectVal !== 'false');
                             $question->addAnswer($answer);
 
                             if ($answer->isCorrect()) {
@@ -291,5 +337,206 @@ class QuizAdminController extends AbstractController
         }
 
         return $this->redirectToRoute('app_quiz_admin_index');
+    }
+
+    private function processTrueFalseQuestion(Question $question, array $qData, EntityManagerInterface $entityManager): void
+    {
+        // For true/false questions, create two predefined answers
+        $answerTrue = new Answer();
+        $answerTrue->setText('Vrai');
+        $answerTrue->setIsCorrect(($qData['correct_answer'] ?? $qData['correctAnswer'] ?? null) === 'true');
+        $question->addAnswer($answerTrue);
+        $entityManager->persist($answerTrue);
+
+        $answerFalse = new Answer();
+        $answerFalse->setText('Faux');
+        $answerFalse->setIsCorrect(($qData['correct_answer'] ?? $qData['correctAnswer'] ?? null) === 'false');
+        $question->addAnswer($answerFalse);
+        $entityManager->persist($answerFalse);
+    }
+
+    private function processShortAnswerQuestion(Question $question, array $qData, EntityManagerInterface $entityManager): void
+    {
+        // For short answer questions, create a single answer that will be validated against user input
+        $answer = new Answer();
+        $answer->setText($qData['correctAnswer'] ?? '');
+        $answer->setIsCorrect(true);
+        $question->addAnswer($answer);
+        $entityManager->persist($answer);
+    }
+
+    private function processMultipleChoiceQuestion(Question $question, array $qData, EntityManagerInterface $entityManager): void
+    {
+        // Process multiple choice answers
+        if (isset($qData['answers']) && is_array($qData['answers'])) {
+            $hasCorrect = false;
+            
+            foreach ($qData['answers'] as $aKey => $aData) {
+                if (!is_array($aData) || !isset($aData['text'])) continue;
+                
+                $answer = new Answer();
+                $answer->setText($aData['text'] ?? '');
+                $isCorrectVal = null;
+                if (isset($aData['isCorrect'])) {
+                    $isCorrectVal = $aData['isCorrect'];
+                } elseif (isset($aData['correct'])) {
+                    $isCorrectVal = $aData['correct'];
+                }
+                $answer->setIsCorrect($isCorrectVal !== null && $isCorrectVal !== 'false');
+                $question->addAnswer($answer);
+                $entityManager->persist($answer);
+
+                if ($answer->isCorrect()) {
+                    $hasCorrect = true;
+                }
+            }
+            
+            // Ensure at least one answer is marked as correct
+            if (!$hasCorrect && $question->getAnswers()->count() > 0) {
+                $question->getAnswers()->first()->setIsCorrect(true);
+            }
+        }
+    }
+
+    private function reconstructQuestionsFromFields(array $quizData): array
+    {
+        $questions = [];
+        
+        // Find all question IDs from field names
+        $questionIds = [];
+        foreach ($quizData as $fieldName => $value) {
+            if (preg_match('/questions\[(\d+)\]/', $fieldName, $matches)) {
+                $questionIds[$matches[1]] = $matches[1];
+            }
+        }
+        
+        error_log('Found question IDs: ' . implode(', ', $questionIds));
+        
+        // Reconstruct each question
+        foreach ($questionIds as $questionId) {
+            $question = [
+                'text' => '',
+                'type' => 'multiple',
+                'points' => 1,
+                'answers' => []
+            ];
+            
+            // Get question text
+            $textField = "questions[{$questionId}][text]";
+            if (isset($quizData[$textField])) {
+                $question['text'] = $quizData[$textField];
+            }
+            
+            // Get question type
+            $typeField = "questions[{$questionId}][type]";
+            if (isset($quizData[$typeField])) {
+                $question['type'] = $quizData[$typeField];
+            }
+            
+            // Get question points
+            $pointsField = "questions[{$questionId}][points]";
+            if (isset($quizData[$pointsField])) {
+                $question['points'] = (int)$quizData[$pointsField];
+            }
+            
+            // Get answers
+            $answers = [];
+            foreach ($quizData as $fieldName => $value) {
+                if (preg_match("/questions\[{$questionId}\]\[answers\]\[(\d+)\]\[text\]/", $fieldName, $matches)) {
+                    $answerIndex = $matches[1];
+                    $answers[$answerIndex]['text'] = $value;
+                }
+                if (preg_match("/questions\[{$questionId}\]\[answers\]\[(\d+)\]\[isCorrect\]/", $fieldName, $matches)) {
+                    $answerIndex = $matches[1];
+                    $answers[$answerIndex]['isCorrect'] = $value;
+                }
+            }
+            
+            $question['answers'] = array_values($answers);
+            
+            // Only add question if it has text
+            if (!empty($question['text'])) {
+                $questions[$questionId] = $question;
+                error_log("Reconstructed question {$questionId}: " . print_r($question, true));
+            }
+        }
+        
+        error_log('Reconstructed ' . count($questions) . ' questions');
+        return $questions;
+    }
+
+    private function extractQuestionsDirectly(array $data): array
+    {
+        $questions = [];
+        
+        error_log('Extracting questions directly from POST data...');
+        
+        // Look for any field that contains 'questions' in the name
+        $questionFields = [];
+        foreach ($data as $key => $value) {
+            if (is_string($key) && strpos($key, 'questions') !== false) {
+                error_log("Found question field: $key = $value");
+                $questionFields[$key] = $value;
+            }
+        }
+        
+        // Group fields by question ID
+        $groupedFields = [];
+        foreach ($questionFields as $fieldName => $fieldValue) {
+            if (preg_match('/questions\[(\d+)\]/', $fieldName, $matches)) {
+                $questionId = $matches[1];
+                if (!isset($groupedFields[$questionId])) {
+                    $groupedFields[$questionId] = [];
+                }
+                $groupedFields[$questionId][$fieldName] = $fieldValue;
+            }
+        }
+        
+        error_log('Grouped fields by question ID: ' . print_r($groupedFields, true));
+        
+        // Build questions from grouped fields
+        foreach ($groupedFields as $questionId => $fields) {
+            $question = [
+                'text' => '',
+                'type' => 'multiple',
+                'points' => 1,
+                'answers' => []
+            ];
+            
+            // Extract question data
+            foreach ($fields as $fieldName => $fieldValue) {
+                if (preg_match('/questions\[' . $questionId . '\]\[text\]/', $fieldName)) {
+                    $question['text'] = $fieldValue;
+                } elseif (preg_match('/questions\[' . $questionId . '\]\[type\]/', $fieldName)) {
+                    $question['type'] = $fieldValue;
+                } elseif (preg_match('/questions\[' . $questionId . '\]\[points\]/', $fieldName)) {
+                    $question['points'] = (int)$fieldValue;
+                } elseif (preg_match('/questions\[' . $questionId . '\]\[answers\]\[(\d+)\]\[text\]/', $fieldName, $matches)) {
+                    $answerIndex = $matches[1];
+                    if (!isset($question['answers'][$answerIndex])) {
+                        $question['answers'][$answerIndex] = ['text' => '', 'isCorrect' => false];
+                    }
+                    $question['answers'][$answerIndex]['text'] = $fieldValue;
+                } elseif (preg_match('/questions\[' . $questionId . '\]\[answers\]\[(\d+)\]\[isCorrect\]/', $fieldName, $matches)) {
+                    $answerIndex = $matches[1];
+                    if (!isset($question['answers'][$answerIndex])) {
+                        $question['answers'][$answerIndex] = ['text' => '', 'isCorrect' => false];
+                    }
+                    $question['answers'][$answerIndex]['isCorrect'] = $fieldValue;
+                }
+            }
+            
+            // Reindex answers
+            $question['answers'] = array_values($question['answers']);
+            
+            // Only add if question has text
+            if (!empty($question['text'])) {
+                $questions[$questionId] = $question;
+                error_log("Extracted question {$questionId}: " . print_r($question, true));
+            }
+        }
+        
+        error_log('Direct extraction found ' . count($questions) . ' questions');
+        return $questions;
     }
 }

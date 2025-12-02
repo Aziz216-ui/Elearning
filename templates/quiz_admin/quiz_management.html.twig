@@ -67,58 +67,6 @@
         box-shadow: 0 8px 20px rgba(102, 126, 234, 0.4);
     }
 
-    .search-bar {
-        background: white;
-        padding: 20px 30px;
-        display: flex;
-        gap: 15px;
-        align-items: center;
-        flex-wrap: wrap;
-        border: 1px solid rgba(25,199,216,0.1);
-        border-radius: 0 0 16px 16px;
-    }
-
-    .search-input {
-        flex: 1;
-        min-width: 300px;
-        padding: 12px 20px;
-        border: 2px solid #e0e0e0;
-        border-radius: 8px;
-        font-size: 1em;
-        transition: all 0.3s;
-    }
-
-    .search-input:focus {
-        outline: none;
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(25,199,216,0.15);
-    }
-
-    .filter-group {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-    }
-
-    .filter-group label {
-        font-weight: 600;
-        color: #666;
-    }
-
-    .filter-group select {
-        padding: 10px 15px;
-        border: 2px solid #e0e0e0;
-        border-radius: 8px;
-        font-size: 1em;
-        cursor: pointer;
-        transition: all 0.3s;
-    }
-
-    .filter-group select:focus {
-        outline: none;
-        border-color: var(--primary);
-        box-shadow: 0 0 0 3px rgba(25,199,216,0.15);
-    }
 
     .table-container {
         background: white;
@@ -312,24 +260,6 @@
         .header h1 {
             font-size: 1.8em;
         }
-
-        .search-bar {
-            flex-direction: column;
-            align-items: stretch;
-        }
-
-        .search-input {
-            min-width: 100%;
-        }
-
-        .filter-group {
-            flex-direction: column;
-            align-items: stretch;
-        }
-
-        .filter-group select {
-            width: 100%;
-        }
     }
 </style>
 {% endblock %}
@@ -360,20 +290,6 @@
         </a>
     </div>
 
-    <!-- Barre de recherche -->
-    <div class="search-bar">
-        <input type="text" class="search-input" placeholder="🔍 Rechercher un quiz par titre ou code..." id="searchInput" oninput="filterQuizzes()">
-        
-        <div class="filter-group">
-            <label for="courseFilter">Cours :</label>
-            <select id="courseFilter" onchange="filterQuizzes()">
-                <option value="">Tous les cours</option>
-                {% for course in courses %}
-                    <option value="{{ course.id }}">{{ course.title }}</option>
-                {% endfor %}
-            </select>
-        </div>
-    </div>
 
     <!-- Tableau -->
     <div class="table-container">
