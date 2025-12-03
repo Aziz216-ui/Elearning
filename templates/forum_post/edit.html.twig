@@ -1,0 +1,262 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Modifier le post{% endblock %}
+
+{% block body %}
+    <style>
+        .forum-edit-wrapper {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .forum-edit-container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .forum-edit-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 40px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .forum-edit-header h1 {
+            font-size: 2em;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .forum-edit-content {
+            padding: 40px;
+        }
+
+        .forum-edit-form {
+            margin-bottom: 30px;
+        }
+
+        .forum-form-group {
+            margin-bottom: 25px;
+        }
+
+        .forum-form-group label {
+            display: block;
+            font-weight: 600;
+            color: #495057;
+            margin-bottom: 8px;
+            font-size: 0.95em;
+        }
+
+        .forum-form-group input[type="text"],
+        .forum-form-group input[type="email"],
+        .forum-form-group textarea,
+        .forum-form-group select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        .forum-form-group input:focus,
+        .forum-form-group textarea:focus,
+        .forum-form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .forum-form-group textarea {
+            min-height: 200px;
+            resize: vertical;
+        }
+
+        .forum-form-group input[type="file"] {
+            padding: 10px;
+            border: 2px dashed #dee2e6;
+            border-radius: 10px;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .forum-form-group input[type="file"]:hover {
+            border-color: #667eea;
+            background: #f8f9fa;
+        }
+
+        .forum-btn {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .forum-btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .forum-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            color: white;
+            text-decoration: none;
+        }
+
+        .forum-btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .forum-btn-secondary:hover {
+            background: #5a6268;
+            color: white;
+            text-decoration: none;
+        }
+
+        .forum-btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .forum-btn-danger:hover {
+            background: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+            color: white;
+        }
+
+        .forum-actions {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            padding-top: 20px;
+            border-top: 2px solid #e9ecef;
+            margin-top: 30px;
+        }
+
+        .forum-back-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 10px 20px;
+            border: 2px solid #667eea;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+
+        .forum-back-link:hover {
+            background: #667eea;
+            color: white;
+            text-decoration: none;
+        }
+
+        .forum-delete-section {
+            background: #fff5f5;
+            border: 2px solid #fecaca;
+            border-radius: 10px;
+            padding: 20px;
+            margin-top: 30px;
+        }
+
+        .forum-delete-section h3 {
+            color: #dc3545;
+            font-size: 1.2em;
+            margin-bottom: 10px;
+        }
+
+        .forum-delete-section p {
+            color: #6c757d;
+            margin-bottom: 15px;
+        }
+
+        .forum-alert {
+            padding: 15px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .forum-alert-success {
+            background: #d4edda;
+            border: 2px solid #c3e6cb;
+            color: #155724;
+        }
+
+        .forum-alert-error {
+            background: #f8d7da;
+            border: 2px solid #f5c6cb;
+            color: #721c24;
+        }
+
+        @media (max-width: 768px) {
+            .forum-edit-header {
+                padding: 20px;
+            }
+
+            .forum-edit-header h1 {
+                font-size: 1.5em;
+            }
+
+            .forum-edit-content {
+                padding: 20px;
+            }
+
+            .forum-actions {
+                flex-direction: column;
+            }
+
+            .forum-btn, .forum-back-link {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+
+    <div class="forum-edit-wrapper">
+        <div class="forum-edit-container">
+            <div class="forum-edit-header">
+                <span style="font-size: 2em;">✏️</span>
+                <h1>Modifier le post</h1>
+            </div>
+
+            <div class="forum-edit-content">
+                {{ include('forum_post/_form.html.twig', {'button_label': '💾 Enregistrer les modifications'}) }}
+
+                <div class="forum-actions">
+                    <a href="{{ path('app_forum_post_index') }}" class="forum-back-link">
+                        ← Retour à la liste
+                    </a>
+                </div>
+
+                <div class="forum-delete-section">
+                    <h3>⚠️ Zone dangereuse</h3>
+                    <p>Une fois supprimé, ce post ne pourra pas être récupéré. Cette action est irréversible.</p>
+                    {{ include('forum_post/_delete_form.html.twig') }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

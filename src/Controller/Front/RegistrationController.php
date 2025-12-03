@@ -51,16 +51,8 @@ class RegistrationController extends AbstractController
         }
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Extract plain password explicitly and guard empties
-            $plain = (string) $form->get('plainPassword')->getData();
-            if ($plain === '') {
-                $this->addFlash('error', 'Le mot de passe est requis.');
-                return $this->render('front/registration/register.html.twig', [
-                    'registrationForm' => $form->createView(),
-                ]);
-            }
             // hash password
-            $user->setPassword($passwordHasher->hashPassword($user, $plain));
+            $user->setPassword($passwordHasher->hashPassword($user, $form->get('plainPassword')->getData()));
 
             // Ensure required fields (NOT NULL in DB) have values
             // roles JSON NOT NULL
@@ -73,8 +65,7 @@ class RegistrationController extends AbstractController
                 $user->setIsVerified(false);
             }
             // created_at DATETIME NOT NULL
-            if (method_exists($user, 'setCreatedAt')) {
-                // Always set; entity may not initialize it by itself
+            if (method_exists($user, 'getCreatedAt') && method_exists($user, 'setCreatedAt') && null === $user->getCreatedAt()) {
                 $user->setCreatedAt(new \DateTimeImmutable());
             }
 

@@ -72,6 +72,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Cours::class, cascade: ['persist'], orphanRemoval: false)]
     private Collection $courses;
 
+    // 🆕 AJOUT DE LA RELATION AVEC ForumPost
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: ForumPost::class, cascade: ['persist'], orphanRemoval: true)]
+    private Collection $posts;
     public function __construct()
     {
 
@@ -280,4 +283,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
+    // 🆕 PARTIE POSTS (Forum)
+    /**
+     * @return Collection<int, ForumPost>
+     */
+    public function getPosts(): Collection
+    {
+        return $this->posts;
+    }
+
+    public function addPost(ForumPost $post): static
+    {
+        if (!$this->posts->contains($post)) {
+            $this->posts->add($post);
+            $post->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removePost(ForumPost $post): static
+    {
+        if ($this->posts->removeElement($post)) {
+            if ($post->getUser() === $this) {
+                $post->setUser(null);
+            }
+        }
+
+        return $this;
+    }
 }
+
+
