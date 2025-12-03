@@ -145,20 +145,22 @@
 </style>
 
 <div class="forum-form-wrapper">
-    {{ form_start(form, {'attr': {'class': 'forum-form'}}) }}
+    {{ form_start(form, {'attr': {'class': 'forum-form', 'novalidate': 'novalidate'}}) }}
         
         {# Titre #}
         <div class="forum-form-group">
             {{ form_label(form.titre) }}
-            {{ form_widget(form.titre, {'attr': {'class': 'forum-form-control', 'placeholder': 'Ex: Introduction aux statistiques bayésiennes'}}) }}
             {{ form_errors(form.titre) }}
+            {{ form_widget(form.titre, {'attr': {'class': 'forum-form-control', 'placeholder': 'Ex: Introduction aux statistiques bayésiennes'}}) }}
+            
         </div>
 
         {# Contenu #}
         <div class="forum-form-group">
             {{ form_label(form.contenu) }}
-            {{ form_widget(form.contenu, {'attr': {'class': 'forum-form-control', 'placeholder': 'Rédigez votre post ici... Soyez clair et détaillé.'}}) }}
             {{ form_errors(form.contenu) }}
+            {{ form_widget(form.contenu, {'attr': {'class': 'forum-form-control', 'placeholder': 'Rédigez votre post ici... Soyez clair et détaillé.'}}) }}
+            
             <small class="forum-form-help">💡 Utilisez des paragraphes pour structurer votre contenu</small>
         </div>
 

@@ -439,20 +439,12 @@
                     <span style="font-size: 1.5em;">💬</span>
                     <h3>Ajouter un commentaire</h3>
                 </div>
-                <div class="forum-comment-form">
-                    <form method="post" action="{{ path('app_forul_comment_add', {'postId': forum_post.id}) }}">
-                        <textarea 
-                            name="contenu" 
-                            class="forum-comment-textarea" 
-                            placeholder="Partagez votre avis, posez une question..."
-                            required
-                        ></textarea>
-                        <button type="submit" class="forum-btn forum-btn-submit">
-                            ✨ Publier le commentaire
-                        </button>
-                    </form>
-                </div>
-            </div>
+                <form method="post" action="{{ path('app_forul_comment_add', {'postId': forum_post.id}) }}">
+                 <textarea name="contenu" class="forum-comment-textarea" placeholder="Partagez votre avis, posez une question..." required ></textarea> 
+                 <button type="submit" class="forum-btn forum-btn-submit"> 
+                 ✨ Publier le commentaire </button> </form> </div> 
+                
+                
 
             <!-- Liste des commentaires -->
             <div class="forum-comments-list-section">

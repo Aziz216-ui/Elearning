@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use App\Entity\User;
 use Doctrine\DBAL\Types\Types;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: ForumPostRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -18,10 +19,28 @@ class ForumPost
     #[ORM\Column]
     private ?int $id = null;
 
+    // -----------------------
+    // Titre (max 40 caractères)
+    // -----------------------
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le titre est obligatoire.")]
+    #[Assert\Length(
+        max: 40,
+        maxMessage: "Le titre ne doit pas dépasser {{ limit }} caractères.",
+        min: 5,
+        minMessage: "Le titre doit contenir au minimum {{ limit }} caractères."
+    )]
     private ?string $titre = null;
 
-    #[ORM\Column(type: "text")]
+    // -----------------------
+    // Contenu (min 50 caractères)
+    // -----------------------
+    #[ORM\Column(type: Types::TEXT)]
+    #[Assert\NotBlank(message: "Le contenu est obligatoire.")]
+    #[Assert\Length(
+        min: 50,
+        minMessage: "Le contenu doit contenir au minimum {{ limit }} caractères."
+    )]
     private ?string $contenu = null;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
@@ -30,11 +49,12 @@ class ForumPost
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeImmutable $updatedAt = null;
 
-    #[ORM\Column(type: 'boolean')]
+    #[ORM\Column(type: Types::BOOLEAN)]
     private bool $enabled = true;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $image = null;
+
 
     #[ORM\Column(nullable: true)]
     private ?int $likes = 0;
@@ -43,20 +63,20 @@ class ForumPost
     private int $vues = 0;
 
     // -----------------------
-    // RELATION 1 -> *
+    // Relation 1 -> *
     // -----------------------
     #[ORM\OneToMany(mappedBy: 'post', targetEntity: ForulComment::class, orphanRemoval: true)]
     private Collection $comments;
 
     // -----------------------
-    // RELATION MANY TO ONE -> User
+    // Relation MANY -> User
     // -----------------------
     #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'posts')]
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
     // -----------------------
-    // NOUVELLE RELATION MANY TO ONE -> Category
+    // Relation MANY -> Category
     // -----------------------
     #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'forumPosts')]
     #[ORM\JoinColumn(nullable: true)]
@@ -180,9 +200,6 @@ class ForumPost
     // -----------------------
     // Comments
     // -----------------------
-    /**
-     * @return Collection<int, ForulComment>
-     */
     public function getComments(): Collection
     {
         return $this->comments;
@@ -222,7 +239,7 @@ class ForumPost
     }
 
     // -----------------------
-    // Category (NOUVEAU)
+    // Category
     // -----------------------
     public function getCategory(): ?Category
     {

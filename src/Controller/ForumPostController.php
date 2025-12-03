@@ -14,7 +14,7 @@ use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Symfony\Component\String\Slugger\SluggerInterface;
 
@@ -287,7 +287,7 @@ class ForumPostController extends AbstractController
 
     // ---------------------- ADMIN DASHBOARD ----------------------
     #[Route('/admin', name: 'app_forum_post_admin', methods: ['GET'])]
-    #[IsGranted('ROLE_ADMIN')]
+    
     public function admin(ForumPostRepository $forumPostRepository): Response
     {
         $forumPosts = $forumPostRepository->findAll();
@@ -298,15 +298,19 @@ class ForumPostController extends AbstractController
     }
 
     // ---------------------- TOGGLE ENABLE/DISABLE ----------------------
-    #[Route('/admin/post/{id}/toggle', name: 'app_post_toggle')]
-    #[IsGranted('ROLE_ADMIN')]
-    public function toggle(ForumPost $post, EntityManagerInterface $em): Response
-    {
-        $post->setEnabled(!$post->isEnabled());
-        $em->flush();
-
-        $this->addFlash('success', 'État du post mis à jour.');
-
-        return $this->redirectToRoute('app_forum_post_admin');
+   #[Route('/admin/post/{id}/toggle', name: 'app_post_toggle', methods: ['POST'])]
+public function toggle(?ForumPost $post, EntityManagerInterface $em): Response
+{
+    if (!$post) {
+        throw $this->createNotFoundException('Post introuvable');
     }
+
+    $post->setEnabled(!$post->isEnabled());
+    $em->flush();
+
+    $this->addFlash('success', 'État du post modifié.');
+
+    return $this->redirectToRoute('app_dashboard');
+}
+
 }

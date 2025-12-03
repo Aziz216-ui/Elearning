@@ -1,108 +1,265 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-    <link rel="apple-touch-icon" sizes="76x76" href="{{ asset('admin/img/apple-icon.png') }}" />
-    <link rel="icon" type="image/png" href="{{ asset('admin/img/favicon.png') }}" />
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
 
-    <title>{% block title %}Dashboard{% endblock %}</title>
+    <title>Admin - Tableau de bord</title>
 
-    <!-- Fonts and icons -->
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,600,700" rel="stylesheet" />
-    <script src="https://kit.fontawesome.com/42d5adcbca.js" crossorigin="anonymous"></script>
+    <!-- Custom fonts for this template-->
+    <link href="{{ asset('admin/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
 
-    <!-- Nucleo Icons -->
-    <link href="{{ asset('admin/css/nucleo-icons.css') }}" rel="stylesheet" />
-    <link href="{{ asset('admin/css/nucleo-svg.css') }}" rel="stylesheet" />
+    <!-- Custom styles for this template-->
+    <link href="{{ asset('admin/css/sb-admin-2.min.css') }}" rel="stylesheet">
+</head>
 
-    <!-- Main Styling -->
-    <link href="{{ asset('admin/css/argon-dashboard-tailwind.css?v=1.0.1') }}" rel="stylesheet" />
-
-
-  </head>
-
-  <body class="m-0 font-sans text-base antialiased font-normal dark:bg-slate-900 leading-default bg-gray-50 text-slate-500">
-    <div class="absolute w-full bg-blue-500 dark:hidden min-h-75"></div>
-
-    <!-- ====== Sidebar ====== -->
-    <aside class="fixed inset-y-0 flex-wrap items-center justify-between block w-full p-0 my-4 overflow-y-auto antialiased transition-transform duration-200 -translate-x-full bg-white border-0 shadow-xl dark:shadow-none dark:bg-slate-850 max-w-64 ease-nav-brand z-990 xl:ml-6 rounded-2xl xl:left-0 xl:translate-x-0" aria-expanded="false">
-      <div class="h-19">
-        <a class="block px-8 py-6 text-sm whitespace-nowrap dark:text-white text-slate-700" href="#">
-          <img src="{{ asset('admin/img/logo-ct-dark.png') }}" class="inline h-8 dark:hidden" alt="main_logo" />
-          <img src="{{ asset('admin/img/logo-ct.png') }}" class="hidden h-8 dark:inline" alt="main_logo" />
-          <span class="ml-1 font-semibold">Argon Dashboard</span>
-        </a>
-      </div>
-
-      <hr class="h-px mt-0 bg-transparent bg-gradient-to-r from-transparent via-black/40 to-transparent" />
-
-      <div class="overflow-auto grow">
-        <ul class="flex flex-col pl-0 mb-0">
-          <li class="mt-0.5">
-            <a href="dashboard" class="flex items-center px-4 py-2 text-slate-700 dark:text-white">
-              <i class="ni ni-tv-2 text-blue-500 mr-2"></i> Dashboard
+<body id="page-top">
+    <!-- Page Wrapper -->
+    <div id="wrapper">
+        <!-- Sidebar -->
+        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+            <!-- Sidebar - Brand -->
+            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ path('app_dashboard') }}">
+                <div class="sidebar-brand-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <div class="sidebar-brand-text mx-3">Elearning Admin</div>
             </a>
-          </li>
-          <li class="mt-0.5">
-            <a href="#" class="flex items-center px-4 py-2 text-slate-700 dark:text-white">
-              <i class="ni ni-calendar-grid-58 text-orange-500 mr-2"></i> Tables
-            </a>
-          </li>
-          <li class="mt-0.5">
-            <a href="#" class="flex items-center px-4 py-2 text-slate-700 dark:text-white">
-              <i class="ni ni-single-02 text-emerald-500 mr-2"></i> Users
-            </a>
-          </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider my-0">
+
+            <!-- Nav Item - Dashboard -->
+            <li class="nav-item active">
+                <a class="nav-link" href="{{ path('app_dashboard') }}">
+                    <i class="fas fa-fw fa-tachometer-alt"></i>
+                    <span>Tableau de bord</span>
+                </a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider">
+
+            <!-- Heading -->
+            <div class="sidebar-heading">
+                Gestion
+            </div>
+
+            <!-- Nav Item - Posts Collapse Menu -->
+            <li class="nav-item">
+                <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePosts"
+                    aria-expanded="true" aria-controls="collapsePosts">
+                    <i class="fas fa-fw fa-comments"></i>
+                    <span>Posts de forum</span>
+                </a>
+                <div id="collapsePosts" class="collapse" aria-labelledby="headingPosts" data-parent="#accordionSidebar">
+                    <div class="bg-white py-2 collapse-inner rounded">
+                        <h6 class="collapse-header">Gestion des posts :</h6>
+                        <a class="collapse-item" href="{{ path('app_dashboard') }}">Tous les posts</a>
+                        <a class="collapse-item" href="#">Ajouter un post</a>
+                    </div>
+                </div>
+            </li>
+
+            <!-- Nav Item - Users -->
+            <li class="nav-item">
+                <a class="nav-link" href="#">
+                    <i class="fas fa-fw fa-users"></i>
+                    <span>Utilisateurs</span>
+                </a>
+            </li>
+
+            <!-- Divider -->
+            <hr class="sidebar-divider d-none d-md-block">
+
+            <!-- Sidebar Toggler (Sidebar) -->
+            <div class="text-center d-none d-md-inline">
+                <button class="rounded-circle border-0" id="sidebarToggle"></button>
+            </div>
         </ul>
-      </div>
-    </aside>
-    <!-- ====== End Sidebar ====== -->
+        <!-- End of Sidebar -->
 
-    <!-- ====== Main Content ====== -->
-    <div class="xl:ml-64 relative min-h-screen flex flex-col">
-      <!-- Navbar -->
-      <nav class="w-full px-6 py-3 bg-white border-b border-gray-200 shadow-sm dark:bg-slate-850 dark:border-slate-800 sticky top-0 z-40">
-        <div class="flex items-center justify-between">
-          <div class="flex items-center space-x-3">
-            <img src="{{ asset('admin/img/logo-ct.png') }}" alt="Logo" class="h-8 w-8" />
-            <span class="text-slate-700 dark:text-white font-semibold">Dashboard</span>
-          </div>
-          <div class="flex items-center space-x-4">
-            <a href="#" class="text-slate-600 dark:text-slate-200 text-sm">Home</a>
-            <a href="#" class="text-slate-600 dark:text-slate-200 text-sm">Profile</a>
-            <a href="#" class="text-slate-600 dark:text-slate-200 text-sm">Logout</a>
-          </div>
+        <!-- Content Wrapper -->
+        <div id="content-wrapper" class="d-flex flex-column">
+            <!-- Main Content -->
+            <div id="content">
+                <!-- Topbar -->
+                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                    <!-- Sidebar Toggle (Topbar) -->
+                    <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+                        <i class="fa fa-bars"></i>
+                    </button>
+
+                    <!-- Topbar Navbar -->
+                    <ul class="navbar-nav ml-auto">
+                        <!-- Nav Item - User Information -->
+                        <li class="nav-item dropdown no-arrow">
+                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                                data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                <span class="mr-2 d-none d-lg-inline text-gray-600">Douglas McGee</span>
+                                <img class="img-profile rounded-circle" src="{{ asset('admin/img/undraw_profile.svg') }}">
+                            </a>
+                            <!-- Dropdown - User Information -->
+                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                                aria-labelledby="userDropdown">
+                                <a class="dropdown-item" href="#">
+                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Profil
+                                </a>
+                                <div class="dropdown-divider"></div>
+                                <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                                    Déconnexion
+                                </a>
+                            </div>
+                        </li>
+                    </ul>
+                </nav>
+                <!-- End of Topbar -->
+
+                <!-- Begin Page Content -->
+                <div class="container-fluid">
+                    <!-- DataTales Example -->
+                    <div class="card shadow mb-4">
+                        <div class="card-header py-3">
+                            <h6 class="m-0 font-weight-bold text-primary">Liste des posts de forum</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
+                                    <thead>
+                                        <tr>
+                                            <th>ID</th>
+                                            <th>Titre</th>
+                                            <th>Contenu</th>
+                                            <th>Auteur</th>
+                                            <th>Commentaires</th>
+                                            <th>Statut</th>
+                                            <th>Actions</th>
+                                            <th>Toggle</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for post in forum_posts %}
+                                            <tr>
+                                                <td>{{ post.id }}</td>
+                                                <td>{{ post.titre }}</td>
+                                                <td>{{ post.contenu|length > 50 ? post.contenu|slice(0, 50) ~ '...' : post.contenu }}</td>
+                                                <td>{{ post.user.username }}</td>
+                                                <td>{{ post.comments|length }}</td>
+                                                <td>
+                                                    {% if post.enabled %}
+                                                        <span class="badge badge-success">Actif</span>
+                                                    {% else %}
+                                                        <span class="badge badge-danger">Désactivé</span>
+                                                    {% endif %}
+                                                </td>
+                                                <td>
+                                                    <a href="#" class="btn btn-info btn-circle btn-sm">
+                                                        <i class="fas fa-eye"></i>
+                                                    </a>
+                                                    <a href="#" class="btn btn-warning btn-circle btn-sm">
+                                                        <i class="fas fa-edit"></i>
+                                                    </a>
+                                                    <a href="#" class="btn btn-danger btn-circle btn-sm">
+                                                        <i class="fas fa-trash"></i>
+                                                    </a>
+                                                </td>
+                                                <td>
+    <form method="post"
+          action="{{ path('app_post_toggle', {'id': post.id}) }}"
+          style="display:inline">
+        <input type="hidden" name="_token" value="{{ csrf_token('toggle' ~ post.id) }}">
+        <button type="submit"
+                class="btn btn-sm {% if post.enabled %}btn-warning{% else %}btn-success{% endif %}">
+            {% if post.enabled %}Désactiver{% else %}Activer{% endif %}
+        </button>
+    </form>
+</td>
+
+                                            </tr>
+                                        {% else %}
+                                            <tr>
+                                                <td colspan="7" class="text-center">Aucun post trouvé</td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.container-fluid -->
+            </div>
+            <!-- End of Main Content -->
         </div>
-      </nav>
-      <!-- End Navbar -->
+        <!-- End of Content Wrapper -->
+    </div>
+    <!-- End of Page Wrapper -->
 
-      <!-- Main content -->
+    <!-- Scroll to Top Button-->
+    <a class="scroll-to-top rounded" href="#page-top">
+        <i class="fas fa-angle-up"></i>
+    </a>
 
-<main id="main">
-   {% block body %}
-
-
-    {% endblock %}
-</main>
-
-
-      <!-- Footer -->
-      <footer class="pt-4 mt-auto">
-        <div class="w-full px-6 mx-auto text-center text-sm text-slate-500">
-          © {{ "now"|date("Y") }}, made with <i class="fa fa-heart text-red-500"></i> by
-          <a href="https://www.creative-tim.com" class="font-semibold text-slate-700 dark:text-white" target="_blank">Creative Tim</a>
+    <!-- Logout Modal-->
+    <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Prêt à partir ?</h5>
+                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">×</span>
+                    </button>
+                </div>
+                <div class="modal-body">Sélectionnez "Déconnexion" ci-dessous si vous souhaitez terminer votre session.</div>
+                <div class="modal-footer">
+                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Annuler</button>
+                    <a class="btn btn-primary" href="{{ path('app_logout') }}">Déconnexion</a>
+                </div>
+            </div>
         </div>
-      </footer>
-      <!-- End Footer -->
     </div>
 
-    <!-- ====== Scripts ====== -->
-    <script src="{{ asset('admin/js/plugins/chartjs.min.js') }}"></script>
-    <script src="{{ asset('admin/js/plugins/perfect-scrollbar.min.js') }}"></script>
-    <script src="{{ asset('admin/js/argon-dashboard-tailwind.js?v=1.0.1') }}"></script>
+    <!-- Bootstrap core JavaScript-->
+    <script src="{{ asset('admin/vendor/jquery/jquery.min.js') }}"></script>
+    <script src="{{ asset('admin/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 
-    {% block javascripts %}{% endblock %}
-  </body>
+    <!-- Core plugin JavaScript-->
+    <script src="{{ asset('admin/vendor/jquery-easing/jquery.easing.min.js') }}"></script>
+
+    <!-- Custom scripts for all pages-->
+    <script src="{{ asset('admin/js/sb-admin-2.min.js') }}"></script>
+
+    <!-- Page level plugins -->
+    <script src="{{ asset('admin/vendor/chart.js/Chart.min.js') }}"></script>
+
+    <!-- Page level custom scripts -->
+    <script>
+        // Activer le menu actif dans la sidebar
+        const currentPath = window.location.pathname;
+        document.querySelectorAll('.nav-link').forEach(link => {
+            if (link.getAttribute('href') === currentPath) {
+                link.classList.add('active');
+                // Pour les menus déroulants
+                const parentCollapse = link.closest('.collapse');
+                if (parentCollapse) {
+                    parentCollapse.classList.add('show');
+                    const parentNavItem = parentCollapse.closest('.nav-item');
+                    if (parentNavItem) {
+                        parentNavItem.querySelector('.nav-link').classList.remove('collapsed');
+                    }
+                }
+            }
+        });
+    </script>
+
+</body>
+
 </html>

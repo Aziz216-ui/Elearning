@@ -7,6 +7,8 @@ use Doctrine\ORM\Mapping as ORM;
 use App\Entity\ForumPost;
 use App\Entity\User;
 use Doctrine\DBAL\Types\Types;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity(repositoryClass: ForulCommentRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -18,6 +20,12 @@ class ForulComment
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Length(
+        max: 100,
+        maxMessage: "Le contenu ne doit pas dépasser {{ limit }} caractères.",
+        min: 5,
+        minMessage: "Le contenu doit contenir au minimum {{ limit }} caractères."
+    )]
     private ?string $contenu = null;
 
     // -----------------------
