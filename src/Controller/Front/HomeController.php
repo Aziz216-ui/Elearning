@@ -9,14 +9,18 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
+use App\Repository\UserRepository;
 
-final class HomeController extends AbstractController
+class HomeController extends AbstractController
 {
     #[Route('/home', name: 'app_home')]
     public function index(): Response
     {
-        return $this->render('front/home/index.html.twig', [
-            'controller_name' => 'HomeController',
+        // Ici tu peux afficher l'utilisateur connecté
+        $user = $this->getUser();
+
+        return $this->render('Front/home/index.html.twig', [
+            'user' => $user,
         ]);
     }
 
@@ -58,7 +62,7 @@ final class HomeController extends AbstractController
             $sortOrder
         );
 
-        return $this->render('front/home/courses.html.twig', [
+        return $this->render('Front/home/courses.html.twig', [
             'cours' => $cours,
             'distinctCategories' => $distinctCategories,
             'currentCategory' => $currentCategory,
@@ -69,7 +73,7 @@ final class HomeController extends AbstractController
     #[Route('/home/courses/{id}', name: 'app_home_course_show', methods: ['GET'])]
     public function show(Cours $cour): Response
     {
-        return $this->render('front/home/course_show.html.twig', [
+        return $this->render('Front/home/course_show.html.twig', [
             'cour' => $cour,
         ]);
     }
@@ -77,7 +81,7 @@ final class HomeController extends AbstractController
     #[Route('/home/auteurs/{id}', name: 'app_home_author_show', methods: ['GET'])]
     public function authorShow(Auteur $auteur): Response
     {
-        return $this->render('front/home/author_show.html.twig', [
+        return $this->render('Front/home/author_show.html.twig', [
             'auteur' => $auteur,
         ]);
     }

@@ -1,21 +1,114 @@
 {% extends 'base1.html.twig' %}
 
-
-{% block title %}Hello HomeController!{% endblock %}
+{% block title %}Gestion des utilisateurs{% endblock %}
 
 {% block body %}
+
+<!-- Barre de recherche stylée -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+<form id="searchForm" method="get" action="{{ path('admin_user_search') }}" style="display:flex;gap:0.5rem;align-items:center;">
+    <div class="d-flex justify-content-center" style="width:100%;">
+        <div class="search" style="margin:0 auto;">
+            <input id="searchInput" type="text" class="search-input" name="q" placeholder="Rechercher un utilisateur..." value="{{ term|default('') }}">
+            <button type="submit" class="search-icon"><i class="fa fa-search"></i></button>
+        </div>
+
+    </div>
+</form>
+
 <style>
-    .example-wrapper { margin: 1em auto; max-width: 800px; width: 95%; font: 18px/1.5 sans-serif; }
-    .example-wrapper code { background: #F5F5F5; padding: 2px 6px; }
+/* Styles adaptatifs pour la barre de recherche (n'affecte pas le body global) */
+.search{
+    display:flex;
+    align-items:center;
+    height:50px;
+    background-color: #fff;
+    padding: 6px 8px;
+    border-radius: 6px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+.search-input{
+    border:0;
+    outline: 0;
+    background: none;
+    width: 420px;
+    margin-left:8px;
+    caret-color: #536bf6;
+    line-height: 40px;
+    transition: width 0.4s linear;
+    font-size:16px;
+}
+.search-icon{
+    height: 36px;
+    width: 36px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: white;
+    background-color: #536bf6;
+    border: none;
+    border-radius:4px;
+    cursor:pointer;
+}
+.search-icon i{ font-size:14px; }
+@media (max-width:768px){
+    .search-input{ width:200px; }
+}
 </style>
 
-<div class="example-wrapper">
-    <h1>Hello {{ controller_name }}! ✅</h1>
+<script>
+// Soumet automatiquement le formulaire quand le champ est vidé (UX)
+(function(){
+    const input = document.getElementById('searchInput');
+    const form = document.getElementById('searchForm');
+    if (!input || !form) return;
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>C:/Users/Fathi/E-learning/src/Controller/DashboardController.php</code></li>
-        <li>Your template at <code>C:/Users/Fathi/E-learning/templates/dashboard/index.html.twig</code></li>
-    </ul>
+    let debounce;
+    input.addEventListener('input', function() {
+        clearTimeout(debounce);
+        debounce = setTimeout(() => {
+            if (input.value.trim() === '') {
+                // soumettre pour récupérer la liste complète
+                form.submit();
+            }
+        }, 300);
+    });
+})();
+</script>
+
+<div class="px-6 py-6 mx-auto">
+    <h1 class="text-2xl font-semibold text-slate-700 dark:text-white mb-6">Liste des utilisateurs</h1>
+
+    <div class="container">
+      <table class="table table-hover">
+            <thead class="table-dark">
+                <tr>
+                    <th scope="col" >ID</th>
+                    <th scope="col" >Email</th>
+                    <th scope="col" >Nom</th>
+                    <th scope="col" >Prénom</th>
+
+                </tr>
+            </thead>
+            <tbody class="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
+            {% for user in users %}
+                <tr class="hover:bg-slate-50 dark:hover:bg-slate-700">
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">{{ user.id }}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">{{ user.email }}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">{{ user.name }}</td>
+                    <td class="px-4 py-2 whitespace-nowrap text-sm text-slate-700 dark:text-slate-200">{{ user.lastname }}</td>
+
+                </tr>
+            {% else %}
+                <tr>
+                    <td colspan="5" class="px-4 py-2 text-center text-sm text-slate-500 dark:text-slate-400">Aucun utilisateur trouvé.</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+         <div>
+              <a href="{{ path('app_admin') }}" class="btn btn-secondary" style="margin-left:12px; padding:0.4rem 0.6rem; background:#e2e8f0; border-radius:4px; color:#1f2937; text-decoration:none;">Réinitialiser</a>
+         </div>
+    </div>
 </div>
 {% endblock %}
