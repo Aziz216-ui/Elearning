@@ -120,6 +120,11 @@ final class AuteurController extends AbstractController
                     $this->addFlash('error', 'Upload de la photo échoué.');
                 }
             }
+            // Synchroniser l'association côté Cours (ajouts via le formulaire)
+            // Note: la suppression/détachement de cours n'est pas autorisée car Cours.auteur est non-nullable
+            foreach ($auteur->getCours() as $cour) {
+                $cour->setAuteur($auteur);
+            }
             $entityManager->flush();
             $this->addFlash('success', 'Auteur mis à jour avec succès.');
 
