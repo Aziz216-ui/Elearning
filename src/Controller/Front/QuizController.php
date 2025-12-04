@@ -86,11 +86,15 @@ class QuizController extends AbstractController
 
         $questions = $em->getRepository(Question::class)->findBy(['quiz' => $quiz]);
 
+        // La limite de temps est stockée en minutes dans le back-office, on la convertit en secondes pour le JS
+        $timeLimitMinutes = $quiz->getTimeLimit() ?? 30; // 30 minutes par défaut si non défini
+        $timeLimitSeconds = $timeLimitMinutes * 60;
+
         return $this->render('quiz/quiz.html.twig', [
             'cours' => $cours,
             'quiz' => $quiz,
             'questions' => $questions,
-            'timeLimit' => $quiz->getTimeLimit() ?? 1800
+            'timeLimit' => $timeLimitSeconds,
         ]);
     }
 

@@ -189,8 +189,8 @@
             const addAnswerButton = document.getElementById('add-answer');
             const answersList = document.getElementById('answers-list');
             const noAnswersMessage = document.getElementById('no-answers-message');
-            const answerPrototype = answersList.dataset.prototype;
-            let answerIndex = {{ form.answers|length }};
+            const answerPrototype = answersList ? answersList.dataset.prototype : '';
+            let answerIndex = answersList ? answersList.querySelectorAll('.answer-row').length : 0;
             
             // Fonction pour ajouter une nouvelle réponse
             function addAnswerForm() {
@@ -436,9 +436,9 @@
             updateUI();
             
             // Ajouter une première réponse si aucune n'existe
-            if (answerIndex === 0) {
+            if (answerIndex === 0 && answersList) {
                 addAnswerForm();
             }
-        });
+});
     </script>
 {% endblock %}

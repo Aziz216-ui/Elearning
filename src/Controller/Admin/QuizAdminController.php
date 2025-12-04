@@ -255,7 +255,27 @@ class QuizAdminController extends AbstractController
     public function delete(Request $request, Quiz $quiz, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$quiz->getId(), $request->request->get('_token'))) {
+            // 1) Supprimer d'abord les UserAnswer liés aux questions de ce quiz (FK sur question_id)
+            $dqlQuestions = 'DELETE FROM App\\Entity\\UserAnswer ua WHERE ua.question IN (
+                                SELECT q FROM App\\Entity\\Question q WHERE q.quiz = :quiz
+                            )';
+
+            $entityManager->createQuery($dqlQuestions)
+                ->setParameter('quiz', $quiz)
+                ->execute();
+
+            // 2) Supprimer ensuite les UserAnswer liés aux réponses de ce quiz (FK sur answer_id), par sécurité
+            $dqlAnswers = 'DELETE FROM App\\Entity\\UserAnswer ua WHERE ua.answer IN (
+                               SELECT a FROM App\\Entity\\Answer a JOIN a.question q WHERE q.quiz = :quiz
+                           )';
+
+            $entityManager->createQuery($dqlAnswers)
+                ->setParameter('quiz', $quiz)
+                ->execute();
+
+            // 3) Puis supprimer le quiz (et ses questions/réponses via la configuration Doctrine)
             $entityManager->remove($quiz);
+
             $entityManager->flush();
             $this->addFlash('success', 'Le quiz a été supprimé avec succès.');
         } else {
@@ -264,7 +284,7 @@ class QuizAdminController extends AbstractController
 
         return $this->redirectToRoute('app_quiz_admin_index');
     }
-    
+
     #[Route('/{id}/add-question', name: 'app_quiz_admin_add_question', methods: ['GET', 'POST'])]
     public function addQuestion(Request $request, Quiz $quiz, EntityManagerInterface $entityManager): Response
     {

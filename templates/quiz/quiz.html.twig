@@ -6,17 +6,16 @@
     {{ parent() }}
     <style>
         .quiz-timer {
-            position: fixed;
-            top: 20px;
-            right: 20px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
             background-color: #f8f9fa;
             border: 1px solid #dee2e6;
-            border-radius: 5px;
-            padding: 10px 15px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            z-index: 1000;
-            font-size: 1.2rem;
-            font-weight: bold;
+            border-radius: 12px;
+            padding: 8px 14px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.08);
+            font-size: 1rem;
+            font-weight: 600;
         }
         .time-warning { color: #ffc107; }
         .time-danger { color: #dc3545; }
@@ -25,11 +24,14 @@
 
 {% block body %}
 <div class="container mt-4" id="quizContainer">
-    <div class="quiz-timer" id="quizTimer">
-        <i class="bi bi-stopwatch"></i> Temps restant : <span id="timeRemaining">{{ (timeLimit // 60) }}:{{ "%02d"|format(timeLimit % 60) }}</span>
+    <h1 class="mb-3">Quiz : {{ quiz.title }}</h1>
+
+    <div class="mb-4">
+        <div class="quiz-timer" id="quizTimer">
+            <i class="bi bi-stopwatch"></i>
+            <span>Temps restant : <span id="timeRemaining">{{ (timeLimit // 60) }}:{{ "%02d"|format(timeLimit % 60) }}</span></span>
+        </div>
     </div>
-    
-    <h1 class="mb-4">Quiz : {{ quiz.title }}</h1>
     
     {% if app.request.query.get('result') %}
         <div class="alert alert-success">
