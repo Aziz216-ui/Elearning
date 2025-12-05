@@ -148,4 +148,5 @@ class AuteurRepository extends ServiceEntityRepository
             ->getSingleScalarResult();
         return $count > 0;
     }
+
 }

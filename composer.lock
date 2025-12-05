@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "4a1097a469550262710535c96561185d",
+    "content-hash": "4b75cf183fd5360315c58beb6f7b7237",
     "packages": [
         {
             "name": "composer/semver",
@@ -1595,6 +1595,54 @@
                 }
             ],
             "time": "2025-03-24T10:02:05+00:00"
+        },
+        {
+            "name": "paymee/paymee-php",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/paymeebrasil/sdk-php.git",
+                "reference": "493869c44b9072a018d191e71ba1b09859a7256a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/paymeebrasil/sdk-php/zipball/493869c44b9072a018d191e71ba1b09859a7256a",
+                "reference": "493869c44b9072a018d191e71ba1b09859a7256a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.6.0"
+            },
+            "default-branch": true,
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Paymee\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "GPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Junior Maia",
+                    "email": "comoquepode@gmail.com",
+                    "homepage": "https://jrmaia.github.io/"
+                }
+            ],
+            "description": "SDK Paymee for PHP",
+            "homepage": "https://paymee.com.br",
+            "keywords": [
+                "paymee",
+                "paymee-php",
+                "paymee-php-sdk"
+            ],
+            "support": {
+                "issues": "https://github.com/paymeebrasil/sdk-php/issues",
+                "source": "https://github.com/paymeebrasil/sdk-php/tree/main"
+            },
+            "time": "2021-07-22T17:10:57+00:00"
         },
         {
             "name": "phpdocumentor/reflection-common",
@@ -10630,8 +10678,10 @@
         }
     ],
     "aliases": [],
-    "minimum-stability": "stable",
-    "stability-flags": {},
+    "minimum-stability": "dev",
+    "stability-flags": {
+        "paymee/paymee-php": 20
+    },
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {

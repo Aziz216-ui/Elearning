@@ -5,6 +5,7 @@ namespace App\Controller\Front;
 use App\Entity\Cours;
 use App\Entity\Auteur;
 use App\Repository\CoursRepository;
+use App\Repository\SubscriptionRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
@@ -77,6 +78,46 @@ class HomeController extends AbstractController
         ]);
     }
 
+    #[Route('/home/my-courses', name: 'app_my_courses', methods: ['GET'])]
+    public function myCourses(SubscriptionRepository $subscriptionRepository): Response
+    {
+        // Must be authenticated
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        // Fetch active subscriptions for the user
+        $subscriptions = $subscriptionRepository->findActiveByUser($user);
+
+        // Aggregate courses from all active plans
+        $byId = [];
+        foreach ($subscriptions as $sub) {
+            $plan = $sub->getPlan();
+            if (!$plan) { continue; }
+            foreach ($plan->getCourses() as $course) {
+                $byId[$course->getId()] = $course;
+            }
+        }
+
+        $cours = array_values($byId);
+
+        // Build distinct categories from filtered set
+        $distinctCategories = [];
+        foreach ($cours as $c) {
+            $cat = $c->getCategory();
+            if ($cat !== null && $cat !== '' && !in_array($cat, $distinctCategories, true)) {
+                $distinctCategories[] = $cat;
+            }
+        }
+
+        return $this->render('Front/home/courses.html.twig', [
+            'cours' => $cours,
+            'distinctCategories' => $distinctCategories,
+            'currentCategory' => null,
+            'currentType' => 'my',
+        ]);
+    }
     #[Route('/home/auteurs/{id}', name: 'app_home_author_show', methods: ['GET'])]
     public function authorShow(Auteur $auteur): Response
     {

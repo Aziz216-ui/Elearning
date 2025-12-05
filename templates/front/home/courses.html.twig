@@ -83,10 +83,16 @@
                   {% endif %}
                 </p>
 
+                {% set isMy = (currentType is defined and currentType == 'my') or app.request.attributes.get('_route') == 'app_my_courses' %}
                 <div class="mt-auto d-flex flex-wrap gap-2">
-                  {# Ajouter au panier #}
-                  <a href="{{ path('app_cart_add', { id: c.id }) }}" class="btn btn-outline-primary flex-grow-1">Ajouter au panier</a>
-                  <a href="{{ path('app_cart_index') }}" class="btn btn-outline-success">Voir panier</a>
+                  {% if isMy %}
+                    {# Mes Cours: afficher le bouton Voir Quiz, pas de panier #}
+                    <a href="{{ path('app_quiz_list', {'id': c.id}) }}" class="btn btn-warning flex-grow-1">Voir Quiz</a>
+                  {% else %}
+                    {# Ajouter au panier #}
+                    <a href="{{ path('app_cart_add', { id: c.id }) }}" class="btn btn-outline-primary flex-grow-1">Ajouter au panier</a>
+                    <a href="{{ path('app_cart_index') }}" class="btn btn-outline-success">Voir panier</a>
+                  {% endif %}
                   {# Détails cours (front) #}
                   <a href="{{ path('app_home_course_show', { id: c.id }) }}" class="btn btn-primary flex-grow-1">Détails</a>
                   {# Détails auteur (front) #}

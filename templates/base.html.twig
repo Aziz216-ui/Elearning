@@ -52,6 +52,7 @@
         <a href="{{ path('app_home') }}" class="navbar-brand d-flex align-items-center px-4 px-lg-5">
             <h2 class="m-0 text-primary"><i class="fa fa-book me-3"></i>Elearning</h2>
 
+
         </a>
         <button type="button" class="navbar-toggler me-4" data-bs-toggle="collapse" data-bs-target="#navbarCollapse">
             <span class="navbar-toggler-icon"></span>
@@ -60,12 +61,22 @@
             <div class="navbar-nav ms-auto p-4 p-lg-0">
                 <a  href="{{path('app_home_stat')}}" class="nav-item nav-link active ">Home</a>
 
+                               {% if app.user %}
                                <a href="{{path('app_forum_post_index')}}" class="nav-item nav-link">Forum</a>
+                               {% endif %}
 
 
                 <a href="{{ path('app_home_courses') }}" class="nav-item nav-link">Courses</a>
 
 
+
+
+
+                <a href="{{ app.user ? path('app_dashboard_plans') : path('payment_plans') }}" class="nav-item nav-link">Plans</a>
+                {% if app.user %}
+                <a href="{{ path('payment_my_subscription') }}" class="nav-item nav-link">Mes Abonnements</a>
+                {% endif %}
+          
                 <div class="nav-item dropdown">
                     <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">Pages</a>
 
@@ -78,8 +89,10 @@
 
                 <a href="{{ path('app_contact') }}" class="nav-item nav-link">Contact</a>
                 <a href="{{ path('app_about') }}" class="nav-item nav-link">About</a>
+
             </div>
             <div class="d-flex align-items-center">
+                {% if app.user %}
                 {# Favorites button (left of Cart) #}
                 <a href="{{ path('app_fav_index') }}" class="btn btn-outline-secondary me-3 d-none d-lg-flex align-items-center">
                     <i class="fa fa-heart me-2"></i>
@@ -106,14 +119,17 @@
 
 
 
-                <a href="{{ path('app_home_courses') }}" class="nav-item nav-link {% if app.request.attributes.get('_route') in ['app_home_courses','app_home_courses_html'] %}active{% endif %}">Mes Cours</a>
-                
-            
+                <a href="{{ path('app_my_courses') }}" class="nav-item nav-link {% if app.request.attributes.get('_route') in ['app_my_courses'] %}active{% endif %}">Mes Cours</a>
+                {% endif %}
             </div>
         </div>
-         <a href="{{path('app_login')}}" class="nav-item nav-link ">Connexion</a>
+         {% if not app.user %}
+         <a href="{{ path('app_login') }}" class="nav-item nav-link">Connexion</a>
+         {% else %}
+         <a href="{{ path('app_logout') }}" class="nav-item nav-link">Déconnexion</a>
+         {% endif %}
             </div>
-            <a href="{{path('app_register')}}" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block">Join Now<i class="fa fa-arrow-right ms-3"></i></a>
+            {% if not app.user %}<a href="{{ path('app_register') }}" class="btn btn-primary py-4 px-lg-5 d-none d-lg-block">Join Now<i class="fa fa-arrow-right ms-3"></i></a>{% endif %}
         </div>
     </nav>
     <!-- Navbar End -->

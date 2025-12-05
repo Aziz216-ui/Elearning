@@ -1,0 +1,93 @@
+{% extends 'admin/layouts/base1_wrapper.html.twig' %}
+
+{% block title %}Plans{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">Plans</h1>
+            <p class="mb-0 text-muted small">Gérez vos plans d'abonnement</p>
+        </div>
+        <a href="{{ path('admin_plan_new') }}" class="btn btn-primary btn-sm shadow-sm">
+            <i class="fas fa-plus fa-sm text-white-50"></i> Nouveau plan
+        </a>
+    </div>
+
+    <!-- Plans Table -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Liste des plans</h6>
+        </div>
+        <div class="card-body">
+            <div class="mb-3 d-flex flex-wrap align-items-center">
+                <form class="form-inline mr-3" method="get" action="{{ path('admin_plan_price_range') }}">
+                    <div class="form-group mr-2 mb-2">
+                        <label for="min" class="mr-2 small mb-0">Prix min</label>
+                        <input type="number" step="0.01" id="min" name="min" class="form-control form-control-sm" value="{{ app.request.query.get('min') }}">
+                    </div>
+                    <div class="form-group mr-2 mb-2">
+                        <label for="max" class="mr-2 small mb-0">Prix max</label>
+                        <input type="number" step="0.01" id="max" name="max" class="form-control form-control-sm" value="{{ app.request.query.get('max') }}">
+                    </div>
+                    <button type="submit" class="btn btn-sm btn-primary mb-2">Filtrer par prix</button>
+                </form>
+
+                <form class="form-inline" method="get" action="{{ path('admin_plan_index') }}">
+                    <div class="form-group mr-2 mb-2">
+                        <label for="active" class="mr-2 small mb-0">État</label>
+                        <select id="active" name="active" class="form-control form-control-sm" onchange="this.form.submit();">
+                            <option value="" {{ app.request.query.get('active') is empty ? 'selected' : '' }}>Tous</option>
+                            <option value="1" {{ app.request.query.get('active') == '1' ? 'selected' : '' }}>Actifs</option>
+                            <option value="0" {{ app.request.query.get('active') == '0' ? 'selected' : '' }}>Inactifs</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Prix (DT)</th>
+                            <th>Durée</th>
+                            <th>Actif</th>
+                            <th>Max cours</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for plan in plans %}
+                        <tr>
+                            <td>{{ plan.name }}</td>
+                            <td>{{ plan.price }}</td>
+                            <td>{{ plan.duration }}</td>
+                            <td>
+                                <span class="badge {{ plan.isActive ? 'badge-success' : 'badge-secondary' }}">
+                                    {{ plan.isActive ? 'Actif' : 'Inactif' }}
+                                </span>
+                            </td>
+                            <td>{{ plan.maxCourses ?? '∞' }}</td>
+                            <td>
+                                <a class="btn btn-info btn-sm" href="{{ path('admin_plan_show', {id: plan.id}) }}">Voir</a>
+                                <a class="btn btn-primary btn-sm" href="{{ path('admin_plan_edit', {id: plan.id}) }}">Éditer</a>
+                                <form method="post" action="{{ path('admin_plan_delete', {id: plan.id}) }}" onsubmit="return confirm('Supprimer ce plan ?');" style="display:inline">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ plan.id) }}">
+                                    <button class="btn btn-danger btn-sm">Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center">Aucun plan trouvé.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

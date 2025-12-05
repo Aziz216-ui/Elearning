@@ -1,0 +1,91 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Plans - Tableau de bord{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="display-4 fw-bold mb-0">Choisissez votre plan</h1>
+            <p class="lead text-muted mb-0">Accédez à tous nos cours en ligne</p>
+        </div>
+        <form class="d-flex align-items-center" method="get" action="{{ path('app_dashboard_plans_filter') }}">
+            <div class="me-2">
+                <label for="minPrice" class="form-label form-label-sm mb-1">Prix min</label>
+                <input type="number" step="0.01" name="minPrice" id="minPrice" class="form-control form-control-sm" value="{{ app.request.query.get('minPrice') }}">
+            </div>
+            <div class="me-2">
+                <label for="maxPrice" class="form-label form-label-sm mb-1">Prix max</label>
+                <input type="number" step="0.01" name="maxPrice" id="maxPrice" class="form-control form-control-sm" value="{{ app.request.query.get('maxPrice') }}">
+            </div>
+            <div class="mt-3">
+                <button type="submit" class="btn btn-sm btn-primary mt-1">Filtrer</button>
+            </div>
+        </form>
+    </div>
+    
+    <div class="row g-4">
+        {% for plan in plans %}
+        <div class="col-md-4">
+            <div class="card h-100 shadow-sm {% if plan.name == 'Premium' %}border-primary{% endif %}">
+                {% if plan.name == 'Premium' %}
+                <div class="card-header text-center bg-primary text-white">
+                    <span class="badge bg-warning text-dark">POPULAIRE</span>
+                </div>
+                {% endif %}
+                
+                <div class="card-header text-center {% if plan.name != 'Premium' %}bg-light{% else %}bg-primary text-white{% endif %}">
+                    <h3 class="my-2">{{ plan.name }}</h3>
+                </div>
+                
+                <div class="card-body d-flex flex-column">
+                    <div class="text-center mb-4">
+                        <h2 class="display-4 fw-bold">{{ plan.price }}DT</h2>
+                        <p class="text-muted">
+                            {% if plan.duration == 'monthly' %}
+                                par mois
+                            {% elseif plan.duration == 'yearly' %}
+                                par an
+                            {% else %}
+                                paiement unique
+                            {% endif %}
+                        </p>
+                    </div>
+                    
+                    <p class="text-muted">{{ plan.description }}</p>
+                    
+                    <ul class="list-unstyled mb-4">
+                        {% if plan.maxCourses %}
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                                Accès à {{ plan.maxCourses }} cours
+                            </li>
+                        {% else %}
+                            <li class="mb-2">
+                                <i class="bi bi-check-circle-fill text-success"></i>
+                                Accès illimité aux cours
+                            </li>
+                        {% endif %}
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                            Support 24/7
+                        </li>
+                        <li class="mb-2">
+                            <i class="bi bi-check-circle-fill text-success"></i>
+                            Certificats de formation
+                        </li>
+                    </ul>
+                    
+                    <div class="mt-auto">
+                        <a href="{{ path('payment_checkout', {id: plan.id}) }}" 
+                           class="btn {% if plan.name == 'Premium' %}btn-primary{% else %}btn-outline-primary{% endif %} btn-lg w-100">
+                            Acheter
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,144 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Paiement - {{ plan.name }}{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <h1 class="mb-4 text-center">Paiement du plan {{ plan.name }}</h1>
+
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <div class="mb-4 text-center">
+                        <h2 class="display-5 fw-bold">{{ plan.price }} DT</h2>
+                        <p class="text-muted mb-1">
+                            {% if plan.duration == 'monthly' %}
+                                Facturation mensuelle
+                            {% elseif plan.duration == 'yearly' %}
+                                Facturation annuelle
+                            {% else %}
+                                Paiement unique
+                            {% endif %}
+                        </p>
+                    </div>
+
+                    <form method="post" action="{{ path('payment_card', { id: plan.id }) }}">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Adresse email</label>
+                            <input type="email" id="email" name="email" class="form-control" required
+                                   value="{{ app.user ? app.user.email : '' }}">
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label d-block">M&eacute;thode de paiement</label>
+                            <div class="form-check">
+                                <input class="form-check-input" type="radio" name="payment_method" id="method_paymee" value="paymee" checked>
+                                <label class="form-check-label" for="method_paymee">
+                                    Paymee
+                                </label>
+                            </div>
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="radio" name="payment_method" id="method_d17" value="d17">
+                                <label class="form-check-label" for="method_d17">
+                                    D17
+                                </label>
+                            </div>
+                            <div class="form-check mt-2">
+                                <input class="form-check-input" type="radio" name="payment_method" id="method_card" value="card">
+                                <label class="form-check-label" for="method_card">
+                                    Carte bancaire
+                                </label>
+                            </div>
+                        </div>
+
+                        <div id="paymee_block" class="mb-3">
+                            <p class="text-muted mb-2">Cliquez sur le lien ci-dessous pour payer avec Paymee :</p>
+                            <a href="{{ path('payment_paymee', { id: plan.id }) }}" class="btn btn-primary" target="_blank">
+                                Payer avec Paymee
+                            </a>
+                        </div>
+
+                        <div id="d17_block" class="mb-3" style="display:none;">
+                            <p class="mb-1">Num&eacute;ro D17 &agrave; utiliser pour le paiement :</p>
+                            <div class="alert alert-info mb-0 fw-bold">
+                                56701292
+                            </div>
+                        </div>
+                        <div id="card_block" class="mb-3" style="display:none;">
+                            <div class="mb-3">
+                                <label for="owner_name" class="form-label">Nom du titulaire</label>
+                                <input type="text" id="owner_name" name="owner_name" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label for="card_number" class="form-label">Num&eacute;ro de carte</label>
+                                <input type="text" id="card_number" name="card_number" class="form-control">
+                            </div>
+                            <div class="mb-3">
+                                <label for="security_code" class="form-label">Code de s&eacute;curit&eacute;</label>
+                                <input type="text" id="security_code" name="security_code" class="form-control">
+                            </div>
+
+                            <button type="button" id="start_payment" class="btn btn-success w-100 mb-3">Payer</button>
+
+                            <div id="verification_section" style="display:none;">
+                                <div class="mb-3">
+                                    <label for="verification_code" class="form-label">Code de v&eacute;rification</label>
+                                    <input type="text" id="verification_code" name="verification_code" class="form-control">
+                                </div>
+                                <button type="submit" class="btn btn-primary w-100">V&eacute;rifier</button>
+                            </div>
+                        </div>
+                    </form>
+
+                    <div class="mt-3 text-muted small">
+                        <i class="bi bi-shield-lock"></i>
+                        Vos informations de paiement sont trait&eacute;es de mani&egrave;re s&eacute;curis&eacute;e.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const paymeeRadio = document.getElementById('method_paymee');
+        const d17Radio = document.getElementById('method_d17');
+        const cardRadio = document.getElementById('method_card');
+        const paymeeBlock = document.getElementById('paymee_block');
+        const d17Block = document.getElementById('d17_block');
+        const cardBlock = document.getElementById('card_block');
+        const startPaymentButton = document.getElementById('start_payment');
+        const verificationSection = document.getElementById('verification_section');
+
+        function updateVisibility() {
+            if (paymeeRadio.checked) {
+                paymeeBlock.style.display = 'block';
+                d17Block.style.display = 'none';
+                cardBlock.style.display = 'none';
+            } else if (d17Radio.checked) {
+                paymeeBlock.style.display = 'none';
+                d17Block.style.display = 'block';
+                cardBlock.style.display = 'none';
+            } else if (cardRadio.checked) {
+                paymeeBlock.style.display = 'none';
+                d17Block.style.display = 'none';
+                cardBlock.style.display = 'block';
+            }
+        }
+
+        paymeeRadio.addEventListener('change', updateVisibility);
+        d17Radio.addEventListener('change', updateVisibility);
+        cardRadio.addEventListener('change', updateVisibility);
+
+        if (startPaymentButton && verificationSection) {
+            startPaymentButton.addEventListener('click', function () {
+                verificationSection.style.display = 'block';
+            });
+        }
+
+        updateVisibility();
+    });
+</script>
+{% endblock %}
