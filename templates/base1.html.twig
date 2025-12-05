@@ -1,8 +1,6 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html lang="fr">
 <head>
-
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
@@ -12,33 +10,197 @@
 
     <title>SB Admin 2 - Dashboard</title>
 
+
     <!-- Custom fonts for this template-->
     <link href="{{ asset('admin/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet" type="text/css">
-    <link
-        href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i"
-        rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Nunito:200,200i,300,300i,400,400i,600,600i,700,700i,800,800i,900,900i" rel="stylesheet">
 
     <!-- Custom styles for this template-->
     <link href="{{ asset('admin/css/sb-admin-2.min.css') }}" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #4e73df;
+            --primary-hover: #2e59d9;
+            --secondary: #858796;
+            --light: #f8f9fc;
+            --dark: #5a5c69;
+            --success: #1cc88a;
+            --info: #36b9cc;
+            --warning: #f6c23e;
+            --danger: #e74a3b;
+            --light-bg: #f8f9fc;
+            --dark-text: #5a5c69;
+            --grey-text: #858796;
+        }
 
-</head>
+        body {
+            color: var(--grey-text);
+        }
 
-<body id="page-top">
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--dark-text);
+        }
 
+        .bg-gradient-primary {
+            background-color: var(--primary);
+            background-image: linear-gradient(180deg, var(--primary) 10%, #224abe 100%);
+            background-size: cover;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+
+        .sidebar .nav-item .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        .sidebar .nav-item .nav-link:hover {
+            color: #fff;
+        }
+
+        .sidebar .nav-item.active .nav-link {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .card {
+            border: none;
+            border-radius: 0.35rem;
+            box-shadow: 0 0.15rem 1.75rem 0 rgba(58, 59, 69, 0.15);
+        }
+
+        .card-header {
+            background-color: #f8f9fc;
+            border-bottom: 1px solid #e3e6f0;
+        }
+        background: var(--primary-hover);
+        color: #fff;
+      }
+
+      .btn-outline-custom {
+        border: 2px solid var(--primary);
+        color: var(--primary);
+        padding: 10px 22px;
+        border-radius: 8px;
+        background: transparent;
+        font-weight: 600;
+        transition: 0.2s ease;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        text-decoration: none;
+      }
+
+      .btn-outline-custom:hover {
+        background: var(--light-bg);
+      }
+
+      .badge-primary-custom {
+        background: var(--light-bg);
+        color: var(--primary);
+        font-weight: 600;
+        padding: 6px 14px;
+        border-radius: 6px;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .card-custom {
+        border: 1px solid #eaeaea;
+        border-radius: 12px;
+        padding: 25px;
+        background: white;
+        box-shadow: 0 3px 10px rgba(0,0,0,0.08);
+        transition: 0.3s ease;
+      }
+
+      .card-custom:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+      }
+      
+      /* Styles spécifiques pour les formulaires */
+      .form-control:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 0.2rem rgba(78, 115, 223, 0.25);
+      }
+      
+      /* Styles pour les onglets */
+      .nav-tabs .nav-link {
+        color: var(--secondary);
+      }
+      
+      .nav-tabs .nav-link.active {
+        color: var(--primary);
+        border-color: var(--primary) var(--primary) #fff;
+      }
+      
+      /* Styles pour les tableaux */
+      .table thead th {
+        border-bottom: 2px solid #e3e6f0;
+        color: var(--dark);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 0.7rem;
+      }
+      
+      /* Styles pour les alertes */
+      .alert {
+        border: none;
+        border-left: 4px solid;
+      }
+      
+      .alert-success {
+        background-color: #d1e7dd;
+        border-color: #0f5132;
+        color: #0f5132;
+      }
+      
+      .alert-danger {
+        background-color: #f8d7da;
+        border-color: #842029;
+        color: #842029;
+      }
+      
+      .alert-warning {
+        background-color: #fff3cd;
+        border-color: #664d03;
+        color: #664d03;
+      }
+      
+      .alert-info {
+        background-color: #cff4fc;
+        border-color: #055160;
+        color: #055160;
+      }
+    </style>
+
+    {% block stylesheets %}{% endblock %}
+  </head>
+
+  <body id="page-top">
     <!-- Page Wrapper -->
     <div id="wrapper">
+      <!-- Sidebar -->
+      <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+        <!-- Sidebar - Brand -->
+        <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ path('app_dashboard') }}">
+          <div class="sidebar-brand-icon">
+            <i class="fas fa-graduation-cap"></i>
+          </div>
+          <div class="sidebar-brand-text mx-3">Elearning Admin</div>
+        </a>
 
-        <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
-
-            <!-- Sidebar - Brand -->
- 
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ path('app_dashboard') }}">
-                <div class="sidebar-brand-icon">
-                    <i class="fas fa-graduation-cap"></i>
-                </div>
-                <div class="sidebar-brand-text mx-3">ELlearnig</div>
-            </a>
+       
 
             <!-- Divider -->
             <hr class="sidebar-divider">
@@ -50,6 +212,15 @@
                     <i class="fas fa-graduation-cap"></i>
                     <span>Courses</span>
                 </a>
+                  <!-- Nav Item - Quiz -->
+             <li class="nav-item {% if 'app_quiz_admin' in app.request.get('_route') %}
+            active
+            {% endif %}">
+            <a class="nav-link" href="{{ path('app_quiz_admin_index') }}">
+            <i class="fas fa-fw fa-question-circle"></i>
+            <span>Quiz</span>
+            </a>
+     
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapsePosts"
                     aria-expanded="true" aria-controls="collapsePosts">
                     <i class="fas fa-fw fa-comments"></i>
@@ -185,7 +356,7 @@
             <div class="text-center d-none d-md-inline">
                 <button class="rounded-circle border-0" id="sidebarToggle"></button>
             </div>
-
+            </ul>
 
             <!-- Sidebar Message -->
             <div class="sidebar-card d-none d-lg-flex">
@@ -194,13 +365,14 @@
                 <a class="btn btn-success btn-sm" href="https://startbootstrap.com/theme/sb-admin-pro">Upgrade to Pro!</a>
             </div>
 
-        </ul>
         <!-- End of Sidebar -->
+        
 
         <!-- Content Wrapper -->
         <div id="content-wrapper" class="d-flex flex-column">
 
             <!-- Main Content -->
+              <div id="content">
             {% block body %}
             <div class="container-fluid mt-3">
               {% for label, messages in app.flashes %}
@@ -210,12 +382,49 @@
                     <button type="button" class="close" data-dismiss="alert" aria-label="Close">
                       <span aria-hidden="true">&times;</span>
                     </button>
-                  </div>
+                  {% endfor %}
                 {% endfor %}
-              {% endfor %}
-            </div>
 
-            {% endblock %}
+                    <!-- Topbar Navbar -->
+            <ul class="navbar-nav ml-auto">
+              <!-- Nav Item - User Information -->
+              <li class="nav-item dropdown no-arrow">
+                <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button"
+                  data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                  <span class="mr-2 d-none d-lg-inline text-gray-600 small">
+                    {% if app.user %}
+                      {{ app.user.name }} {{ app.user.lastname }}
+                    {% else %}
+                      Invité
+                    {% endif %}
+                  </span>
+                  <img class="img-profile rounded-circle" src="{{ asset('admin/img/undraw_profile.svg') }}">
+                </a>
+                 <!-- Dropdown - User Information -->
+                <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in"
+                  aria-labelledby="userDropdown">
+                  <a class="dropdown-item" href="{{ path('app_profile') }}">
+                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
+                    Profil
+                  </a>
+                  <div class="dropdown-divider"></div>
+                  <a class="dropdown-item" href="#" data-toggle="modal" data-target="#logoutModal">
+                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
+                    Déconnexion
+                  </a>
+                </div>
+              </li>
+            </ul>
+          </nav>
+           <!-- Begin Page Content -->
+          <div class="container-fluid">
+            <!-- Page Heading -->
+            <div class="d-sm-flex align-items-center justify-content-between mb-4">
+              <h1 class="h3 mb-0 text-gray-800">{% block page_title %}{% endblock %}</h1>
+              {% block actions %}{% endblock %}
+            </div>
+                  
+
              <!-- End of Main Content -->
 
             <!-- Footer -->
@@ -230,35 +439,85 @@
 
             <!-- End of Footer -->
 
-        </div>
-        <!-- End of Content Wrapper -->
 
+        <!-- Heading -->
+        <div class="sidebar-heading">
+          Gestion
+        </div>
+
+        
+
+    
+       
+       
+
+        <!-- Sidebar Toggler (Sidebar) -->
+        <div class="text-center d-none d-md-inline">
+          <button class="rounded-circle border-0" id="sidebarToggle"></button>
+        </div>
+      </ul>
+      <!-- End of Sidebar -->
+
+      <!-- Content Wrapper -->
+      <div id="content-wrapper" class="d-flex flex-column">
+        <!-- Main Content -->
+        <div id="content">
+          <!-- Topbar -->
+          <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+            <!-- Sidebar Toggle (Topbar) -->
+            <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
+              <i class="fa fa-bars"></i>
+            </button>
+
+            
+               
+          <!-- End of Topbar -->
+
+         
+            {% endblock %}
+
+          </div>
+          <!-- /.container-fluid -->
+        </div>
+        <!-- End of Main Content -->
+
+        <!-- Footer -->
+        <footer class="sticky-footer bg-white">
+          <div class="container my-auto">
+            <div class="copyright text-center my-auto">
+              <span>Copyright &copy; Elearning {{ "now"|date("Y") }}</span>
+            </div>
+          </div>
+        </footer>
+        <!-- End of Footer -->
+      </div>
+      <!-- End of Content Wrapper -->
     </div>
     <!-- End of Page Wrapper -->
 
     <!-- Scroll to Top Button-->
     <a class="scroll-to-top rounded" href="#page-top">
-        <i class="fas fa-angle-up"></i>
+      <i class="fas fa-angle-up"></i>
     </a>
 
     <!-- Logout Modal-->
     <div class="modal fade" id="logoutModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
-        aria-hidden="true">
-        <div class="modal-dialog" role="document">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="exampleModalLabel">Ready to Leave?</h5>
-                    <button class="close" type="button" data-dismiss="modal" aria-label="Close">
-                        <span aria-hidden="true">×</span>
-                    </button>
-                </div>
-                <div class="modal-body">Select "Logout" below if you are ready to end your current session.</div>
-                <div class="modal-footer">
-                    <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
-                    <a class="btn btn-primary" href="{{ asset('admin/login.html') }}">Logout</a>
-                </div>
-            </div>
+      aria-hidden="true">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="exampleModalLabel">Prêt à partir ?</h5>
+            <button class="close" type="button" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          <div class="modal-body">Sélectionnez "Déconnexion" ci-dessous si vous êtes prêt à mettre fin à votre session en cours.</div>
+          <div class="modal-footer">
+            <button class="btn btn-secondary" type="button" data-dismiss="modal">Annuler</button>
+            <a class="btn btn-primary" href="{{ path('app_logout') }}">Déconnexion</a>
+          </div>
         </div>
+      </div>
     </div>
 
     <!-- Bootstrap core JavaScript-->
@@ -280,6 +539,35 @@
     <script src="{{ asset('admin/js/demo/chart-area-demo.js') }}"></script>
     <script src="{{ asset('admin/js/demo/chart-pie-demo.js') }}"></script>
 
-</body>
-
+    {% block javascripts %}{% endblock %}
+    
+    <script>
+      // Activer les tooltips partout avec data-toggle="tooltip"
+      $(function () {
+        $('[data-toggle="tooltip"]').tooltip()
+      })
+      
+      // Activer les popovers partout avec data-toggle="popover"
+      $(function () {
+        $('[data-toggle="popover"]').popover()
+      })
+      
+      // Fermer les alertes après 5 secondes
+      $(document).ready(function() {
+        // Fermer automatiquement les alertes après 5 secondes
+        setTimeout(function() {
+          $('.alert').fadeOut('slow', function() {
+            $(this).remove();
+          });
+        }, 5000);
+        
+        // Fermer les alertes au clic sur le bouton de fermeture
+        $('.alert .close').on('click', function() {
+          $(this).closest('.alert').fadeOut('slow', function() {
+            $(this).remove();
+          });
+        });
+      });
+    </script>
+  </body>
 </html>

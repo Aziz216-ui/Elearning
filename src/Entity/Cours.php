@@ -1,14 +1,18 @@
 <?php
 
 namespace App\Entity;
-
-    use App\Repository\CoursRepository;
-    use Doctrine\DBAL\Types\Types;
-    use Doctrine\ORM\Mapping as ORM;
+use App\Repository\CoursRepository;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
 
     #[ORM\Entity(repositoryClass: CoursRepository::class)]
     class Cours
+
+   
     {
         #[ORM\Id]
         #[ORM\GeneratedValue]
@@ -51,13 +55,24 @@ use Symfony\Component\Validator\Constraints as Assert;
         #[ORM\ManyToOne(targetEntity: Auteur::class, inversedBy: 'cours')]
         #[ORM\JoinColumn(nullable: false)]
         private ?Auteur $auteur = null;
+         /**
+     * @var Collection<int, Quiz>
+     */
+    #[ORM\OneToMany(targetEntity: Quiz::class, mappedBy: 'cours', cascade: ['persist', 'remove'])]
+    private Collection $quizzes;
 
-        public function getId(): ?int
-        {
-            return $this->id;
-        }
+    public function __construct()
+    {
+        $this->quizzes = new ArrayCollection();
+    }
 
-        public function getTitle(): ?string
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+
+     public function getTitle(): ?string
         {
             return $this->title;
         }
@@ -140,4 +155,34 @@ use Symfony\Component\Validator\Constraints as Assert;
 
             return $this;
         }
+    
+
+    /**
+     * @return Collection<int, Quiz>
+     */
+    public function getQuizzes(): Collection
+    {
+        return $this->quizzes;
     }
+
+    public function addQuiz(Quiz $quiz): static
+    {
+        if (!$this->quizzes->contains($quiz)) {
+            $this->quizzes->add($quiz);
+            $quiz->setCours($this);
+        }
+
+        return $this;
+    }
+
+    public function removeQuiz(Quiz $quiz): static
+    {
+        if ($this->quizzes->removeElement($quiz)) {
+            if ($quiz->getCours() === $this) {
+                $quiz->setCours(null);
+            }
+        }
+
+        return $this;
+    }
+}

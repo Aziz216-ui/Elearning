@@ -3,19 +3,8 @@
 {% block title %}Accueil{% endblock %}
 
 {% block body %}
-
-<div class="container mt-5">
-    {% if user %}
-        <h1>Bienvenue {{ user.name }} {{ user.lastname }}</h1>
-        <p>Vous êtes connecté avec succès !</p>
-
-
-        <p> jawekk bhyyyyyyyy</p>
-        <a href="{{ path('app_logout') }}" class="btn btn-danger">Déconnexion</a>
-    {% else %}
-        <h1>Bienvenue invité</h1>
-        <p>Vous n'êtes pas connecté.</p>
-        <a href="{{ path('app_login') }}" class="btn btn-primary">Se connecter</a>
-    {% endif %}
-</div>
+  <div class="container mt-4">
+    <h1 class="mb-3">Bienvenue sur Elearning</h1>
+    <p>Cette page d’accueil Front existe maintenant. Personnalisez-la selon vos besoins.</p>
+  </div>
 {% endblock %}

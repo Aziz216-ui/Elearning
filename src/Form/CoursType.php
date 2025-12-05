@@ -88,11 +88,9 @@ class CoursType extends AbstractType
             'choice_label' => function($auteur) {
                 return $auteur->getNom() . ' ' . $auteur->getPrenom();
             },
-            'required' => true,
+            'required' => false,
             'placeholder' => 'Sélectionner un auteur',
-            'constraints' => [
-                new NotBlank(['message' => 'Veuillez sélectionner un auteur']),
-            ],
+            'constraints' => [],
             'attr' => [
                 'class' => 'form-select',
             ],
