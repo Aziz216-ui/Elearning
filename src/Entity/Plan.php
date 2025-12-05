@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\PlanRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
@@ -41,6 +43,15 @@ class Plan
     #[ORM\Column(nullable: true)]
     #[Assert\Positive]
     private ?int $maxCourses = null;
+
+    #[ORM\ManyToMany(targetEntity: Cours::class, inversedBy: 'plans')]
+    #[ORM\JoinTable(name: 'plan_cours')]
+    private Collection $courses;
+
+    public function __construct()
+    {
+        $this->courses = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -122,6 +133,30 @@ class Plan
     public function setMaxCourses(?int $maxCourses): static
     {
         $this->maxCourses = $maxCourses;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Cours>
+     */
+    public function getCourses(): Collection
+    {
+        return $this->courses;
+    }
+
+    public function addCourse(Cours $course): static
+    {
+        if (!$this->courses->contains($course)) {
+            $this->courses->add($course);
+        }
+
+        return $this;
+    }
+
+    public function removeCourse(Cours $course): static
+    {
+        $this->courses->removeElement($course);
 
         return $this;
     }

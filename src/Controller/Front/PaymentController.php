@@ -60,6 +60,41 @@ class PaymentController extends AbstractController
         ]);
     }
 
+    #[Route('/pay-card/{id}', name: 'payment_card', methods: ['POST'])]
+    public function payCard(Request $request, Plan $plan): Response
+    {
+        if (!$this->getUser()) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $verificationCode = $request->request->get('verification_code');
+
+        if ($verificationCode !== '1234') {
+            $this->addFlash('error', 'Code de vérification invalide. Veuillez réessayer.');
+
+            return $this->redirectToRoute('payment_checkout', ['id' => $plan->getId()]);
+        }
+
+        // Paiement accepté : créer l'abonnement
+        $subscription = $this->subscriptionManager->createSubscription($this->getUser(), $plan);
+
+        // Enregistrer le paiement en base
+        $payment = new Payment();
+        $payment->setUser($this->getUser());
+        $payment->setSubscription($subscription);
+        $payment->setAmount((string) $plan->getPrice());
+        $payment->setCurrency('TND');
+        $payment->setStatus('success');
+        $payment->setCreatedAt(new \DateTime());
+
+        $this->entityManager->persist($payment);
+        $this->entityManager->flush();
+
+        $this->addFlash('success', 'Paiement avec succès. Votre abonnement a été activé.');
+
+        return $this->redirectToRoute('payment_my_subscription');
+    }
+
     // Crée une session de paiement Paymee et redirige vers Paymee
     
     #[Route('/paymee/{id}', name: 'payment_paymee')]

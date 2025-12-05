@@ -2,7 +2,9 @@
 
 namespace App\Form;
 
+use App\Entity\Cours;
 use App\Entity\Plan;
+use Symfony\Bridge\Doctrine\Form\Type\EntityType;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
@@ -29,6 +31,13 @@ class PlanType extends AbstractType
             ])
             ->add('isActive')
             ->add('maxCourses')
+            ->add('courses', EntityType::class, [
+                'class' => Cours::class,
+                'choice_label' => 'title',
+                'multiple' => true,
+                'expanded' => true,
+                'required' => false,
+            ])
         ;
     }
 

@@ -3,6 +3,8 @@
 namespace App\Entity;
 
     use App\Repository\CoursRepository;
+    use Doctrine\Common\Collections\ArrayCollection;
+    use Doctrine\Common\Collections\Collection;
     use Doctrine\DBAL\Types\Types;
     use Doctrine\ORM\Mapping as ORM;
 
@@ -35,6 +37,14 @@ namespace App\Entity;
         #[ORM\ManyToOne(inversedBy: 'cours')]
         #[ORM\JoinColumn(nullable: false)]
         private ?Auteur $auteur = null;
+
+        #[ORM\ManyToMany(targetEntity: Plan::class, mappedBy: 'courses')]
+        private Collection $plans;
+
+        public function __construct()
+        {
+            $this->plans = new ArrayCollection();
+        }
 
         public function getId(): ?int
         {
@@ -121,6 +131,33 @@ namespace App\Entity;
         public function setAuteur(?Auteur $auteur): static
         {
             $this->auteur = $auteur;
+
+            return $this;
+        }
+
+        /**
+         * @return Collection<int, Plan>
+         */
+        public function getPlans(): Collection
+        {
+            return $this->plans;
+        }
+
+        public function addPlan(Plan $plan): static
+        {
+            if (!$this->plans->contains($plan)) {
+                $this->plans->add($plan);
+                $plan->addCourse($this);
+            }
+
+            return $this;
+        }
+
+        public function removePlan(Plan $plan): static
+        {
+            if ($this->plans->removeElement($plan)) {
+                $plan->removeCourse($this);
+            }
 
             return $this;
         }
