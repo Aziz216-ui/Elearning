@@ -33,11 +33,11 @@
                         </select>
                     </div>
                     <div class="col-6 col-md-2">
-                        <label class="form-label">Prix min (€)</label>
+                        <label class="form-label">Prix min (DT)</label>
                         <input type="number" step="0.01" min="0" name="min" class="form-control" placeholder="{{ minPrice is not null ? minPrice : '' }}" value="{{ app.request.get('min') }}">
                     </div>
                     <div class="col-6 col-md-2">
-                        <label class="form-label">Prix max (€)</label>
+                        <label class="form-label">Prix max (DT)</label>
                         <input type="number" step="0.01" min="0" name="max" class="form-control" placeholder="{{ maxPrice is not null ? maxPrice : '' }}" value="{{ app.request.get('max') }}">
                     </div>
                     <div class="col-12 col-md-3">
