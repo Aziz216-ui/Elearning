@@ -32,4 +32,3 @@ final class DashboardController extends AbstractController
         }
     }
     
-    

@@ -59,10 +59,7 @@
               </span>
             </div>
 
-            <div class="d-flex gap-2">
-              <form action="{{ path('panier_add', { id: cour.id }) }}" method="post" class="d-inline">
-                <button type="submit" class="btn btn-primary">Ajouter au panier</button>
-              </form>
+            <div class="d-flex gap-2 mb-4">
               {% if cour.auteur is defined and cour.auteur %}
                 <a href="{{ path('app_home_author_show', { id: cour.auteur.id }) }}" class="btn btn-outline-secondary">Auteur</a>
               {% elseif cour.author is defined and cour.author %}
