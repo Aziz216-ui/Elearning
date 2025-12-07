@@ -116,7 +116,7 @@
             <i class="fas fa-arrow-left"></i> Retour au cours
         </a>
         {% if quizResult.score < (quizResult.totalPoints * 0.8) %}
-            <a href="{{ path('app_quiz', {'id': quiz.cours.id}) }}" class="btn btn-warning">
+            <a href="{{ path('app_quiz_start', {'id': quiz.id}) }}" class="btn btn-warning">
                 <i class="fas fa-redo"></i> Réessayer le quiz
             </a>
         {% endif %}

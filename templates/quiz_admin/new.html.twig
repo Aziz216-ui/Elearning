@@ -58,9 +58,8 @@
         }
 
         .form-layout {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
+            display: flex;
+            justify-content: center;
             margin-bottom: 30px;
         }
 
@@ -89,6 +88,13 @@
 
         .card-body {
             padding: 30px;
+        }
+
+        /* Conteneur principal du formulaire pour le centrer dans la card */
+        .quiz-form-wrapper {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
         }
 
         .form-group {
@@ -120,7 +126,7 @@
         }
 
         .form-group.full-width {
-            grid-column: 1 / -1;
+            width: 100%;
         }
 
         label {
@@ -320,6 +326,38 @@
             border-top: 2px solid var(--border);
         }
 
+        /* Styles pour la gestion des erreurs */
+        .has-error .form-control,
+        .has-error .form-check-input {
+            border-color: #dc3545 !important;
+        }
+        
+        .has-error .form-control:focus,
+        .has-error .form-check-input:focus {
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+        
+        .error-text {
+            color: #dc3545;
+            font-size: 0.875em;
+            margin-top: 0.25rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group.has-error {
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
         @media (max-width: 1024px) {
             .form-layout {
                 grid-template-columns: 1fr;
@@ -352,107 +390,136 @@
 {% endblock %}
 
 {% block body %}
-    <div class="container">
-        <div class="header">
-            <h1>📝 {% if quiz.id is defined and quiz.id %}Modifier le Quiz{% else %}Créer un Nouveau Quiz{% endif %}</h1>
-            <p>Remplissez les informations ci-dessous pour {% if quiz.id is defined and quiz.id %}modifier{% else %}créer{% endif %} votre quiz</p>
+    <div class="container-fluid">
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h1 class="h3 mb-0 text-gray-800">
+                    {% if quiz.id is defined and quiz.id %}Modifier le quiz{% else %}Nouveau quiz{% endif %}
+                </h1>
+                <p class="mb-0 text-muted small">
+                    {% if quiz.id is defined and quiz.id %}
+                        Mettre à jour un quiz existant
+                    {% else %}
+                        Créer un nouveau quiz
+                    {% endif %}
+                </p>
+            </div>
+            <a href="{{ path('app_quiz_admin_index') }}" class="btn btn-secondary btn-sm shadow-sm">
+                <i class="fas fa-arrow-left fa-sm"></i> Retour
+            </a>
         </div>
 
-        <div class="form-layout">
-            <!-- Colonne de gauche : Informations générales -->
-            <div class="card">
-                <div class="card-header">
-                    <h3>📋 Informations Générales</h3>
-                </div>
-                <div class="card-body">
-                    {{ form_start(form, {
-                        attr: {
-                            id: 'quizForm',
-                            class: 'quiz-form needs-validation',
-                            novalidate: 'novalidate'
-                        }
-                    }) }}
-                    
-                    {% set titleHasError = not form.title.vars.valid %}
-                    <div class="form-group full-width {{ titleHasError ? 'has-error' : '' }}">
-                        {{ form_label(form.title, 'Titre du Quiz *') }}
-                        {{ form_widget(form.title, {
-                            'attr': {
-                                'class': 'form-control' ~ (titleHasError ? ' is-invalid' : '')
+        <div class="card shadow mt-0 mb-4">
+            <div class="card-body">
+                <div class="form-layout">
+                    <!-- Colonne de gauche : Informations générales -->
+                    <div class="quiz-form-wrapper">
+                        <h3 style="margin-bottom: 20px;">📋 Informations Générales</h3>
+                        {{ form_start(form, {
+                            attr: {
+                                id: 'quizForm',
+                                class: 'quiz-form needs-validation',
+                                novalidate: 'novalidate'
                             }
                         }) }}
-                        <div class="error-text">{{ form_errors(form.title) }}</div>
-                    </div>
-
-                    {% set descHasError = not form.description.vars.valid %}
-                    <div class="form-group full-width {{ descHasError ? 'has-error' : '' }}">
-                        {{ form_label(form.description, 'Description') }}
-                        {{ form_widget(form.description, {
-                            'attr': {
-                                'class': 'form-control' ~ (descHasError ? ' is-invalid' : ''),
-                                'rows': '3'
-                            }
-                        }) }}
-                        <div class="error-text">{{ form_errors(form.description) }}</div>
-                    </div>
-
-                    <div class="form-row">
-                        {% set coursHasError = not form.cours.vars.valid %}
-                        <div class="form-group {{ coursHasError ? 'has-error' : '' }}">
-                            {{ form_label(form.cours, 'Cours Associé') }}
-                            {{ form_widget(form.cours, {
+                        
+                        {% set titleHasError = not form.title.vars.valid %}
+                        <div class="form-group full-width {{ titleHasError ? 'has-error' : '' }}">
+                            {{ form_label(form.title, 'Titre du Quiz *') }}
+                            {{ form_widget(form.title, {
                                 'attr': {
-                                    'class': 'form-control' ~ (coursHasError ? ' is-invalid' : '')
+                                    'class': 'form-control' ~ (titleHasError ? ' is-invalid' : '')
                                 }
                             }) }}
-                            <div class="error-text">{{ form_errors(form.cours) }}</div>
+                            <div class="error-text">{{ form_errors(form.title) }}</div>
                         </div>
 
-                        {% set timeHasError = not form.timeLimit.vars.valid %}
-                        <div class="form-group {{ timeHasError ? 'has-error' : '' }}">
-                            {{ form_label(form.timeLimit, 'Limite de temps (minutes)') }}
-                            {{ form_widget(form.timeLimit, {
+                        {% set descHasError = not form.description.vars.valid %}
+                        <div class="form-group full-width {{ descHasError ? 'has-error' : '' }}">
+                            {{ form_label(form.description, 'Description') }}
+                            {{ form_widget(form.description, {
                                 'attr': {
-                                    'class': 'form-control' ~ (timeHasError ? ' is-invalid' : ''),
-                                    'min': '1',
-                                    'max': '120'
+                                    'class': 'form-control' ~ (descHasError ? ' is-invalid' : ''),
+                                    'rows': '3'
                                 }
                             }) }}
-                            <div class="error-text">{{ form_errors(form.timeLimit) }}</div>
+                            <div class="error-text">{{ form_errors(form.description) }}</div>
                         </div>
-                    </div>
 
-                    {% set visibleHasError = not form.is_visible.vars.valid %}
-                    <div class="form-group {{ visibleHasError ? 'has-error' : '' }}">
-                        {{ form_label(form.is_visible, 'Rendre visible pour les étudiants') }}
-                        {{ form_widget(form.is_visible, {
-                            'attr': {
-                                'class': 'form-check-input' ~ (visibleHasError ? ' is-invalid' : '')
-                            }
-                        }) }}
-                        <div class="error-text">{{ form_errors(form.is_visible) }}</div>
-                    </div>
+                        <div class="form-row">
+                            {% set coursHasError = not form.cours.vars.valid %}
+                            <div class="form-group {{ coursHasError ? 'has-error' : '' }}">
+                                {{ form_label(form.cours, 'Cours Associé') }}
+                                {{ form_widget(form.cours, {
+                                    'attr': {
+                                        'class': 'form-control' ~ (coursHasError ? ' is-invalid' : '')
+                                    }
+                                }) }}
+                                <div class="error-text">{{ form_errors(form.cours) }}</div>
+                            </div>
 
-                    <div class="form-group full-width">
-                        <label>Questions du Quiz</label>
-                        <button type="button" class="btn btn-add" onclick="addQuestion()">
-                            ➕ Ajouter une question
-                        </button>
-                        <div id="questionsArea" class="questions-container">
-                            <div class="empty-state" id="emptyState">
-                                <div class="empty-icon">📝</div>
-                                <p><strong>Aucune question ajoutée</strong></p>
-                                <small>Cliquez sur "Ajouter une question" pour commencer</small>
+                            {% set totalPointsHasError = not form.totalPoints.vars.valid %}
+                            <div class="form-group {{ totalPointsHasError ? 'has-error' : '' }}">
+                                {{ form_label(form.totalPoints, 'Points totaux *') }}
+                                {{ form_widget(form.totalPoints, {
+                                    'attr': {
+                                        'class': 'form-control' ~ (totalPointsHasError ? ' is-invalid' : ''),
+                                        'min': '1',
+                                        'oninput': 'validateTotalPoints()',
+                                        'onblur': 'validateTotalPoints()'
+                                    }
+                                }) }}
+                                <div class="error-text">{{ form_errors(form.totalPoints) }}</div>
                             </div>
                         </div>
-                    </div>
 
-                    <div class="form-actions">
-                        <a href="{{ path('app_quiz_admin_index') }}" class="btn btn-secondary">❌ Annuler</a>
-                        <button type="submit" class="btn btn-primary">💾 Enregistrer le Quiz</button>
-                    </div>
+                        <div class="form-row">
+                            {% set timeHasError = not form.timeLimit.vars.valid %}
+                            <div class="form-group {{ timeHasError ? 'has-error' : '' }}">
+                                {{ form_label(form.timeLimit, 'Limite de temps (minutes)') }}
+                                {{ form_widget(form.timeLimit, {
+                                    'attr': {
+                                        'class': 'form-control' ~ (timeHasError ? ' is-invalid' : ''),
+                                        'min': '1',
+                                        'max': '120'
+                                    }
+                                }) }}
+                                <div class="error-text">{{ form_errors(form.timeLimit) }}</div>
+                            </div>
+                        </div>
 
-                    {{ form_end(form) }}
+                        {% set visibleHasError = not form.is_visible.vars.valid %}
+                        <div class="form-group {{ visibleHasError ? 'has-error' : '' }}">
+                            {{ form_label(form.is_visible, 'Rendre visible pour les étudiants') }}
+                            {{ form_widget(form.is_visible, {
+                                'attr': {
+                                    'class': 'form-check-input' ~ (visibleHasError ? ' is-invalid' : '')
+                                }
+                            }) }}
+                            <div class="error-text">{{ form_errors(form.is_visible) }}</div>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Questions du Quiz</label>
+                            <button type="button" class="btn btn-add" onclick="addQuestion()">
+                                ➕ Ajouter une question
+                            </button>
+                            <div id="questionsArea" class="questions-container">
+                                <div class="empty-state" id="emptyState">
+                                    <div class="empty-icon">📝</div>
+                                    <p><strong>Aucune question ajoutée</strong></p>
+                                    <small>Cliquez sur "Ajouter une question" pour commencer</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <a href="{{ path('app_quiz_admin_index') }}" class="btn btn-secondary">❌ Annuler</a>
+                            <button type="submit" class="btn btn-primary">💾 Enregistrer le Quiz</button>
+                        </div>
+
+                        {{ form_end(form) }}
+                    </div>
                 </div>
             </div>
         </div>
@@ -461,6 +528,81 @@
     <script>
         let questionCounter = 0;
         let formSubmitted = false;
+        
+        // Fonction pour gérer la validation du champ is_visible
+        function validateVisibilityField() {
+            const visibilityField = document.querySelector('select[name="quiz[is_visible]"]');
+            const formGroup = visibilityField.closest('.form-group');
+            
+            if (!visibilityField.value) {
+                formGroup.classList.add('has-error');
+                visibilityField.style.borderColor = 'red';
+                return false;
+            } else {
+                formGroup.classList.remove('has-error');
+                visibilityField.style.borderColor = '';
+                return true;
+            }
+        }
+        
+        // Fonction pour valider le champ totalPoints
+        function validateTotalPoints() {
+            const totalPointsField = document.querySelector('input[name="quiz[totalPoints]"]');
+            const formGroup = totalPointsField.closest('.form-group');
+            const value = parseInt(totalPointsField.value);
+            
+            if (isNaN(value) || value < 1) {
+                formGroup.classList.add('has-error');
+                totalPointsField.style.borderColor = 'red';
+                return false;
+            } else {
+                formGroup.classList.remove('has-error');
+                totalPointsField.style.borderColor = '';
+                return true;
+            }
+        }
+        
+        // Valider le champ is_visible lors du changement de valeur
+        document.addEventListener('DOMContentLoaded', function() {
+            const visibilityField = document.querySelector('select[name="quiz[is_visible]"]');
+            if (visibilityField) {
+                visibilityField.addEventListener('change', validateVisibilityField);
+                
+                // Vérification initiale
+                validateVisibilityField();
+            }
+            
+            // Validation du formulaire avant soumission
+            const form = document.getElementById('quizForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    let isValid = true;
+                    
+                    if (!validateVisibilityField()) {
+                        isValid = false;
+                    }
+                    
+                    if (!validateTotalPoints()) {
+                        isValid = false;
+                        const totalPointsField = document.querySelector('input[name="quiz[totalPoints]"]');
+                        const formGroup = totalPointsField.closest('.form-group');
+                        formGroup.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        alert('Veuillez entrer un nombre de points total valide (au moins 1).');
+                    }
+                    
+                    if (!isValid) {
+                        e.preventDefault();
+                    }
+                });
+                
+                // Ajouter la validation en temps réel pour totalPoints
+                const totalPointsField = document.querySelector('input[name="quiz[totalPoints]"]');
+                if (totalPointsField) {
+                    totalPointsField.addEventListener('input', validateTotalPoints);
+                    totalPointsField.addEventListener('blur', validateTotalPoints);
+                }
+            }
+        });
 
         function addQuestion() {
             questionCounter++;

@@ -154,6 +154,14 @@ class QuizAdminController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             // Récupérer les données brutes du formulaire
             $data = $request->request->all();
+            
+            // Mettre à jour la limite de temps
+            if (isset($data['quiz']['timeLimit'])) {
+                $timeLimit = (int)$data['quiz']['timeLimit'];
+                if ($timeLimit > 0) {
+                    $quiz->setTimeLimit($timeLimit);
+                }
+            }
 
             // Vérifier si nous avons des données de formulaire
             if (isset($data['quiz']['questions']) && is_array($data['quiz']['questions'])) {

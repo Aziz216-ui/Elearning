@@ -1,0 +1,107 @@
+{% extends "base.html.twig" %}
+
+{% block title %}Gestion des Webhooks - Administration{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-12">
+            <h1 class="mb-4">Gestion des Webhooks</h1>
+
+            {% if app.flashes %}
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ label == 'error' ? 'danger' : label }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endfor %}
+            {% endif %}
+
+            <div class="mb-3">
+                <a href="{{ path('admin_webhook_new') }}" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Créer un nouveau webhook
+                </a>
+                <a href="{{ path('admin_webhook_status') }}" class="btn btn-info">
+                    <i class="fas fa-chart-line"></i> Voir le statut
+                </a>
+            </div>
+
+            {% if webhooks|length > 0 %}
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>URL</th>
+                                <th>Type d'événement</th>
+                                <th>Statut</th>
+                                <th>Créé le</th>
+                                <th>Dernier déclenchement</th>
+                                <th>Échecs</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for webhook in webhooks %}
+                                <tr>
+                                    <td>
+                                        <code class="text-truncate d-block" style="max-width: 300px;" title="{{ webhook.url }}">
+                                            {{ webhook.url }}
+                                        </code>
+                                    </td>
+                                    <td>
+                                        {% if webhook.eventType == 'quiz_started' %}
+                                            <span class="badge bg-info">Quiz commencé</span>
+                                        {% elseif webhook.eventType == 'quiz_completed' %}
+                                            <span class="badge bg-success">Quiz complété</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">Tous les événements</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if webhook.isActive %}
+                                            <span class="badge bg-success">Actif</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Inactif</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ webhook.createdAt ? webhook.createdAt|format_datetime('short', 'short') : 'N/A' }}</td>
+                                    <td>{{ webhook.lastTriggeredAt ? webhook.lastTriggeredAt|format_datetime('short', 'short') : 'Jamais' }}</td>
+                                    <td>
+                                        {% if webhook.failureCount > 0 %}
+                                            <span class="badge bg-warning">{{ webhook.failureCount }}</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">0</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{{ path('admin_webhook_edit', {'id': webhook.id}) }}" class="btn btn-sm btn-warning">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <form method="POST" action="{{ path('admin_webhook_test', {'id': webhook.id}) }}" style="display: inline;">
+                                            <button type="submit" class="btn btn-sm btn-info" title="Tester">
+                                                <i class="fas fa-flask"></i>
+                                            </button>
+                                        </form>
+                                        <form method="POST" action="{{ path('admin_webhook_delete', {'id': webhook.id}) }}" style="display: inline;" onsubmit="return confirm('Êtes-vous sûr?')">
+                                            <button type="submit" class="btn btn-sm btn-danger">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </form>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    <i class="fas fa-info-circle"></i> Aucun webhook configuré. 
+                    <a href="{{ path('admin_webhook_new') }}">Créer un nouveau webhook</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

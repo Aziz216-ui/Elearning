@@ -1,0 +1,239 @@
+<!-- Notification Icon with Badge -->
+<style>
+.notification-icon {
+    position: relative;
+    cursor: pointer;
+}
+
+.notification-badge {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #dc3545;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.notification-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    min-width: 350px;
+    max-height: 400px;
+    overflow-y: auto;
+    z-index: 1000;
+    display: none;
+}
+
+.notification-dropdown.show {
+    display: block;
+}
+
+.notification-item {
+    padding: 12px 16px;
+    border-bottom: 1px solid #eee;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.notification-item:hover {
+    background: #f8f9fa;
+}
+
+.notification-item.unread {
+    background: #e3f2fd;
+    border-left: 4px solid #2196f3;
+}
+
+.notification-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.notification-message {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 4px;
+}
+
+.notification-time {
+    font-size: 12px;
+    color: #999;
+}
+
+.notification-header {
+    padding: 12px 16px;
+    border-bottom: 1px solid #eee;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.notification-footer {
+    padding: 8px 16px;
+    text-align: center;
+    border-top: 1px solid #eee;
+}
+
+.mark-all-read {
+    background: none;
+    border: none;
+    color: #007bff;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.mark-all-read:hover {
+    text-decoration: underline;
+}
+</style>
+
+<div class="notification-icon" onclick="toggleNotifications()">
+    <i class="fas fa-bell" style="font-size: 20px; color: #333;"></i>
+    <div class="notification-badge" id="notificationBadge" style="display: none;">0</div>
+    
+    <div class="notification-dropdown" id="notificationDropdown">
+        <div class="notification-header">
+            <strong>Notifications</strong>
+            <button class="mark-all-read" onclick="markAllAsRead(event)">Tout marquer comme lu</button>
+        </div>
+        <div id="notificationList">
+            <div style="padding: 20px; text-align: center; color: #666;">
+                Chargement...
+            </div>
+        </div>
+        <div class="notification-footer">
+            <a href="/admin/notifications" style="color: #007bff; text-decoration: none;">Voir toutes</a>
+        </div>
+    </div>
+</div>
+
+<script>
+let notificationInterval;
+
+function startNotificationPolling() {
+    // Check immediately
+    checkNotifications();
+    
+    // Then check every 10 seconds
+    notificationInterval = setInterval(checkNotifications, 10000);
+}
+
+function checkNotifications() {
+    fetch('/api/notifications/unread')
+        .then(response => response.json())
+        .then(data => {
+            updateNotificationBadge(data.count);
+            updateNotificationList(data.notifications);
+        })
+        .catch(error => console.error('Error checking notifications:', error));
+}
+
+function updateNotificationBadge(count) {
+    const badge = document.getElementById('notificationBadge');
+    if (count > 0) {
+        badge.textContent = count > 99 ? '99+' : count;
+        badge.style.display = 'flex';
+    } else {
+        badge.style.display = 'none';
+    }
+}
+
+function updateNotificationList(notifications) {
+    const list = document.getElementById('notificationList');
+    
+    if (notifications.length === 0) {
+        list.innerHTML = '<div style="padding: 20px; text-align: center; color: #666;">Aucune notification non lue</div>';
+        return;
+    }
+    
+    list.innerHTML = notifications.map(notification => `
+        <div class="notification-item unread" onclick="markAsRead(${notification.id}, event)">
+            <div class="notification-title">${notification.title}</div>
+            <div class="notification-message">${notification.message}</div>
+            <div class="notification-time">${formatTime(notification.createdAt)}</div>
+        </div>
+    `).join('');
+}
+
+function formatTime(dateString) {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diff = Math.floor((now - date) / 1000); // seconds
+    
+    if (diff < 60) return 'à l\'instant';
+    if (diff < 3600) return `il y a ${Math.floor(diff / 60)} min`;
+    if (diff < 86400) return `il y a ${Math.floor(diff / 3600)} h`;
+    return `il y a ${Math.floor(diff / 86400)} j`;
+}
+
+function toggleNotifications() {
+    const dropdown = document.getElementById('notificationDropdown');
+    dropdown.classList.toggle('show');
+    
+    if (dropdown.classList.contains('show')) {
+        checkNotifications(); // Refresh when opening
+    }
+}
+
+function markAsRead(notificationId, event) {
+    event.stopPropagation();
+    
+    fetch(`/api/notifications/mark-read/${notificationId}`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            checkNotifications(); // Refresh the list
+        }
+    })
+    .catch(error => console.error('Error marking notification as read:', error));
+}
+
+function markAllAsRead(event) {
+    event.stopPropagation();
+    
+    fetch('/api/notifications/mark-all-read', {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            checkNotifications(); // Refresh the list
+        }
+    })
+    .catch(error => console.error('Error marking all notifications as read:', error));
+}
+
+// Close dropdown when clicking outside
+document.addEventListener('click', function(event) {
+    const dropdown = document.getElementById('notificationDropdown');
+    const icon = document.querySelector('.notification-icon');
+    
+    if (!icon.contains(event.target)) {
+        dropdown.classList.remove('show');
+    }
+});
+
+// Start polling when page loads
+document.addEventListener('DOMContentLoaded', startNotificationPolling);
+</script>

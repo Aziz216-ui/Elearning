@@ -5,7 +5,6 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\RegistrationFormType;
 use App\Security\EmailVerifier;
-use App\Security\SecurityControllerAuthenticator;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -63,8 +62,8 @@ class RegistrationController extends AbstractController
 
                 $this->addFlash('success', 'Un email de confirmation a été envoyé à ' . $user->getEmail() . '. Veuillez vérifier votre boîte de réception.');
                 
-                // Connecte automatiquement l'utilisateur
-                return $security->login($user, SecurityControllerAuthenticator::class, 'main');
+                // Connecte automatiquement l'utilisateur (ne pas passer le nom de firewall comme authenticator)
+                return $security->login($user);
                 
             } catch (\Exception $e) {
                 $this->addFlash('error', 'Une erreur est survenue lors de l\'envoi de l\'email de confirmation : ' . $e->getMessage());

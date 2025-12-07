@@ -252,6 +252,14 @@
           </a>
         </li>
 
+        <!-- Nav Item - Notifications -->
+        <li class="nav-item {% if app.request.get('_route') == 'admin_notifications' %}active{% endif %}">
+          <a class="nav-link" href="{{ path('admin_notifications') }}">
+            <i class="fas fa-fw fa-bell"></i>
+            <span>Notifications</span>
+          </a>
+        </li>
+
         <!-- Divider -->
         <hr class="sidebar-divider d-none d-md-block">
 

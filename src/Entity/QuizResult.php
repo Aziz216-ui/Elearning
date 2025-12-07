@@ -20,10 +20,10 @@ class QuizResult
     private ?Quiz $quiz = null;
 
     #[ORM\Column]
-    private ?float $score = null;
+    private ?float $score = 0;
 
     #[ORM\Column]
-    private ?\DateTimeImmutable $completedAt = null;
+    private ?\DateTimeImmutable $completedAt;
 
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $certificatePath = null;
@@ -33,6 +33,26 @@ class QuizResult
 
     #[ORM\Column(type: 'boolean', options: ['default' => false])]
     private bool $passed = false;
+
+    #[ORM\Column(type: 'datetime_immutable', nullable: true)]
+    private ?\DateTimeImmutable $startedAt = null;
+
+    public function __construct()
+    {
+        $this->completedAt = new \DateTimeImmutable();
+    }
+
+    public function getStartedAt(): ?\DateTimeImmutable
+    {
+        return $this->startedAt;
+    }
+
+    public function setStartedAt(?\DateTimeImmutable $startedAt): static
+    {
+        $this->startedAt = $startedAt;
+
+        return $this;
+    }
 
     public function isPassed(): bool
     {

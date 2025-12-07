@@ -1,0 +1,348 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                ║
+║                   📊 WEBHOOK TEST FLOW VISUALIZATION                         ║
+║                                                                                ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+YOUR SETUP
+═══════════════════════════════════════════════════════════════════════════════════
+
+webhook.site URL:
+  🔗 https://webhook.site/401957a8-71fe-4435-9776-8dfa554dbb5c
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+🎬 WHAT HAPPENS STEP BY STEP
+═══════════════════════════════════════════════════════════════════════════════════
+
+
+STEP 1: Configuration
+────────────────────────────────────────────────────────────────────────────────
+
+   $ php setup_webhook_admin.php
+   
+   Your Computer                          Database (MySQL)
+   ─────────────────────────────────      ─────────────────
+                                          
+   [PowerShell]                           
+   |                                      
+   +─ Read user table
+   |  │
+   |  └─> Update fedi@test.com
+   |      roles = ["ROLE_ADMIN"]
+   |
+   +─ Generate token
+   |  │
+   |  └─> ecc1ba064152f19c0f6b623eec...
+   |
+   +─ Save to .webhook_token
+   |
+   ✅ SUCCESS!
+
+
+STEP 2: Start Symfony Server
+────────────────────────────────────────────────────────────────────────────────
+
+   $ php -S localhost:8000 -t public
+   
+   Your Computer
+   ─────────────────────────────────
+   
+   [Terminal 2]
+   |
+   +─ Start PHP built-in server
+   |  │
+   |  └─ Listen on 127.0.0.1:8000
+   |
+   [Browser] ←─ You can now visit
+   |          http://localhost:8000
+   |
+   ✅ RUNNING!
+
+
+STEP 3: Test Script
+────────────────────────────────────────────────────────────────────────────────
+
+   $ .\quick_test_webhook.ps1
+   
+   Your Computer                         Your Server                    webhook.site
+   ──────────────────────────────────    ─────────────────────────     ────────────────
+   
+   [Terminal 3]                          [Symfony]                     [Internet]
+   |                                     |                             |
+   +─ Read .webhook_token                |                             |
+   |  │                                  |                             |
+   |  └─> ecc1ba064152f19...             |                             |
+   |                                     |                             |
+   +─ POST /api/webhooks                 |                             |
+   |  │                                  |                             |
+   |  +─ Header: Authorization Bearer    |                             |
+   |  │          ecc1ba064152f19...      |                             |
+   |  │                                  |                             |
+   |  +─ Body: {                          |                             |
+   |  │         "url": "https://webhook   |                             |
+   |  │         .site/401957a8...",       |                             |
+   |  │         "eventType": "all"        |                             |
+   |  │        }                          |                             |
+   |  │                                  |                             |
+   |  └──────────────────────────────────> Authenticate user            |
+   |                                     │                             |
+   |                                     +─ Check ROLE_ADMIN ✅       |
+   |                                     │                             |
+   |                                     +─ Create WebhookSubscription |
+   |                                     │  ID: 1                      |
+   |                                     │  Secret: abc123...          |
+   |                                     │  url: https://webhook.site..│
+   |                                     │  isActive: true             |
+   |                                     │                             |
+   |                                     +─ Save to database           |
+   |                                     │                             |
+   |  <──────────────────────────────────+ Return JSON response        |
+   |                                     │  {success: true}            |
+   |                                     │  {data: {...}}              |
+   |                                     │                             |
+   +─ Display webhook ID: 1              |                             |
+   │                                     |                             |
+   +─ POST /api/webhooks/1/test          |                             |
+   │  │                                  │                             |
+   │  +─ Header: Authorization Bearer    │                             |
+   │  │                                  │                             |
+   │  └──────────────────────────────────> Call WebhookDispatcher      |
+   │                                     │                             |
+   │                                     +─ Get webhook from DB        |
+   │                                     │  ID: 1                      |
+   │                                     │  url: https://webhook.site..│
+   │                                     │  secret: abc123...          |
+   │                                     │                             |
+   │                                     +─ Build test payload         |
+   │                                     │  {                          |
+   │                                     │    event: "webhook_test",   |
+   │                                     │    timestamp: "...",        |
+   │                                     │    data: {}                 |
+   │                                     │  }                          |
+   │                                     │                             |
+   │                                     +─ Generate HMAC signature    |
+   │                                     │  hash = HMAC-SHA256(        |
+   │                                     │    json_payload,            |
+   │                                     │    "abc123..."              |
+   │                                     │  )                          |
+   │                                     │                             |
+   │                                     +─ POST to webhook.site       |
+   │                                     │  Header: X-Webhook-Sig...   |
+   │                                     │           sha256=hash       |
+   │                                     │  Body: json_payload         |
+   │                                     │                             |
+   │                                     +───────────────────────────────> RECEIVE
+   │                                     │                             │
+   │                                     │                             +─ Log request
+   │                                     │                             │
+   │                                     │                             +─ Display
+   │                                     │                             │  in UI
+   │                                     │                             │
+   │                                     │ <─────────────────────────────+ Return
+   │                                     │ HTTP 200 OK                 │
+   │                                     │                             │
+   │                                     +─ Update webhook metadata    |
+   │                                     │  lastTriggeredAt = now      |
+   │                                     │  failureCount = 0           |
+   │                                     │                             |
+   │  <──────────────────────────────────+ Return success              |
+   │                                     │  {success: true}            |
+   │                                     │                             |
+   +─ Display "Test sent!"               |                             |
+   │                                     |                             |
+   ✅ SUCCESS!                            ✅ SENT!                     ✅ RECEIVED!
+
+
+STEP 4: Verify
+────────────────────────────────────────────────────────────────────────────────
+
+   Browser: https://webhook.site/401957a8-71fe-4435-9776-8dfa554dbb5c
+   
+   webhook.site
+   ──────────────────────────────────
+   
+   [Refresh F5]
+   
+   Requests:
+   ┌──────────────────────────────────┐
+   │ POST Request                     │
+   │ ┌──────────────────────────────┐ │
+   │ │ URL: webhook.site/401957a8..│ │
+   │ │ Method: POST                 │ │
+   │ │ Time: 14:35:22               │ │
+   │ │ Status: 200                  │ │
+   │ └──────────────────────────────┘ │
+   │                                  │
+   │ [Click to expand]                │
+   │ ┌──────────────────────────────┐ │
+   │ │ Headers:                     │ │
+   │ │ X-Webhook-Signature:         │ │
+   │ │   sha256=abc123def456...     │ │
+   │ │ Content-Type:                │ │
+   │ │   application/json           │ │
+   │ │ User-Agent:                  │ │
+   │ │   Symfony-Webhook-Dispatch.. │ │
+   │ │                              │ │
+   │ │ Body (JSON):                 │ │
+   │ │ {                            │ │
+   │ │   "event": "webhook_test",   │ │
+   │ │   "timestamp": "2025-12-06..│ │
+   │ │   "data": {                  │ │
+   │ │     "message": "This is..."  │ │
+   │ │   }                          │ │
+   │ │ }                            │ │
+   │ └──────────────────────────────┘ │
+   └──────────────────────────────────┘
+   
+   ✅ WEBHOOK RECEIVED!
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+🎯 REAL SCENARIO FLOW
+═══════════════════════════════════════════════════════════════════════════════════
+
+
+STUDENT STARTS QUIZ:
+────────────────────────────────────────────────────────────────────────────────
+
+   Browser                            Your Server                    webhook.site
+   ──────────────────────────────────  ─────────────────────────     ────────────────
+   
+   [Student clicks "Commencer Quiz"]   
+   │                                   
+   +──> GET /front/quiz/5/start        
+   │    │                              
+   │    │                              
+   │    +──────────────────────────────> QuizController::start()
+   │                                   │
+   │                                   +─ Create QuizResult
+   │                                   │  id: 123
+   │                                   │  user: Student
+   │                                   │  quiz: #5
+   │                                   │  startedAt: NOW
+   │                                   │  status: IN_PROGRESS
+   │                                   │
+   │                                   +─ Save to database
+   │                                   │
+   │                                   +─ Call QuizNotification
+   │                                   │  Service::notifyQuizStarted()
+   │                                   │
+   │                                   +─ Find active webhooks
+   │                                   │  for event: quiz_started
+   │                                   │  → Found: 1 (webhook.site)
+   │                                   │
+   │                                   +─ Call WebhookDispatcher
+   │                                   │  ::dispatch()
+   │                                   │
+   │                                   +─ Build payload
+   │                                   │  {
+   │                                   │    event: "quiz_started",
+   │                                   │    timestamp: "2025-12-06...",
+   │                                   │    data: {
+   │                                   │      quiz_result_id: 123,
+   │                                   │      student: {...},
+   │                                   │      quiz: {...},
+   │                                   │      course: {...},
+   │                                   │      startedAt: "..."
+   │                                   │    }
+   │                                   │  }
+   │                                   │
+   │                                   +─ Sign with HMAC-SHA256
+   │                                   │
+   │                                   +─ POST to webhook.site
+   │                                   │                           ──────> RECEIVE
+   │    <──────────────────────────────+                           │
+   │    Response: Quiz started!        │                           +─ Show in UI
+   │                                   │
+   [Quiz interface appears]            │
+   
+   ✅ QUIZ STARTED
+   ✅ WEBHOOK SENT TO webhook.site
+
+
+STUDENT COMPLETES QUIZ:
+────────────────────────────────────────────────────────────────────────────────
+
+   Browser                            Your Server                    webhook.site
+   ──────────────────────────────────  ─────────────────────────     ────────────────
+   
+   [Student clicks "Soumettre"]        
+   │                                   
+   +──> POST /front/quiz/5/submit      
+   │    Answers: {...}                 
+   │    │                              
+   │    │                              
+   │    +──────────────────────────────> QuizController::submit()
+   │                                   │
+   │                                   +─ Get existing QuizResult
+   │                                   │  id: 123 (from session)
+   │                                   │
+   │                                   +─ Evaluate answers
+   │                                   │  Calculate score: 85/100
+   │                                   │  percentage: 85%
+   │                                   │  isPassed: true
+   │                                   │
+   │                                   +─ Update QuizResult
+   │                                   │  score: 85
+   │                                   │  completedAt: NOW
+   │                                   │  status: COMPLETED
+   │                                   │
+   │                                   +─ Save to database
+   │                                   │
+   │                                   +─ Call QuizNotification
+   │                                   │  Service::notifyQuiz
+   │                                   │  Completed()
+   │                                   │
+   │                                   +─ Find active webhooks
+   │                                   │  for event: quiz_completed
+   │                                   │  → Found: 1 (webhook.site)
+   │                                   │
+   │                                   +─ Call WebhookDispatcher
+   │                                   │  ::dispatch()
+   │                                   │
+   │                                   +─ Build payload
+   │                                   │  {
+   │                                   │    event: "quiz_completed",
+   │                                   │    timestamp: "2025-12-06...",
+   │                                   │    data: {
+   │                                   │      quiz_result_id: 123,
+   │                                   │      student: {...},
+   │                                   │      quiz: {...},
+   │                                   │      course: {...},
+   │                                   │      score: 85,
+   │                                   │      maxScore: 100,
+   │                                   │      percentage: 85.0,
+   │                                   │      isPassed: true,
+   │                                   │      completedAt: "..."
+   │                                   │    }
+   │                                   │  }
+   │                                   │
+   │                                   +─ Sign with HMAC-SHA256
+   │                                   │
+   │                                   +─ POST to webhook.site
+   │                                   │                           ──────> RECEIVE
+   │    <──────────────────────────────+                           │
+   │    Response: Quiz completed!      │                           +─ Show in UI
+   │                                   │
+   [Results page displayed]            │
+   
+   ✅ QUIZ COMPLETED
+   ✅ WEBHOOK SENT TO webhook.site
+   
+   
+   On webhook.site you now see:
+   ────────────────────────────────────
+   Request #1: quiz_started (14:35:10)
+   Request #2: quiz_completed (14:35:22)
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+
+🎉 That's the complete flow! 
+
+Now you understand how webhooks work end-to-end!
+
+Next step: Run the actual tests following START_HERE.txt
