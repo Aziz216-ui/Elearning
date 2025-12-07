@@ -7,6 +7,14 @@
         <div class="alert alert-danger" role="alert">{{ flash_error }}</div>
     {% endfor %}
 
+    {# Display general error and success flashes #}
+    {% for msg in app.flashes('error') %}
+        <div class="alert alert-danger" role="alert">{{ msg|nl2br }}</div>
+    {% endfor %}
+    {% for msg in app.flashes('success') %}
+        <div class="alert alert-success" role="alert">{{ msg }}</div>
+    {% endfor %}
+
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-6">

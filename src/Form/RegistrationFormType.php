@@ -12,6 +12,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints\NotBlank;
+use Symfony\Component\Validator\Constraints\IsTrue;
 
 class RegistrationFormType extends AbstractType
 {
@@ -32,11 +34,14 @@ class RegistrationFormType extends AbstractType
             ->add('email')
             ->add('agreeTerms', CheckboxType::class, [
                 'mapped' => false,
-
+                'constraints' => [
+                    new IsTrue([ 'message' => 'Vous devez accepter les conditions.']),
+                ],
             ])
             ->add('plainPassword', PasswordType::class, [
-
+                // Map to the entity's transient property so entity constraints apply
                 'mapped' => true,
+                'required' => true,
                 'attr' => ['autocomplete' => 'new-password'],
             ])
             ->add('name')

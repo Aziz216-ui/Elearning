@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\front;
+namespace App\Controller\Front;
 
 use App\Entity\User;
 use App\Form\RegistrationFormType;
@@ -38,12 +38,48 @@ class RegistrationController extends AbstractController
             }
         }
 
+        // If submitted but invalid, store readable errors in a flash so user sees them in UI
+        if ($form->isSubmitted() && ! $form->isValid()) {
+            $messages = [];
+            foreach ($form->getErrors(true, true) as $error) {
+                $origin = $error->getOrigin()?->getName() ?? 'form';
+                $messages[] = sprintf('%s: %s', $origin, $error->getMessage());
+            }
+            if (count($messages) > 0) {
+                $this->addFlash('error', implode("\n", $messages));
+            }
+        }
+
         if ($form->isSubmitted() && $form->isValid()) {
             // hash password
             $user->setPassword($passwordHasher->hashPassword($user, $form->get('plainPassword')->getData()));
 
-            $entityManager->persist($user);
-            $entityManager->flush();
+            // Ensure required fields (NOT NULL in DB) have values
+            // roles JSON NOT NULL
+            if (method_exists($user, 'getRoles') && empty($user->getRoles())) {
+                $user->setRoles(['ROLE_USER']);
+            }
+            // is_verified TINYINT(1) NOT NULL
+            if (method_exists($user, 'isVerified') && method_exists($user, 'setIsVerified')) {
+                // Default to false on registration
+                $user->setIsVerified(false);
+            }
+            // created_at DATETIME NOT NULL
+            if (method_exists($user, 'getCreatedAt') && method_exists($user, 'setCreatedAt') && null === $user->getCreatedAt()) {
+                $user->setCreatedAt(new \DateTimeImmutable());
+            }
+
+            try {
+                $entityManager->persist($user);
+                $entityManager->flush();
+            } catch (\Throwable $e) {
+                // Surface DB errors to the UI to aid debugging
+                $this->addFlash('error', 'Erreur lors de l\'enregistrement: ' . $e->getMessage());
+                // Re-render the form with error messages
+                return $this->render('front/registration/register.html.twig', [
+                    'registrationForm' => $form->createView(),
+                ]);
+            }
 
             $this->addFlash('success', 'Votre compte a été créé avec succès.');
 

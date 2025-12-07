@@ -1,0 +1,622 @@
+{% extends 'base1.html.twig' %}
+
+{% block title %}Nouveau quiz{% endblock %}
+
+{% block page_title %}{% if quiz.id is defined and quiz.id %}Modifier le quiz{% else %}Créer un nouveau quiz{% endif %}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        :root {
+            --primary: #4159D1;
+            --primary-hover: #0fa8b8;
+            --secondary: #667eea;
+            --success: #48bb78;
+            --danger: #ef4444;
+            --light-bg: #f7fafc;
+            --dark-text: #2d3748;
+            --border: #e2e8f0;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #f8fafc;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            color: white;
+            padding: 40px;
+            border-radius: 16px;
+            text-align: center;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(25, 199, 216, 0.2);
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            font-weight: 700;
+        }
+
+        .header p {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        .form-layout {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+            height: 100%;
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            color: white;
+            padding: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .card-header h3 {
+            margin: 0;
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        /* Conteneur principal du formulaire pour le centrer dans la card */
+        .quiz-form-wrapper {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group.has-error .form-control,
+        .form-group.has-error .form-check-input,
+        .form-group.has-error select {
+            border-color: #dc3545;
+            background-color: #f8d7da;
+        }
+
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+
+        .error-text {
+            color: #dc3545;
+            font-size: 0.875rem;
+            margin-top: 5px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        .form-group.full-width {
+            width: 100%;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--dark-text);
+            font-weight: 600;
+            font-size: 0.95em;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        textarea,
+        select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            font-size: 1em;
+            transition: all 0.3s;
+            font-family: inherit;
+        }
+
+        input:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(25, 199, 216, 0.1);
+        }
+
+        .form-text {
+            display: block;
+            color: #6c757d;
+            font-size: 0.875em;
+            margin-top: 5px;
+        }
+
+        .form-check {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .form-check-input {
+            width: 18px;
+            height: 18px;
+        }
+
+        .questions-container {
+            min-height: 400px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #999;
+        }
+
+        .empty-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+
+        .question-item {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .question-number {
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 1.1em;
+        }
+
+        .answers-container {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .answer-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .answer-item input[type="text"] {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #dee2e6;
+            border-radius: 4px;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-hover));
+            color: white;
+            box-shadow: 0 4px 15px rgba(25, 199, 216, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(25, 199, 216, 0.4);
+        }
+
+        .btn-secondary {
+            background: white;
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--light-bg);
+        }
+
+        .btn-add {
+            background: linear-gradient(135deg, var(--secondary), #5a67d8);
+            color: white;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .btn-add:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-remove {
+            background: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        .btn-remove:hover {
+            background: #dc2626;
+        }
+
+        .btn-add-answer {
+            background: var(--success);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            font-size: 0.9em;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            padding: 30px 0;
+            border-top: 2px solid var(--border);
+        }
+
+        @media (max-width: 1024px) {
+            .form-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .form-actions {
+                flex-direction: column-reverse;
+            }
+
+            .btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .header {
+                padding: 30px 20px;
+            }
+
+            .header h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container-fluid">
+        <div class="d-sm-flex align-items-center justify-content-between mb-4">
+            <div>
+                <h1 class="h3 mb-0 text-gray-800">
+                    {% if quiz.id is defined and quiz.id %}Modifier le quiz{% else %}Nouveau quiz{% endif %}
+                </h1>
+                <p class="mb-0 text-muted small">
+                    {% if quiz.id is defined and quiz.id %}
+                        Mettre à jour un quiz existant
+                    {% else %}
+                        Créer un nouveau quiz
+                    {% endif %}
+                </p>
+            </div>
+            <a href="{{ path('app_quiz_admin_index') }}" class="btn btn-secondary btn-sm shadow-sm">
+                <i class="fas fa-arrow-left fa-sm"></i> Retour
+            </a>
+        </div>
+
+        <div class="card shadow mt-0 mb-4">
+            <div class="card-body">
+                <div class="form-layout">
+                    <!-- Colonne de gauche : Informations générales -->
+                    <div class="quiz-form-wrapper">
+                        <h3 style="margin-bottom: 20px;">📋 Informations Générales</h3>
+                        {{ form_start(form, {
+                            attr: {
+                                id: 'quizForm',
+                                class: 'quiz-form needs-validation',
+                                novalidate: 'novalidate'
+                            }
+                        }) }}
+                        
+                        {% set titleHasError = not form.title.vars.valid %}
+                        <div class="form-group full-width {{ titleHasError ? 'has-error' : '' }}">
+                            {{ form_label(form.title, 'Titre du Quiz *') }}
+                            {{ form_widget(form.title, {
+                                'attr': {
+                                    'class': 'form-control' ~ (titleHasError ? ' is-invalid' : '')
+                                }
+                            }) }}
+                            <div class="error-text">{{ form_errors(form.title) }}</div>
+                        </div>
+
+                        {% set descHasError = not form.description.vars.valid %}
+                        <div class="form-group full-width {{ descHasError ? 'has-error' : '' }}">
+                            {{ form_label(form.description, 'Description') }}
+                            {{ form_widget(form.description, {
+                                'attr': {
+                                    'class': 'form-control' ~ (descHasError ? ' is-invalid' : ''),
+                                    'rows': '3'
+                                }
+                            }) }}
+                            <div class="error-text">{{ form_errors(form.description) }}</div>
+                        </div>
+
+                        <div class="form-row">
+                            {% set coursHasError = not form.cours.vars.valid %}
+                            <div class="form-group {{ coursHasError ? 'has-error' : '' }}">
+                                {{ form_label(form.cours, 'Cours Associé') }}
+                                {{ form_widget(form.cours, {
+                                    'attr': {
+                                        'class': 'form-control' ~ (coursHasError ? ' is-invalid' : '')
+                                    }
+                                }) }}
+                                <div class="error-text">{{ form_errors(form.cours) }}</div>
+                            </div>
+
+                            {% set timeHasError = not form.timeLimit.vars.valid %}
+                            <div class="form-group {{ timeHasError ? 'has-error' : '' }}">
+                                {{ form_label(form.timeLimit, 'Limite de temps (minutes)') }}
+                                {{ form_widget(form.timeLimit, {
+                                    'attr': {
+                                        'class': 'form-control' ~ (timeHasError ? ' is-invalid' : ''),
+                                        'min': '1',
+                                        'max': '120'
+                                    }
+                                }) }}
+                                <div class="error-text">{{ form_errors(form.timeLimit) }}</div>
+                            </div>
+                        </div>
+
+                        {% set visibleHasError = not form.is_visible.vars.valid %}
+                        <div class="form-group {{ visibleHasError ? 'has-error' : '' }}">
+                            {{ form_label(form.is_visible, 'Rendre visible pour les étudiants') }}
+                            {{ form_widget(form.is_visible, {
+                                'attr': {
+                                    'class': 'form-check-input' ~ (visibleHasError ? ' is-invalid' : '')
+                                }
+                            }) }}
+                            <div class="error-text">{{ form_errors(form.is_visible) }}</div>
+                        </div>
+
+                        <div class="form-group full-width">
+                            <label>Questions du Quiz</label>
+                            <button type="button" class="btn btn-add" onclick="addQuestion()">
+                                ➕ Ajouter une question
+                            </button>
+                            <div id="questionsArea" class="questions-container">
+                                <div class="empty-state" id="emptyState">
+                                    <div class="empty-icon">📝</div>
+                                    <p><strong>Aucune question ajoutée</strong></p>
+                                    <small>Cliquez sur "Ajouter une question" pour commencer</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-actions">
+                            <a href="{{ path('app_quiz_admin_index') }}" class="btn btn-secondary">❌ Annuler</a>
+                            <button type="submit" class="btn btn-primary">💾 Enregistrer le Quiz</button>
+                        </div>
+
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let questionCounter = 0;
+        let formSubmitted = false;
+
+        function addQuestion() {
+            questionCounter++;
+            const questionId = Date.now();
+            const questionsArea = document.getElementById('questionsArea');
+            
+            // Supprimer l'état vide s'il existe
+            const emptyState = document.getElementById('emptyState');
+            if (emptyState) {
+                emptyState.style.display = 'none';
+            }
+
+            const questionDiv = document.createElement('div');
+            questionDiv.className = 'question-item';
+            questionDiv.dataset.questionId = questionId;
+            questionDiv.innerHTML = `
+                <div class="question-header">
+                    <span class="question-number">Question ${questionCounter}</span>
+                    <button type="button" onclick="removeQuestion(this)" class="btn-remove">
+                        ×
+                    </button>
+                </div>
+                <div class="form-group">
+                    <label>Énoncé de la question *</label>
+                    <input type="text" name="quiz[questions][${questionId}][text]" 
+                           placeholder="Entrez votre question..." class="form-control">
+                </div>
+                <div class="form-group">
+                    <label>Type de question *</label>
+                    <select name="quiz[questions][${questionId}][type]" onchange="updateQuestionType(this)" class="form-control">
+                        <option value="multiple">Choix multiple</option>
+                        <option value="boolean">Vrai/Faux</option>
+                        <option value="text">Réponse courte</option>
+                    </select>
+                </div>
+                <div class="answers-container" id="answers-${questionId}">
+                    <div class="answer-item">
+                        <input type="text" name="quiz[questions][${questionId}][answers][0][text]" placeholder="Réponse 1" class="form-control">
+                        <input type="checkbox" name="quiz[questions][${questionId}][answers][0][isCorrect]" value="1">
+                        <span>Correcte</span>
+                        <button type="button" class="btn-remove" onclick="removeAnswer(this)">×</button>
+                    </div>
+                    <div class="answer-item">
+                        <input type="text" name="quiz[questions][${questionId}][answers][1][text]" placeholder="Réponse 2" class="form-control">
+                        <input type="checkbox" name="quiz[questions][${questionId}][answers][1][isCorrect]" value="1">
+                        <span>Correcte</span>
+                        <button type="button" class="btn-remove" onclick="removeAnswer(this)">×</button>
+                    </div>
+                </div>
+                <button type="button" class="btn-add-answer" onclick="addAnswer('${questionId}')">
+                    ➕ Ajouter une réponse
+                </button>
+                <div class="form-group" style="margin-top: 15px;">
+                    <label>Points pour cette question</label>
+                    <input type="number" name="quiz[questions][${questionId}][points]" value="1" min="1" class="form-control">
+                </div>
+            `;
+            
+            questionsArea.appendChild(questionDiv);
+        }
+
+        function addAnswer(questionId) {
+            const answersContainer = document.querySelector(`#answers-${questionId}`);
+            const answerIndex = answersContainer.children.length;
+            
+            const answerDiv = document.createElement('div');
+            answerDiv.className = 'answer-item';
+            answerDiv.innerHTML = `
+                <input type="text" name="quiz[questions][${questionId}][answers][${answerIndex}][text]" 
+                       placeholder="Réponse ${answerIndex + 1}" class="form-control">
+                <input type="checkbox" name="quiz[questions][${questionId}][answers][${answerIndex}][isCorrect]" value="1">
+                <span>Correcte</span>
+                <button type="button" class="btn-remove" onclick="removeAnswer(this)">×</button>
+            `;
+            
+            answersContainer.appendChild(answerDiv);
+        }
+
+        function removeAnswer(button) {
+            const answerItem = button.closest('.answer-item');
+            if (answerItem && answerItem.parentElement.children.length > 1) {
+                answerItem.remove();
+            }
+        }
+
+        function removeQuestion(button) {
+            if (confirm('Êtes-vous sûr de vouloir supprimer cette question ?')) {
+                const questionItem = button.closest('.question-item');
+                questionItem.remove();
+                
+                const questionsArea = document.getElementById('questionsArea');
+                if (questionsArea.children.length === 0) {
+                    document.getElementById('emptyState').style.display = 'block';
+                }
+            }
+        }
+
+        function updateQuestionType(select) {
+            const questionItem = select.closest('.question-item');
+            const answersContainer = questionItem.querySelector('.answers-container');
+            
+            if (select.value === 'boolean') {
+                answersContainer.innerHTML = `
+                    <div class="answer-item">
+                        <input type="radio" name="${select.name.replace('[type]', '[correct_answer]')}" value="true">
+                        <span>Vrai</span>
+                    </div>
+                    <div class="answer-item">
+                        <input type="radio" name="${select.name.replace('[type]', '[correct_answer]')}" value="false">
+                        <span>Faux</span>
+                    </div>
+                `;
+            } else if (select.value === 'text') {
+                answersContainer.innerHTML = `
+                    <div class="answer-item">
+                        <input type="text" name="${select.name.replace('[type]', '[correct_answer]')}" 
+                               placeholder="Réponse attendue" class="form-control">
+                    </div>
+                `;
+                } else {
+                    // Remettre les champs de réponse par défaut pour choix multiple
+                    const questionId = questionItem.dataset.questionId;
+                    answersContainer.innerHTML = `
+                        <div class="answer-item">
+                            <input type="text" name="quiz[questions][${questionId}][answers][0][text]" placeholder="Réponse 1" class="form-control">
+                            <input type="checkbox" name="quiz[questions][${questionId}][answers][0][isCorrect]" value="1">
+                            <span>Correcte</span>
+                            <button type="button" class="btn-remove" onclick="removeAnswer(this)">×</button>
+                        </div>
+                        <div class="answer-item">
+                            <input type="text" name="quiz[questions][${questionId}][answers][1][text]" placeholder="Réponse 2" class="form-control">
+                            <input type="checkbox" name="quiz[questions][${questionId}][answers][1][isCorrect]" value="1">
+                            <span>Correcte</span>
+                            <button type="button" class="btn-remove" onclick="removeAnswer(this)">×</button>
+                        </div>
+                    `;
+            }
+        }
+    </script>
+{% endblock %}

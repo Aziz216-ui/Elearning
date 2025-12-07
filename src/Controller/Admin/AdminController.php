@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller\admin;
+namespace App\Controller\Admin;
 
 use App\Entity\User;
 use App\Form\UserType;
@@ -17,7 +17,7 @@ final class AdminController extends AbstractController
     #[Route('/admin', name: 'app_admin')]
     public function index(UserRepository $userRepository): Response
     {
-        return $this->render('admin/dashboard/index.html.twig', [
+        return $this->render('Admin/dashboard/index.html.twig', [
             'users' => $userRepository->listUserByName()
 
         ]);
@@ -25,7 +25,7 @@ final class AdminController extends AbstractController
     #[Route('/admin/users', name: 'admin_user_index', methods: ['GET'])]
     public function users(UserRepository $userRepository): Response
     {
-        return $this->render('admin/user/index.html.twig', [
+        return $this->render('Admin/user/index.html.twig', [
             'users' => $userRepository->findAll()
         ]);
     }
@@ -34,7 +34,7 @@ final class AdminController extends AbstractController
     public function listCoursesByUser($id, UserRepository $userRepository): Response
     {
         $courses = $userRepository->showAllCoursesByUser((int) $id);
-        return $this->render('admin/listCoursesByUser.html.twig', ['tab' => $courses]);
+        return $this->render('Admin/listCoursesByUser.html.twig', ['tab' => $courses]);
     }
 
     #[Route('/admin/user/new', name: 'admin_user_new', methods: ['GET', 'POST'])]
@@ -62,7 +62,7 @@ final class AdminController extends AbstractController
             return $this->redirectToRoute('admin_user_index');
         }
 
-        return $this->render('admin/user/new.html.twig', [
+        return $this->render('Admin/user/new.html.twig', [
             'form' => $form->createView(),
         ]);
     }
@@ -91,7 +91,7 @@ final class AdminController extends AbstractController
             return $this->redirectToRoute('admin_user_index');
         }
 
-        return $this->render('admin/user/edit.html.twig', [
+        return $this->render('Admin/user/edit.html.twig', [
             'form' => $form->createView(),
             'user' => $user,
         ]);
@@ -127,7 +127,7 @@ final class AdminController extends AbstractController
             $users = $repo->findUserByName($term);
         }
 
-        return $this->render('admin/dashboard/index.html.twig', [
+        return $this->render('Admin/dashboard/index.html.twig', [
             'users' => $users,
             'term' => $term
         ]);

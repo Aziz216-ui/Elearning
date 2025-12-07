@@ -1,0 +1,77 @@
+{% extends 'base1.html.twig' %}
+
+{% block title %}Cours{% endblock %}
+
+{% block content %}
+    <div class="container-fluid py-3">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h1 class="h4 mb-0 text-gray-800">Détails du Cours</h1>
+        <div class="d-flex gap-2">
+          <a href="{{ path('app_cours_index') }}" class="btn btn-outline-secondary">Retour</a>
+          <a href="{{ path('app_cours_edit', {'id': cour.id}) }}" class="btn btn-primary">Modifier</a>
+        </div>
+      </div>
+
+      <div class="card shadow mb-4">
+        <div class="card-body">
+          <div class="row mb-3"><div class="col-4 text-muted small">Id</div><div class="col-8">{{ cour.id }}</div></div>
+          <div class="row mb-3"><div class="col-4 text-muted small">Title</div><div class="col-8">{{ cour.title }}</div></div>
+          <div class="row mb-3"><div class="col-4 text-muted small">Description</div><div class="col-8">{{ cour.description }}</div></div>
+          <div class="row mb-3"><div class="col-4 text-muted small">Price</div><div class="col-8">{{ cour.price }}</div></div>
+          <div class="row mb-3"><div class="col-4 text-muted small">Duration</div><div class="col-8">{% if cour.duration is not null %}{{ cour.duration|date('d/m/Y H:i') }}{% else %}Non défini{% endif %}</div></div>
+          <div class="row mb-2"><div class="col-4 text-muted small">Publié</div><div class="col-8">{% if cour.isPublished %}<span class="badge bg-success">Oui</span>{% else %}<span class="badge bg-secondary">Non</span>{% endif %}</div></div>
+          {% if cour.auteur is not null %}
+          <div class="row mb-0"><div class="col-4 text-muted small">Auteur a des cours publiés ?</div><div class="col-8">{% if hasPublishedByAuteur %}<span class="badge bg-success">Oui</span>{% else %}<span class="badge bg-secondary">Non</span>{% endif %}</div></div>
+          {% endif %}
+        </div>
+      </div>
+
+      {% if cour.auteur %}
+      <div class="card shadow mb-4">
+        <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Auteur</h6></div>
+        <div class="card-body">
+          <div class="d-flex align-items-center gap-3">
+            {% if cour.auteur.photo %}
+              <img src="{{ asset('uploads/auteurs/' ~ cour.auteur.photo) }}" alt="Photo de {{ cour.auteur.prenom }} {{ cour.auteur.nom }}" class="rounded-circle border" style="width:64px; height:64px; object-fit:cover;" />
+            {% else %}
+              <div class="rounded-circle bg-light d-flex align-items-center justify-content-center border" style="width:64px; height:64px;">
+                <small class="text-muted">N/A</small>
+              </div>
+            {% endif %}
+            <div>
+              <div class="fw-semibold">{{ cour.auteur.prenom }} {{ cour.auteur.nom }}</div>
+              {% if cour.auteur.specialite %}<div class="text-muted small">{{ cour.auteur.specialite }}</div>{% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="row">
+        <div class="col-lg-8">
+          <div class="d-flex justify-content-start pt-2 mb-3">
+            {{ include('cours/_delete_form.html.twig') }}
+          </div>
+        </div>
+        <div class="col-lg-4">
+          <div class="card shadow mb-4">
+            <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Derniers cours publiés</h6></div>
+            <div class="card-body">
+              {% if latest is defined and latest %}
+                <ul class="list-unstyled mb-0">
+                  {% for c in latest %}
+                    <li class="mb-2">
+                      <a href="{{ path('app_cours_show', {id: c.id}) }}">{{ c.title }}</a>
+                      <div class="small text-muted">{{ c.price|number_format(2, ',', ' ') }} € • {{ c.category ?? 'Non classé' }}</div>
+                    </li>
+                  {% endfor %}
+                </ul>
+              {% else %}
+                <div class="text-muted small">Aucun cours publié récemment.</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock %}

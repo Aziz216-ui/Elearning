@@ -1,0 +1,232 @@
+{% extends 'base1.html.twig' %}
+
+{% block title %}Gestion des Cours{% endblock %}
+
+{% block body %}
+    <div class="container-fluid py-4">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+            <h1 class="h3 mb-0 text-gray-800">Gestion des Cours</h1>
+            <a href="{{ path('app_cours_new') }}" class="btn btn-primary">
+                <i class="fas fa-plus-circle mr-2"></i>Nouveau Cours
+            </a>
+        </div>
+
+        {# Filtres frontend (catégorie, prix min/max, tri) #}
+        <div class="card shadow mb-4">
+            <div class="card-body">
+                <form id="cours-filters" method="get" action="{{ path('app_cours_index') }}" class="row g-3 align-items-end">
+                    <div class="col-12 col-md-3">
+                        <label class="form-label">Mot-clé</label>
+                        <input type="text" name="q" class="form-control" placeholder="Titre ou description" value="{{ app.request.get('q') }}">
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <label class="form-label">Catégorie</label>
+                        <select name="category" class="form-control js-auto-submit">
+                            <option value="">Toutes catégories</option>
+                            {% if distinctCategories is defined and distinctCategories %}
+                                {% set current = app.request.get('category') %}
+                                {% for cat in distinctCategories %}
+                                    {% set val = cat %}
+                                    <option value="{{ val }}" {{ current == val ? 'selected' : '' }}>{{ val }}</option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <label class="form-label">Prix min (DT)</label>
+                        <input type="number" step="0.01" min="0" name="min" class="form-control" placeholder="{{ minPrice is not null ? minPrice : '' }}" value="{{ app.request.get('min') }}">
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <label class="form-label">Prix max (DT)</label>
+                        <input type="number" step="0.01" min="0" name="max" class="form-control" placeholder="{{ maxPrice is not null ? maxPrice : '' }}" value="{{ app.request.get('max') }}">
+                    </div>
+                    <div class="col-12 col-md-3">
+                        <label class="form-label d-block">Publié</label>
+                        {% set pub = app.request.get('published') %}
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input js-auto-submit" type="radio" name="published" id="pub_all" value="" {{ pub is empty ? 'checked' : '' }}>
+                          <label class="form-check-label" for="pub_all">Tous</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input js-auto-submit" type="radio" name="published" id="pub_yes" value="1" {{ pub == '1' ? 'checked' : '' }}>
+                          <label class="form-check-label" for="pub_yes">Publiés</label>
+                        </div>
+                        <div class="form-check form-check-inline">
+                          <input class="form-check-input js-auto-submit" type="radio" name="published" id="pub_no" value="0" {{ pub == '0' ? 'checked' : '' }}>
+                          <label class="form-check-label" for="pub_no">Non publiés</label>
+                        </div>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <label class="form-label">Date min</label>
+                        <input type="date" name="dmin" class="form-control" value="{{ app.request.get('dmin') }}">
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <label class="form-label">Date max</label>
+                        <input type="date" name="dmax" class="form-control" value="{{ app.request.get('dmax') }}">
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <label class="form-label">Champ de tri</label>
+                        <select name="sortField" class="form-control js-auto-submit">
+                            {% set sf = app.request.get('sortField') ?? 'price' %}
+                            <option value="price"    {{ sf == 'price' ? 'selected' : '' }}>Prix</option>
+                            <option value="title"    {{ sf == 'title' ? 'selected' : '' }}>Titre</option>
+                            <option value="duration" {{ sf == 'duration' ? 'selected' : '' }}>Durée</option>
+                            <option value="category" {{ sf == 'category' ? 'selected' : '' }}>Catégorie</option>
+                            <option value="id"       {{ sf == 'id' ? 'selected' : '' }}>ID</option>
+                        </select>
+                    </div>
+                    <div class="col-6 col-md-2">
+                        <label class="form-label">Ordre</label>
+                        <select name="sort" class="form-control js-auto-submit">
+                            <option value="ASC"  {{ app.request.get('sort') != 'DESC' ? 'selected' : '' }}>Croissant</option>
+                            <option value="DESC" {{ app.request.get('sort') == 'DESC' ? 'selected' : '' }}>Décroissant</option>
+                        </select>
+                    </div>
+                    <div class="col-12 col-md-2 text-end">
+                        <button type="submit" class="btn btn-outline-primary w-100">
+                            <i class="fas fa-filter mr-2"></i>Filtrer
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        {% if statsByCategory is defined and statsByCategory %}
+        <div class="row mb-3">
+            <div class="col-12">
+                <div class="small text-muted">
+                    <strong>Statistiques par catégorie:</strong>
+                    {% for row in statsByCategory %}
+                       <span class="badge badge-light mr-1">{{ row.category ?? 'Non classé' }}: {{ row.total }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <script>
+          (function() {
+            var form = document.getElementById('cours-filters');
+            if (!form) return;
+            var autos = form.querySelectorAll('.js-auto-submit');
+            autos.forEach(function(el){
+              el.addEventListener('change', function(){ form.submit(); });
+            });
+          })();
+        </script>
+
+        <div class="card shadow">
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead class="bg-light">
+                            <tr>
+                                <th class="text-nowrap" width="1%">#</th>
+                                <th>Titre</th>
+                                <th>Description</th>
+                                <th class="text-nowrap text-center">Prix (€)</th>
+                                <th class="text-nowrap text-center">Durée</th>
+                                <th class="text-center">Catégorie</th>
+                                <th class="text-center">Statut</th>
+                                <th class="text-right" width="200">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for cour in cours %}
+                            <tr>
+                                <td class="text-muted">#{{ cour.id }}</td>
+                                <td>
+                                    <div class="font-weight-bold" title="{{ cour.title }}">
+                                        {{ cour.title|length > 30 ? cour.title|slice(0, 30) ~ '...' : cour.title }}
+                                    </div>
+                                    <small class="text-muted">Par {{ cour.auteur ? cour.auteur.prenom ~ ' ' ~ cour.auteur.nom : 'Auteur inconnu' }}</small>
+                                </td>
+                                <td>
+                                    <div style="max-width: 300px;">
+                                        <div class="text-truncate" data-toggle="tooltip" title="{{ cour.description|escape('html_attr') }}">
+                                            {% set desc = cour.description|striptags|trim %}
+                                            {{ desc|length > 50 ? desc|slice(0, 47) ~ '...' : desc }}
+                                        </div>
+                                        {% if cour.description|length > 50 %}
+                                            <small class="text-muted">(Cliquez pour voir plus)</small>
+                                        {% endif %}
+                                    </div>
+                                </td>
+                                <td class="text-center font-weight-bold">{{ cour.price|number_format(2, ',', ' ') }} €</td>
+                                <td class="text-center text-nowrap">
+                                    {% if cour.duration is not null %}
+                                        {{ cour.duration|date('d/m/Y') }}
+                                        <div class="text-muted small">{{ cour.duration|date('H:i') }}</div>
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <span class="badge badge-info">{{ cour.category ?? 'Non classé' }}</span>
+                                </td>
+                                <td class="text-center">
+                                    {% if cour.isPublished %}
+                                        <span class="badge badge-success">Publié</span>
+                                    {% else %}
+                                        <span class="badge badge-secondary">Brouillon</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-right">
+                                    <div class="btn-group" role="group">
+                                        <a href="{{ path('app_cours_show', {'id': cour.id}) }}" 
+                                           class="btn btn-sm btn-outline-primary" 
+                                           data-toggle="tooltip" 
+                                           title="Voir les détails">
+                                            <i class="fas fa-eye"></i>
+                                        </a>
+                                        <a href="{{ path('app_cours_edit', {'id': cour.id}) }}" 
+                                           class="btn btn-sm btn-outline-secondary"
+                                           data-toggle="tooltip"
+                                           title="Modifier">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="8" class="text-center py-5">
+                                    <div class="text-muted mb-3">
+                                        <i class="fas fa-book-open fa-3x mb-3"></i>
+                                        <h5 class="font-weight-light">Aucun cours enregistré</h5>
+                                        <p class="small">Commencez par ajouter un nouveau cours</p>
+                                        <a href="{{ path('app_cours_new') }}" class="btn btn-primary mt-2">
+                                            <i class="fas fa-plus-circle mr-2"></i>Créer un cours
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            {# <div class="card-footer bg-white">
+                <nav aria-label="Navigation">
+                    <ul class="pagination justify-content-center mb-0">
+                        <!-- Pagination would go here -->
+                    </ul>
+                </nav>
+            </div> #}
+        </div>
+    </div>
+
+    <style>
+        .table th { font-weight: 600; text-transform: uppercase; font-size: 0.75rem; }
+        .table td { vertical-align: middle; }
+        .badge { font-weight: 500; padding: 0.35em 0.65em; }
+        .btn-sm { padding: 0.25rem 0.5rem; }
+    </style>
+
+    <script>
+        // Initialize tooltips
+        $(function () {
+            $('[data-toggle="tooltip"]').tooltip();
+        });
+    </script>
+{% endblock %}

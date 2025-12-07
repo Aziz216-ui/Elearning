@@ -1,0 +1,444 @@
+{% extends 'base1.html.twig' %}
+
+{% block title %}Ajouter une question - {{ quiz.title }}{% endblock %}
+
+{% block page_title %}Ajouter une question{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .answer-item {
+            background: #f8f9fa;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+        }
+        .add-answer {
+            margin-bottom: 20px;
+        }
+        
+        .collection-actions {
+            margin-top: 10px;
+        }
+        .answer-row {
+            margin-bottom: 15px;
+            padding: 15px;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            background-color: #f8f9fa;
+            transition: all 0.2s ease;
+        }
+        .answer-row:hover {
+            border-color: #adb5bd;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        }
+        .form-check-input:checked {
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        .btn-outline-primary {
+            color: #0d6efd;
+            border-color: #0d6efd;
+        }
+        .btn-outline-primary:hover {
+            background-color: #0d6efd;
+            color: white;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-question-circle me-2"></i>
+                        Nouvelle question pour : {{ quiz.title }}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <a href="{{ path('app_quiz_admin_edit', {'id': quiz.id}) }}" class="btn btn-outline-secondary mb-4">
+                        <i class="fas fa-arrow-left me-2"></i> Retour au quiz
+                    </a>
+                    
+                    {{ form_start(form, {'attr': {'id': 'question-form', 'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                        <div class="mb-4">
+                            {{ form_row(form.text, {
+                                'attr': {
+                                    'class': 'form-control form-control-lg',
+                                    'placeholder': 'Entrez votre question ici...',
+                                    'rows': 3,
+                                    'required': 'required'
+                                },
+                                'label': 'Question',
+                                'label_attr': {
+                                    'class': 'form-label fw-bold fs-5'
+                                }
+                            }) }}
+                        </div>
+                        
+                        <div class="row mb-4">
+                            <div class="col-md-6 mb-3 mb-md-0">
+                                {{ form_row(form.points, {
+                                    'attr': {
+                                        'class': 'form-control',
+                                        'min': 1,
+                                        'value': 1,
+                                        'required': 'required'
+                                    },
+                                    'label': 'Points',
+                                    'label_attr': {
+                                        'class': 'form-label fw-bold'
+                                    }
+                                }) }}
+                            </div>
+                            <div class="col-md-6">
+                                {{ form_row(form.type, {
+                                    'attr': {
+                                        'class': 'form-select',
+                                        'id': 'question-type',
+                                        'required': 'required'
+                                    },
+                                    'label': 'Type de question',
+                                    'label_attr': {
+                                        'class': 'form-label fw-bold'
+                                    }
+                                }) }}
+                            </div>
+                        </div>
+                        
+                        <div class="answers-container mt-4">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="fw-bold mb-0">
+                                    <i class="fas fa-list-ul me-2"></i>
+                                    Réponses
+                                </h5>
+                                <button type="button" class="btn btn-outline-primary btn-sm" id="add-answer">
+                                    <i class="fas fa-plus me-1"></i> Ajouter une réponse
+                                </button>
+                            </div>
+                            
+                            <div id="answers-list" data-prototype="{{ form_widget(form.answers.vars.prototype)|e('html_attr') }}" class="mb-3">
+                                {% for answer in form.answers %}
+                                    <div class="answer-row mb-3">
+                                        <div class="row align-items-center">
+                                            <div class="col-md-9">
+                                                <div class="form-group mb-0">
+                                                    {{ form_widget(answer.text, {
+                                                        'attr': {
+                                                            'class': 'form-control answer-text',
+                                                            'placeholder': 'Entrez une réponse...',
+                                                            'required': 'required'
+                                                        },
+                                                        'label': false
+                                                    }) }}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-2 d-flex align-items-center">
+                                                <div class="form-check form-switch">
+                                                    {{ form_widget(answer.isCorrect, {
+                                                        'attr': {
+                                                            'class': 'form-check-input answer-correct',
+                                                            'role': 'switch'
+                                                        },
+                                                        'label_attr': {
+                                                            'class': 'form-check-label'
+                                                        }
+                                                    }) }}
+                                                    <label class="form-check-label ms-2" for="{{ answer.isCorrect.vars.id }}">
+                                                        Correcte
+                                                    </label>
+                                                </div>
+                                            </div>
+                                            <div class="col-md-1 text-end">
+                                                <button type="button" class="btn btn-sm btn-danger remove-answer" title="Supprimer cette réponse">
+                                                    <i class="fas fa-trash"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            
+                            <div id="no-answers-message" class="alert alert-info {{ form.answers|length > 0 ? 'd-none' : '' }}">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Aucune réponse n'a été ajoutée. Cliquez sur le bouton ci-dessus pour en ajouter une.
+                            </div>
+                        </div>
+                        
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4 pt-3 border-top">
+                            <button type="submit" class="btn btn-primary px-4">
+                                <i class="fas fa-save me-2"></i> Enregistrer la question
+                            </button>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const addAnswerButton = document.getElementById('add-answer');
+            const answersList = document.getElementById('answers-list');
+            const noAnswersMessage = document.getElementById('no-answers-message');
+            const answerPrototype = answersList ? answersList.dataset.prototype : '';
+            let answerIndex = answersList ? answersList.querySelectorAll('.answer-row').length : 0;
+            
+            // Fonction pour ajouter une nouvelle réponse
+            function addAnswerForm() {
+                const newForm = document.createElement('div');
+                newForm.className = 'answer-row mb-3';
+                
+                // Créer un nouvel identifiant unique
+                const newId = 'answer_' + answerIndex;
+                
+                // Créer le HTML du nouveau formulaire de réponse
+                newForm.innerHTML = `
+                    <div class="row align-items-center">
+                        <div class="col-md-9">
+                            <div class="form-group mb-0">
+                                <input type="text" 
+                                       id="question_answers_${answerIndex}_text" 
+                                       name="question[answers][${answerIndex}][text]" 
+                                       class="form-control answer-text" 
+                                       placeholder="Entrez une réponse..."
+                                       required>
+                            </div>
+                        </div>
+                        <div class="col-md-2 d-flex align-items-center">
+                            <div class="form-check form-switch">
+                                <input type="checkbox" 
+                                       id="question_answers_${answerIndex}_isCorrect" 
+                                       name="question[answers][${answerIndex}][isCorrect]" 
+                                       class="form-check-input answer-correct" 
+                                       role="switch"
+                                       value="1">
+                                <label class="form-check-label ms-2" for="question_answers_${answerIndex}_isCorrect">
+                                    Correcte
+                                </label>
+                            </div>
+                        </div>
+                        <div class="col-md-1 text-end">
+                            <button type="button" class="btn btn-sm btn-danger remove-answer" title="Supprimer cette réponse">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+                
+                // Ajouter le nouveau formulaire à la liste
+                answersList.appendChild(newForm);
+                
+                // Ajouter un gestionnaire d'événement pour le bouton de suppression
+                const removeBtn = newForm.querySelector('.remove-answer');
+                if (removeBtn) {
+                    removeBtn.addEventListener('click', function() {
+                        newForm.remove();
+                        updateUI();
+                    });
+                }
+                
+                // Ajouter un gestionnaire pour la validation des réponses
+                const textInput = newForm.querySelector('.answer-text');
+                const checkbox = newForm.querySelector('.answer-correct');
+                
+                if (textInput) {
+                    textInput.addEventListener('input', updateUI);
+                }
+                
+                if (checkbox) {
+                    checkbox.addEventListener('change', function() {
+                        // Si cette réponse est marquée comme correcte, décocher les autres
+                        if (this.checked) {
+                            document.querySelectorAll('.answer-correct').forEach(cb => {
+                                if (cb !== this) cb.checked = false;
+                            });
+                        }
+                        updateUI();
+                    });
+                }
+                
+                // Incrémenter le compteur pour la prochaine réponse
+                answerIndex++;
+                
+                // Mettre à jour l'interface utilisateur
+                updateUI();
+                
+                // Donner le focus au champ de texte de la nouvelle réponse
+                if (textInput) {
+                    setTimeout(() => textInput.focus(), 100);
+                }
+            }
+            
+            // Fonction pour mettre à jour l'interface utilisateur
+            function updateUI() {
+                const answerRows = document.querySelectorAll('.answer-row');
+                const correctAnswers = document.querySelectorAll('.answer-correct:checked');
+                
+                // Afficher/masquer le message "Aucune réponse"
+                if (noAnswersMessage) {
+                    noAnswersMessage.classList.toggle('d-none', answerRows.length > 0);
+                }
+                
+                // Activer/désactiver le bouton d'ajout en fonction du nombre de réponses
+                if (addAnswerButton) {
+                    addAnswerButton.disabled = answerRows.length >= 10;
+                    if (answerRows.length >= 10) {
+                        addAnswerButton.title = 'Nombre maximum de réponses atteint (10)';
+                    }
+                }
+                
+                // Mettre à jour les indices des réponses
+                answerRows.forEach((row, index) => {
+                    const textInput = row.querySelector('.answer-text');
+                    const checkbox = row.querySelector('.answer-correct');
+                    const labels = row.querySelectorAll('label');
+                    
+                    if (textInput) {
+                        textInput.name = `question[answers][${index}][text]`;
+                        textInput.id = `question_answers_${index}_text`;
+                    }
+                    
+                    if (checkbox) {
+                        checkbox.name = `question[answers][${index}][isCorrect]`;
+                        checkbox.id = `question_answers_${index}_isCorrect`;
+                    }
+                    
+                    // Mettre à jour les attributs for des labels
+                    labels.forEach(label => {
+                        if (label.getAttribute('for') && label.getAttribute('for').includes('isCorrect')) {
+                            label.setAttribute('for', `question_answers_${index}_isCorrect`);
+                        }
+                    });
+                    
+                    // Mettre en évidence la première réponse correcte
+                    if (checkbox && checkbox.checked) {
+                        row.style.borderLeft = '4px solid #198754';
+                    } else {
+                        row.style.borderLeft = '4px solid transparent';
+                    }
+                });
+                
+                // Si aucune réponse n'est marquée comme correcte, marquer visuellement
+                if (correctAnswers.length === 0 && answerRows.length > 0) {
+                    answerRows[0].style.borderLeft = '4px solid #dc3545';
+                }
+                
+                return correctAnswers.length > 0 || answerRows.length === 0;
+            }
+            
+            // Gérer l'ajout d'une nouvelle réponse
+            if (addAnswerButton) {
+                addAnswerButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    addAnswerForm();
+                });
+            }
+            
+            // Gérer la suppression d'une réponse existante
+            document.addEventListener('click', function(e) {
+                if (e.target && e.target.closest('.remove-answer')) {
+                    e.preventDefault();
+                    const row = e.target.closest('.answer-row');
+                    if (row) {
+                        row.remove();
+                        updateUI();
+                    }
+                }
+            });
+            
+            // Validation du formulaire
+            const form = document.getElementById('question-form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    const answerRows = document.querySelectorAll('.answer-row');
+                    const correctAnswers = document.querySelectorAll('.answer-correct:checked');
+                    let isValid = true;
+                    
+                    // Vérifier qu'il y a au moins une réponse
+                    if (answerRows.length === 0) {
+                        isValid = false;
+                        showToast('Erreur', 'Veuillez ajouter au moins une réponse.', 'danger');
+                    }
+                    
+                    // Vérifier qu'au moins une réponse est marquée comme correcte
+                    if (correctAnswers.length === 0 && answerRows.length > 0) {
+                        isValid = false;
+                        showToast('Erreur', 'Veuillez sélectionner au moins une réponse correcte.', 'danger');
+                    }
+                    
+                    // Vérifier que toutes les réponses ont un texte
+                    const emptyAnswers = Array.from(document.querySelectorAll('.answer-text'))
+                        .some(input => input.value.trim() === '');
+                    
+                    if (emptyAnswers) {
+                        isValid = false;
+                        showToast('Erreur', 'Veuillez remplir le texte pour toutes les réponses.', 'danger');
+                    }
+                    
+                    if (!isValid) {
+                        e.preventDefault();
+                        return false;
+                    }
+                    
+                    // Afficher un message de chargement
+                    const submitButton = form.querySelector('button[type="submit"]');
+                    if (submitButton) {
+                        submitButton.disabled = true;
+                        submitButton.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i> Enregistrement...';
+                    }
+                    
+                    return true;
+                });
+            }
+            
+            // Fonction pour afficher des notifications
+            function showToast(title, message, type = 'info') {
+                // Utiliser Toast de Bootstrap si disponible
+                if (typeof bootstrap !== 'undefined' && bootstrap.Toast) {
+                    const toastContainer = document.createElement('div');
+                    toastContainer.innerHTML = `
+                        <div class="toast align-items-center text-white bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+                            <div class="d-flex">
+                                <div class="toast-body">
+                                    <strong>${title}</strong><br>${message}
+                                </div>
+                                <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+                            </div>
+                        </div>
+                    `;
+                    
+                    document.body.appendChild(toastContainer);
+                    const toastEl = toastContainer.querySelector('.toast');
+                    const toast = new bootstrap.Toast(toastEl, { autohide: true, delay: 5000 });
+                    toast.show();
+                    
+                    // Supprimer le toast du DOM après sa disparition
+                    toastEl.addEventListener('hidden.bs.toast', function() {
+                        toastContainer.remove();
+                    });
+                } else {
+                    // Fallback simple si Bootstrap Toast n'est pas disponible
+                    alert(`${title}\n${message}`);
+                }
+                return true;
+            }
+            
+            // Initialiser l'interface utilisateur
+            updateUI();
+            
+            // Ajouter une première réponse si aucune n'existe
+            if (answerIndex === 0 && answersList) {
+                addAnswerForm();
+            }
+});
+    </script>
+{% endblock %}

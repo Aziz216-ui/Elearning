@@ -1,0 +1,62 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Tableau de bord - Liste des cours{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Liste des cours disponibles</h1>
+        <a href="{{ path('app_mes_cours') }}" class="btn btn-primary">
+            <i class="fas fa-shopping-cart"></i> Mes cours
+        </a>
+    </div>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert alert-success">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    {% for message in app.flashes('warning') %}
+        <div class="alert alert-warning">
+            {{ message }}
+        </div>
+    {% endfor %}
+
+    <div class="row">
+        {% for cour in cours %}
+            <div class="col-md-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ cour.title }}</h5>
+                        <p class="card-text">{{ cour.description|slice(0, 100) }}...</p>
+                        <p class="card-text">
+                            <strong>Prix:</strong> {{ cour.price }} €<br>
+                            <strong>Catégorie:</strong> {{ cour.category }}
+                        </p>
+                        
+                        {% if cour.id in coursInPanier %}
+                            <button class="btn btn-success btn-block" disabled>
+                                <i class="fas fa-check"></i> Déjà dans vos cours
+                            </button>
+                        {% else %}
+                            <form action="{{ path('app_panier_ajouter', {'id': cour.id}) }}" method="post" class="d-inline">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="fas fa-plus"></i> Ajouter à mes cours
+                                </button>
+                            </form>
+                            <a href="{{ path('app_quiz_list', {'id': cour.id}) }}" class="btn btn-outline-secondary">Voir les quiz</a>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info">
+                    Aucun cours disponible pour le moment.
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %}

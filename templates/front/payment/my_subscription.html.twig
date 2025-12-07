@@ -1,0 +1,115 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Abonnements{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="mb-0">Mes Abonnements</h1>
+        <div class="btn-group" role="group" aria-label="Filtrer les abonnements">
+            <a href="{{ path('payment_my_subscription') }}" class="btn btn-sm btn-outline-secondary">Tous</a>
+            <a href="{{ path('payment_my_subscription_filter', {status: 'active'}) }}" class="btn btn-sm btn-outline-secondary">Actifs</a>
+            <a href="{{ path('payment_my_subscription_filter', {status: 'canceled'}) }}" class="btn btn-sm btn-outline-secondary">canceled</a>
+        </div>
+    </div>
+    
+    {% if subscriptions is not empty %}
+        {% for subscription in subscriptions %}
+            <div class="card shadow-sm mb-4">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <h3 class="card-title">{{ subscription.plan.name }}</h3>
+                            <p class="card-text text-muted">{{ subscription.plan.description }}</p>
+                            
+                            <div class="mt-4">
+                                <h5>Détails de l'abonnement :</h5>
+                                <ul class="list-unstyled">
+                                    <li><strong>Statut :</strong> 
+                                        {% if subscription.isActive %}
+                                            <span class="badge bg-success">Actif</span>
+                                        {% else %}
+                                            <span class="badge bg-secondary">canceled</span>
+                                        {% endif %}
+                                    </li>
+                                    <li><strong>Date de début :</strong> {{ subscription.startDate|date('d/m/Y') }}</li>
+                                    {% if subscription.endDate %}
+                                        <li><strong>Date de fin :</strong> {{ subscription.endDate|date('d/m/Y') }}</li>
+                                    {% else %}
+                                        <li><strong>Type :</strong> Accès à vie</li>
+                                    {% endif %}
+                                    <li><strong>Renouvellement automatique :</strong> 
+                                        {{ subscription.autoRenew ? 'Oui' : 'Non' }}
+                                    </li>
+                                </ul>
+                            </div>
+                            
+                            <div class="mt-4">
+                                <h5>Avantages inclus :</h5>
+                                <ul>
+                                    {% if subscription.plan.maxCourses %}
+                                        <li>Accès à {{ subscription.plan.maxCourses }} cours</li>
+                                    {% else %}
+                                        <li>Accès illimité à tous les cours</li>
+                                    {% endif %}
+                                    <li>Support prioritaire</li>
+                                    <li>Certificats de formation</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 text-center">
+                            <div class="border rounded p-4 mb-3">
+                                <h2 class="display-4">{{ subscription.plan.price }}DT</h2>
+                                <p class="text-muted">
+                                    {% if subscription.plan.duration == 'monthly' %}
+                                        /mois
+                                    {% elseif subscription.plan.duration == 'yearly' %}
+                                        /an
+                                    {% else %}
+                                        unique
+                                    {% endif %}
+                                </p>
+                            </div>
+                            
+                            {% if subscription.endDate %}
+                                <div class="alert alert-info">
+                                    Expire le {{ subscription.endDate|date('d/m/Y') }}
+                                </div>
+                            {% endif %}
+                            
+                            {% if subscription.autoRenew %}
+
+                                <form method="post" action="{{ path('payment_cancel_subscription', {id: subscription.id}) }}" 
+                                      onsubmit="return confirm('Êtes-vous sûr de vouloir annuler le renouvellement automatique ?');">
+                                    <button type="submit" class="btn btn-outline-danger w-100 mb-2">
+                                        Annuler le renouvellement
+                                    </button>
+                                </form>
+                            {% endif %}
+
+                            {% if subscription.isActive %}
+                                <form method="post" action="{{ path('payment_cancel_subscription_full', {id: subscription.id}) }}" 
+                                      onsubmit="return confirm('Êtes-vous sûr de vouloir annuler complètement cet abonnement ?');">
+                                    <button type="submit" class="btn btn-danger w-100">
+                                        Annuler l'abonnement
+                                    </button>
+                                </form>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="alert alert-warning">
+            <h4 class="alert-heading">Aucun abonnement actif</h4>
+            <p>Vous n'avez actuellement aucun abonnement actif. Souscrivez à un plan pour accéder à nos cours.</p>
+            <hr>
+            <a href="{{ path('payment_plans') }}" class="btn btn-primary">
+                Voir les plans disponibles
+            </a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

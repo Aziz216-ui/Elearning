@@ -1,0 +1,194 @@
+{# templates/forum_post/_form.html.twig #}
+<style>
+    .forum-form-wrapper {
+        background: white;
+    }
+
+    .forum-form-group {
+        margin-bottom: 25px;
+    }
+
+    .forum-form-group label {
+        display: block;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+        font-size: 0.95em;
+    }
+
+    .forum-form-group label.required::after {
+        content: " *";
+        color: #dc3545;
+    }
+
+    .forum-form-control {
+        width: 100%;
+        padding: 12px 15px;
+        border: 2px solid #dee2e6;
+        border-radius: 10px;
+        font-size: 1em;
+        transition: all 0.3s;
+        font-family: inherit;
+    }
+
+    .forum-form-control:focus {
+        outline: none;
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .forum-form-control.is-invalid {
+        border-color: #dc3545;
+    }
+
+    .forum-form-control.is-invalid:focus {
+        box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+    }
+
+    textarea.forum-form-control {
+        min-height: 200px;
+        resize: vertical;
+    }
+
+    .forum-form-select {
+        appearance: none;
+        background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23667eea' d='M10.293 3.293L6 7.586 1.707 3.293A1 1 0 00.293 4.707l5 5a1 1 0 001.414 0l5-5a1 1 0 10-1.414-1.414z'/%3E%3C/svg%3E");
+        background-repeat: no-repeat;
+        background-position: right 15px center;
+        padding-right: 40px;
+    }
+
+    input[type="file"].forum-form-control {
+        padding: 10px;
+        border: 2px dashed #dee2e6;
+        cursor: pointer;
+    }
+
+    input[type="file"].forum-form-control:hover {
+        border-color: #667eea;
+        background: #f8f9fa;
+    }
+
+    .forum-form-error {
+        color: #dc3545;
+        font-size: 0.85em;
+        margin-top: 5px;
+        display: block;
+    }
+
+    .forum-form-help {
+        color: #6c757d;
+        font-size: 0.85em;
+        margin-top: 5px;
+        display: block;
+    }
+
+    .forum-submit-btn {
+        padding: 15px 40px;
+        background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+        color: white;
+        border: none;
+        border-radius: 10px;
+        font-size: 1.05em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        margin-top: 10px;
+    }
+
+    .forum-submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+    }
+
+    .forum-submit-btn:active {
+        transform: translateY(0);
+    }
+
+    /* Override Symfony form theme styles */
+    .forum-form-wrapper .form-control,
+    .forum-form-wrapper .form-select {
+        padding: 12px 15px;
+        border: 2px solid #dee2e6;
+        border-radius: 10px;
+        font-size: 1em;
+        transition: all 0.3s;
+    }
+
+    .forum-form-wrapper .form-control:focus,
+    .forum-form-wrapper .form-select:focus {
+        border-color: #667eea;
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    }
+
+    .forum-form-wrapper label {
+        display: block;
+        font-weight: 600;
+        color: #495057;
+        margin-bottom: 8px;
+        font-size: 0.95em;
+    }
+
+    .forum-form-wrapper .invalid-feedback {
+        color: #dc3545;
+        font-size: 0.85em;
+        margin-top: 5px;
+    }
+
+    .forum-form-wrapper textarea {
+        min-height: 200px;
+        resize: vertical;
+    }
+</style>
+
+<div class="forum-form-wrapper">
+    {{ form_start(form, {'attr': {'class': 'forum-form', 'novalidate': 'novalidate'}}) }}
+        
+        {# Titre #}
+        <div class="forum-form-group">
+            {{ form_label(form.titre) }}
+            {{ form_errors(form.titre) }}
+            {{ form_widget(form.titre, {'attr': {'class': 'forum-form-control', 'placeholder': 'Ex: Introduction aux statistiques bayésiennes'}}) }}
+            
+        </div>
+
+        {# Contenu #}
+        <div class="forum-form-group">
+            {{ form_label(form.contenu) }}
+            {{ form_errors(form.contenu) }}
+            {{ form_widget(form.contenu, {'attr': {'class': 'forum-form-control', 'placeholder': 'Rédigez votre post ici... Soyez clair et détaillé.'}}) }}
+            
+            <small class="forum-form-help">💡 Utilisez des paragraphes pour structurer votre contenu</small>
+        </div>
+
+        {# Catégorie (si présent) #}
+        {% if form.category is defined %}
+        <div class="forum-form-group">
+            {{ form_label(form.category) }}
+            {{ form_widget(form.category, {'attr': {'class': 'forum-form-control forum-form-select'}}) }}
+            {{ form_errors(form.category) }}
+        </div>
+        {% endif %}
+
+        {# Image (si présent) #}
+        {% if form.image is defined %}
+        <div class="forum-form-group">
+            {{ form_label(form.image) }}
+            {{ form_widget(form.image, {'attr': {'class': 'forum-form-control'}}) }}
+            {{ form_errors(form.image) }}
+            <small class="forum-form-help">📸 Formats acceptés: JPG, PNG, GIF (Max 5MB)</small>
+        </div>
+        {% endif %}
+
+        {# Tous les autres champs non traités #}
+        {{ form_rest(form) }}
+
+        <button type="submit" class="forum-submit-btn">
+            {{ button_label|default('💾 Enregistrer') }}
+        </button>
+        
+    {{ form_end(form) }}
+</div>

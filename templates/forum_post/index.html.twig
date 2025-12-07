@@ -1,0 +1,632 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Forum de Mathématiques & Statistiques{% endblock %}
+
+{% block body %}
+    <style>
+        /* Reset pour éviter les conflits avec Bootstrap */
+        .forum-wrapper * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .forum-wrapper {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .forum-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        .forum-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        .forum-header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .forum-header p {
+            font-size: 1.1em;
+            opacity: 0.95;
+        }
+
+        .forum-search-bar {
+            padding: 30px 40px;
+            background: #f8f9fa;
+            border-bottom: 2px solid #e9ecef;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .forum-search-form {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            gap: 10px;
+        }
+
+        .forum-search-bar input {
+            flex: 1;
+            padding: 15px 20px;
+            border: 2px solid #dee2e6;
+            border-radius: 10px;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+
+        .forum-search-bar input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .forum-search-bar button {
+            padding: 15px 30px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .forum-search-bar button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .forum-create-btn {
+            padding: 15px 30px;
+            background: #28a745 !important;
+            color: white !important;
+            border: none;
+            border-radius: 10px;
+            font-size: 1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .forum-create-btn:hover {
+            background: #218838 !important;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+            color: white !important;
+        }
+
+        .forum-filter-section {
+            padding: 20px 40px;
+            background: white;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .forum-filter-btn {
+            padding: 10px 20px;
+            border: 2px solid #dee2e6;
+            background: white;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.9em;
+            text-decoration: none;
+            color: #495057;
+        }
+
+        .forum-filter-btn:hover, .forum-filter-btn.active {
+            background: #667eea;
+            color: white !important;
+            border-color: #667eea;
+            text-decoration: none;
+        }
+
+        .forum-posts-container {
+            padding: 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+        }
+
+        .forum-post-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            border: 2px solid #e9ecef;
+            transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .forum-post-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transform: scaleX(0);
+            transition: transform 0.3s;
+        }
+
+        .forum-post-card:hover {
+            border-color: #667eea;
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.2);
+        }
+
+        .forum-post-card:hover::before {
+            transform: scaleX(1);
+        }
+
+        .forum-post-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .forum-post-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .forum-post-meta {
+            flex: 1;
+        }
+
+        .forum-post-author {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.9em;
+        }
+
+        .forum-post-date {
+            color: #6c757d;
+            font-size: 0.85em;
+        }
+
+        .forum-post-title {
+            font-size: 1.3em;
+            font-weight: 700;
+            color: #212529;
+            margin-bottom: 15px;
+            line-height: 1.4;
+        }
+
+        .forum-post-image {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-bottom: 15px;
+        }
+
+        .forum-post-excerpt {
+            color: #6c757d;
+            line-height: 1.6;
+            margin-bottom: 15px;
+            font-size: 0.95em;
+        }
+
+        .forum-post-stats {
+            display: flex;
+            gap: 20px;
+            padding: 15px 0;
+            border-top: 1px solid #e9ecef;
+            margin-top: 15px;
+        }
+
+        .forum-stat-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .forum-stat-item svg {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        .forum-like-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            color: #6c757d;
+            font-size: 0.9em;
+            padding: 5px 10px;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+
+        .forum-like-btn:hover {
+            background: #f8f9fa;
+            color: #667eea;
+        }
+
+        .forum-like-btn.liked {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .forum-like-btn.liked svg {
+            fill: #667eea;
+        }
+
+        .forum-like-btn svg {
+            transition: transform 0.3s;
+        }
+
+        .forum-like-btn:active svg {
+            transform: scale(1.3);
+        }
+
+        .forum-post-tags {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-top: 15px;
+        }
+
+        .forum-tag {
+            padding: 5px 12px;
+            background: #f8f9fa;
+            border-radius: 15px;
+            font-size: 0.8em;
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        .forum-post-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .forum-action-btn {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 0.9em;
+            text-decoration: none;
+            text-align: center;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 5px;
+        }
+
+        .forum-view-btn {
+            background: #667eea;
+            color: white;
+        }
+
+        .forum-view-btn:hover {
+            background: #5568d3;
+            color: white;
+            text-decoration: none;
+        }
+
+        .forum-edit-btn {
+            background: #6c757d;
+            color: white;
+        }
+
+        .forum-edit-btn:hover {
+            background: #5a6268;
+            color: white;
+            text-decoration: none;
+        }
+
+        .forum-comments-preview {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+
+        .forum-comment-item {
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 3px solid #667eea;
+        }
+
+        .forum-comment-author {
+            font-weight: 600;
+            color: #495057;
+            font-size: 0.85em;
+        }
+
+        .forum-comment-text {
+            color: #6c757d;
+            margin-top: 5px;
+        }
+
+        .forum-empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #6c757d;
+            grid-column: 1 / -1;
+        }
+
+        .forum-empty-state svg {
+            width: 100px;
+            height: 100px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        @media (max-width: 768px) {
+            .forum-posts-container {
+                grid-template-columns: 1fr;
+                padding: 20px;
+            }
+
+            .forum-header h1 {
+                font-size: 1.8em;
+            }
+
+            .forum-search-bar {
+                padding: 20px;
+            }
+
+            .forum-search-form {
+                width: 100%;
+            }
+        }
+    </style>
+
+    <div class="forum-wrapper">
+        <div class="forum-container">
+            <header class="forum-header">
+                <h1>📚 Forum </h1>
+                <p>Partagez vos connaissances et apprenez ensemble</p>
+            </header>
+
+            <div class="forum-search-bar">
+                <form method="get" action="{{ path('app_forum_post_index') }}" class="forum-search-form">
+                    <input type="text" 
+                           name="q" 
+                           placeholder="Rechercher un post par titre, auteur ou tag..." 
+                           value="{{ app.request.get('q') }}">
+                    <button type="submit">🔍 Rechercher</button>
+                </form>
+                <a href="{{ path('app_forum_post_new') }}" class="forum-create-btn">
+                    ➕ Créer un nouveau post
+                </a>
+            </div>
+
+            {% if categories is defined and categories is not empty %}
+            <div class="forum-filter-section">
+                <a href="{{ path('app_forum_post_index') }}" class="forum-filter-btn {{ app.request.get('category') is null ? 'active' : '' }}">
+                    Tous
+                </a>
+                {% for category in categories %}
+                    <a href="{{ path('app_forum_post_index', {'category': category.slug}) }}" 
+                       class="forum-filter-btn {{ app.request.get('category') == category.slug ? 'active' : '' }}">
+                        {{ category.icone ?? '📁' }} {{ category.nom }}
+                    </a>
+                {% endfor %}
+            </div>
+            {% endif %}
+
+            <div class="forum-posts-container">
+                {% if forum_posts is empty %}
+                    <div class="forum-empty-state">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4"></path>
+                        </svg>
+                        <h3>Aucun post trouvé</h3>
+                        <p>{% if app.request.get('q') %}Aucun résultat pour votre recherche.{% else %}Soyez le premier à créer un post !{% endif %}</p>
+                        <a href="{{ path('app_forum_post_new') }}" class="forum-create-btn" style="margin-top: 20px;">
+                            ➕ Créer le premier post
+                        </a>
+                    </div>
+                {% else %}
+                    {% for post in forum_posts %}
+                        <div class="forum-post-card">
+                            <div class="forum-post-header">
+                                <div class="forum-post-icon">
+                                    {{ post.user.name|first|upper }}
+                                </div>
+                                <div class="forum-post-meta">
+                                    <div class="forum-post-author">{{ post.user.name }}</div>
+                                    <div class="forum-post-date">{{ post.createdAt|date('d/m/Y H:i') }}</div>
+                                </div>
+                            </div>
+                            
+                            <h3 class="forum-post-title">{{ post.titre }}</h3>
+                            
+                            {% if post.image %}
+                                <img src="{{ asset('uploads/' ~ post.image) }}" 
+                                     class="forum-post-image" 
+                                     alt="{{ post.titre }}"
+                                     onerror="this.style.display='none'">
+                            {% endif %}
+                            
+                            <p class="forum-post-excerpt">
+                                {{ post.contenu|striptags|slice(0, 150) }}...
+                            </p>
+                            
+                            {% if post.category %}
+                                <div class="forum-post-tags">
+                                    <span class="forum-tag">{{ post.category.icone ?? '📁' }} {{ post.category.nom }}</span>
+                                </div>
+                            {% endif %}
+                            
+                            <div class="forum-post-stats">
+                                <div class="forum-stat-item">
+                                    <svg fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10 12a2 2 0 100-4 2 2 0 000 4z"/>
+                                        <path fill-rule="evenodd" d="M.458 10C1.732 5.943 5.522 3 10 3s8.268 2.943 9.542 7c-1.274 4.057-5.064 7-9.542 7S1.732 14.057.458 10zM14 10a4 4 0 11-8 0 4 4 0 018 0z" clip-rule="evenodd"/>
+                                    </svg>
+                                    {{ post.vues|default(0) }} vues
+                                </div>
+                                <div class="forum-stat-item">
+                                    <svg fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z" clip-rule="evenodd"/>
+                                    </svg>
+                                    {% if post.comments|length > 0 %}
+                                        {{ post.comments|length }} commentaire{{ post.comments|length > 1 ? 's' : '' }}
+                                    {% else %}
+                                        Soyez le premier !
+                                    {% endif %}
+                                </div>
+                                <div class="forum-stat-item forum-like-container" data-post-id="{{ post.id }}">
+                                    <button class="forum-like-btn" onclick="toggleLike({{ post.id }})">
+                                        <svg fill="currentColor" viewBox="0 0 20 20">
+                                            <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z"/>
+                                        </svg>
+                                        <span class="like-count">{{ post.likes|default(0) }}</span>
+                                    </button>
+                                </div>
+                            </div>
+
+                            {% if post.comments|length > 0 %}
+                                <div class="forum-comments-preview">
+                                    <strong>💬 Derniers commentaires :</strong>
+                                    {% for comment in post.comments|slice(0, 2) %}
+                                        <div class="forum-comment-item">
+                                            <div class="forum-comment-author">{{ comment.user.name }}</div>
+                                            <div class="forum-comment-text">{{ comment.contenu|slice(0, 80) }}...</div>
+                                        </div>
+                                    {% endfor %}
+                                    {% if post.comments|length > 2 %}
+                                        <small style="color: #6c757d;">+ {{ post.comments|length - 2 }} autre(s) commentaire(s)</small>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                            
+                            <div class="forum-post-actions">
+                                <a href="{{ path('app_forum_post_show', {'id': post.id}) }}" class="forum-action-btn forum-view-btn">
+                                    👁️ Voir plus
+                                </a>
+                                {% if app.user and post.user is not null and app.user.id == post.user.id %}
+                                <a href="{{ path('app_forum_post_edit', {'id': post.id}) }}" class="forum-action-btn forum-edit-btn">
+                                    ✏️ Modifier
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.querySelector('.forum-search-bar input[name="q"]');
+            if (searchInput) {
+                searchInput.addEventListener('keyup', function(e) {
+                    if (e.key === 'Enter') {
+                        e.target.closest('form').submit();
+                    }
+                });
+            }
+        });
+
+        // Fonction pour liker/unliker un post
+        async function toggleLike(postId) {
+            const likeContainer = document.querySelector(`[data-post-id="${postId}"]`);
+            const likeBtn = likeContainer.querySelector('.forum-like-btn');
+            const likeCount = likeContainer.querySelector('.like-count');
+            
+            // Vérifier si déjà liké (stocké dans localStorage)
+            const isLiked = localStorage.getItem(`post_${postId}_liked`) === 'true';
+            const action = isLiked ? 'unlike' : 'like';
+            
+            try {
+                const response = await fetch(`/forum/post/${postId}/${action}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    }
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    // Mettre à jour le compteur
+                    likeCount.textContent = data.likes;
+                    
+                    // Mettre à jour l'état du bouton
+                    if (isLiked) {
+                        likeBtn.classList.remove('liked');
+                        localStorage.removeItem(`post_${postId}_liked`);
+                    } else {
+                        likeBtn.classList.add('liked');
+                        localStorage.setItem(`post_${postId}_liked`, 'true');
+                    }
+                    
+                    // Animation
+                    likeBtn.style.transform = 'scale(1.2)';
+                    setTimeout(() => {
+                        likeBtn.style.transform = 'scale(1)';
+                    }, 200);
+                }
+            } catch (error) {
+                console.error('Erreur lors du like:', error);
+                alert('Vous devez être connecté pour liker un post');
+            }
+        }
+
+        // Charger l'état des likes au chargement de la page
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelectorAll('.forum-like-container').forEach(container => {
+                const postId = container.dataset.postId;
+                const likeBtn = container.querySelector('.forum-like-btn');
+                
+                if (localStorage.getItem(`post_${postId}_liked`) === 'true') {
+                    likeBtn.classList.add('liked');
+                }
+            });
+        });
+    </script>
+{% endblock %}

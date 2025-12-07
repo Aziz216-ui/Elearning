@@ -1,0 +1,26 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}ForulComment{% endblock %}
+
+{% block body %}
+    <h1>ForulComment</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ forul_comment.id }}</td>
+            </tr>
+            <tr>
+                <th>Contenu</th>
+                <td>{{ forul_comment.Contenu }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_forul_comment_index') }}">back to list</a>
+
+    <a href="{{ path('app_forul_comment_edit', {'id': forul_comment.id}) }}">edit</a>
+
+    {{ include('forul_comment/_delete_form.html.twig') }}
+{% endblock %}

@@ -12,7 +12,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\Table(name: '`user`')]
+#[ORM\Table(name: 'user')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
@@ -23,61 +23,60 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
-    #[Assert\NotBlank( message :"l'email est obligatoire !")]
-    #[Assert\Email( message :"l'email '{{ value }}' est invalide !")]
+    #[Assert\NotBlank(message: "l'email est obligatoire !")]
+    #[Assert\Email(message: "l'email '{{ value }}' est invalide !")]
     private ?string $email = null;
 
-    /**
-     * @var list<string> The user roles
-     */
     #[ORM\Column]
     private array $roles = [];
 
-    /**
-     * @var string The hashed password
-     */
     #[ORM\Column]
     private ?string $password = null;
 
-
-    /**
-     * @var string|null Plain password used for validation (not persisted)
-     */
     #[Assert\NotBlank(message: 'Le mot de passe est obligatoire.')]
     #[Assert\Length(min: 6, minMessage: 'Le mot de passe doit contenir au moins {{ limit }} caractères.')]
     private ?string $plainPassword = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank( message :"le nom est obligatoire !")]
+    #[Assert\NotBlank(message: "le nom est obligatoire !")]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank( message :"le nom est obligatoire !")]
+    #[Assert\NotBlank(message: "le nom est obligatoire !")]
     private ?string $lastname = null;
 
     #[ORM\Column]
     private bool $isVerified = false;
 
     #[ORM\Column(type: 'date', nullable: true)]
-    #[Assert\NotBlank(message: "Veuillez entrer une date valide au format AAAA-MM-JJ.")]
     private ?\DateTimeInterface $birthdate = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank( message :"le sexe est obligatoire !")]
+    #[Assert\NotBlank(message: "le sexe est obligatoire !")]
     private ?string $sexe = null;
 
     #[ORM\Column(type: 'datetime')]
     private ?\DateTimeInterface $createdAt = null;
 
-    // Relation OneToMany vers Cours (inverse de ManyToOne dans Cours::$user)
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Cours::class, cascade: ['persist'], orphanRemoval: false)]
     private Collection $courses;
 
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: ForumPost::class, cascade: ['persist'], orphanRemoval: true)]
+    private Collection $posts;
+
+    #[ORM\OneToMany(targetEntity: QuizResult::class, mappedBy: 'user')]
+    private Collection $quizResults;
+
+    #[ORM\OneToMany(targetEntity: Panier::class, mappedBy: 'user', orphanRemoval: true)]
+    private Collection $paniers;
+
     public function __construct()
     {
-
         $this->createdAt = new \DateTimeImmutable();
         $this->courses = new ArrayCollection();
+        $this->posts = new ArrayCollection();
+        $this->quizResults = new ArrayCollection();
+        $this->paniers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -93,45 +92,27 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setEmail(string $email): static
     {
         $this->email = $email;
-
         return $this;
     }
 
-    /**
-     * A visual identifier that represents this user.
-     *
-     * @see UserInterface
-     */
     public function getUserIdentifier(): string
     {
         return (string) $this->email;
     }
 
-    /**
-     * @see UserInterface
-     */
     public function getRoles(): array
     {
         $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
         $roles[] = 'ROLE_USER';
-
         return array_unique($roles);
     }
 
-    /**
-     * @param list<string> $roles
-     */
     public function setRoles(array $roles): static
     {
         $this->roles = $roles;
-
         return $this;
     }
 
-    /**
-     * @see PasswordAuthenticatedUserInterface
-     */
     public function getPassword(): ?string
     {
         return $this->password;
@@ -140,10 +121,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPassword(string $password): static
     {
         $this->password = $password;
-
         return $this;
     }
-
 
     public function getPlainPassword(): ?string
     {
@@ -153,14 +132,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPlainPassword(?string $plainPassword): static
     {
         $this->plainPassword = $plainPassword;
-
         return $this;
     }
 
     #[\Deprecated]
     public function eraseCredentials(): void
     {
-        // @deprecated, to be removed when upgrading to Symfony 8
     }
 
     public function getName(): ?string
@@ -171,7 +148,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setName(string $name): static
     {
         $this->name = $name;
-
         return $this;
     }
 
@@ -183,7 +159,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setLastname(string $lastname): static
     {
         $this->lastname = $lastname;
-
         return $this;
     }
 
@@ -192,15 +167,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->birthdate;
     }
 
-
-    public function setBirthdate($birthdate): static
+    public function setBirthdate(?\DateTimeInterface $birthdate): static
     {
-
-        $this->birthdate = null;
+        $this->birthdate = $birthdate;
         return $this;
     }
-
-
 
     public function isVerified(): bool
     {
@@ -210,7 +181,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setIsVerified(bool $isVerified): static
     {
         $this->isVerified = $isVerified;
-
         return $this;
     }
 
@@ -222,7 +192,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setSexe(string $sexe): static
     {
         $this->sexe = $sexe;
-
         return $this;
     }
 
@@ -233,27 +202,10 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function setCreatedAt(?\DateTimeInterface $createdAt): static
     {
-        if ($createdAt === null) {
-            $this->createdAt = null;
-            return $this;
-        }
-
-        if ($createdAt instanceof \DateTimeImmutable) {
-            $this->createdAt = $createdAt;
-            return $this;
-        }
-
-        if ($createdAt instanceof \DateTime) {
-            $this->createdAt = \DateTimeImmutable::createFromMutable($createdAt);
-            return $this;
-        }
-
-        throw new \InvalidArgumentException('createdAt doit être un \DateTimeInterface ou null.');
+        $this->createdAt = $createdAt;
+        return $this;
     }
 
-    /**
-     * @return Collection|Cours[]
-     */
     public function getCourses(): Collection
     {
         return $this->courses;
@@ -261,24 +213,92 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function addCourse(Cours $course): static
     {
-        if (! $this->courses->contains($course)) {
+        if (!$this->courses->contains($course)) {
             $this->courses->add($course);
             $course->setUser($this);
         }
-
         return $this;
     }
 
     public function removeCourse(Cours $course): static
     {
-        if ($this->courses->contains($course)) {
-            $this->courses->removeElement($course);
-            // set the owning side to null (unless already changed)
+        if ($this->courses->removeElement($course)) {
             if ($course->getUser() === $this) {
                 $course->setUser(null);
             }
         }
+        return $this;
+    }
 
+    public function getQuizResults(): Collection
+    {
+        return $this->quizResults;
+    }
+
+    public function addQuizResult(QuizResult $quizResult): static
+    {
+        if (!$this->quizResults->contains($quizResult)) {
+            $this->quizResults->add($quizResult);
+            $quizResult->setUser($this);
+        }
+        return $this;
+    }
+
+    public function removeQuizResult(QuizResult $quizResult): static
+    {
+        if ($this->quizResults->removeElement($quizResult)) {
+            if ($quizResult->getUser() === $this) {
+                $quizResult->setUser(null);
+            }
+        }
+        return $this;
+    }
+
+    public function getPosts(): Collection
+    {
+        return $this->posts;
+    }
+
+    public function addPost(ForumPost $post): static
+    {
+        if (!$this->posts->contains($post)) {
+            $this->posts->add($post);
+            $post->setUser($this);
+        }
+        return $this;
+    }
+
+    public function removePost(ForumPost $post): static
+    {
+        if ($this->posts->removeElement($post)) {
+            if ($post->getUser() === $this) {
+                $post->setUser(null);
+            }
+        }
+        return $this;
+    }
+
+    public function getPaniers(): Collection
+    {
+        return $this->paniers;
+    }
+
+    public function addPanier(Panier $panier): static
+    {
+        if (!$this->paniers->contains($panier)) {
+            $this->paniers->add($panier);
+            $panier->setUser($this);
+        }
+        return $this;
+    }
+
+    public function removePanier(Panier $panier): static
+    {
+        if ($this->paniers->removeElement($panier)) {
+            if ($panier->getUser() === $this) {
+                $panier->setUser(null);
+            }
+        }
         return $this;
     }
 }

@@ -1,5 +1,5 @@
 <?php
-namespace App\Controller\admin;
+namespace App\Controller\Admin;
 
 use App\Entity\User;
 use App\Repository\UserRepository;
@@ -41,7 +41,7 @@ class UserController extends AbstractController
         // Récupère les stats par année de naissance
         $birthYearStats = $userRepository->countUsersByBirthYear();
 
-        return $this->render('admin/user/stats.html.twig', [
+        return $this->render('Admin/user/stats.html.twig', [
             'usersByMonth' => $data,
             'sexeDistribution' => $sexeDistribution,
             'birthYearStats' => $birthYearStats,

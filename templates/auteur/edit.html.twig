@@ -1,0 +1,36 @@
+{% extends 'base1.html.twig' %}
+
+{% block title %}Edit Auteur{% endblock %}
+
+{% block body %}
+    <div class="container-fluid py-4">
+      <nav aria-label="breadcrumb" class="mb-3">
+        <ol class="breadcrumb mb-0">
+          <li class="breadcrumb-item"><a href="{{ path('app_auteur_index') }}">Auteurs</a></li>
+          <li class="breadcrumb-item active" aria-current="page">Modifier</li>
+        </ol>
+      </nav>
+      <div class="row justify-content-center">
+        <div class="col-12 col-lg-10 col-xl-8">
+          <div class="card shadow mb-4">
+            <div class="card-header py-3">
+              <div class="d-flex align-items-start gap-2">
+                <h6 class="m-0 font-weight-bold text-primary"><i class="fa fa-user mr-2"></i> Modifier l'Auteur</h6>
+              </div>
+              <small class="text-muted d-block mt-1">Mettez à jour les informations de l'auteur.</small>
+            </div>
+            <div class="card-body">
+              {{ include('auteur/_form.html.twig', {'button_label': 'Mettre à jour', 'button_class': 'btn btn-primary'}) }}
+            </div>
+            <div class="card-footer d-flex justify-content-between align-items-center">
+              <a href="{{ path('app_auteur_index') }}" class="btn btn-outline-secondary" data-toggle="tooltip" title="Revenir à la liste"><i class="fa fa-arrow-left mr-1"></i> Retour</a>
+              <div>
+                {{ include('auteur/_delete_form.html.twig') }}
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock %}
+

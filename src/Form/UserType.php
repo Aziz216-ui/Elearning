@@ -60,6 +60,7 @@ class UserType extends AbstractType
                 'attr' => ['autocomplete' => 'new-password'],
             ]);
         }
+
     }
 
     public function configureOptions(OptionsResolver $resolver): void
@@ -67,6 +68,7 @@ class UserType extends AbstractType
         $resolver->setDefaults([
             'data_class' => User::class,
             'is_edit' => false,
+
         ]);
     }
 }

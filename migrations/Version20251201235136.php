@@ -20,6 +20,11 @@ final class Version20251201235136 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
+        // Guard: skip if the expected column does not exist (entity was renamed to Auteur)
+        if (!$schema->hasTable('cours') || !$schema->getTable('cours')->hasColumn('user_id')) {
+            // Nothing to do; avoid failing or losing data
+            return;
+        }
         $this->addSql('ALTER TABLE cours ADD CONSTRAINT FK_FDCA8C9CA76ED395 FOREIGN KEY (user_id) REFERENCES `user` (id)');
         $this->addSql('CREATE INDEX IDX_FDCA8C9CA76ED395 ON cours (user_id)');
     }
@@ -27,7 +32,12 @@ final class Version20251201235136 extends AbstractMigration
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE cours DROP FOREIGN KEY FK_FDCA8C9CA76ED395');
-        $this->addSql('DROP INDEX IDX_FDCA8C9CA76ED395 ON cours');
+        if (!$schema->hasTable('cours')) {
+            return;
+        }
+        if ($schema->getTable('cours')->hasColumn('user_id')) {
+            $this->addSql('ALTER TABLE cours DROP FOREIGN KEY FK_FDCA8C9CA76ED395');
+            $this->addSql('DROP INDEX IDX_FDCA8C9CA76ED395 ON cours');
+        }
     }
 }
