@@ -19,8 +19,24 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-8">
-                            <h3 class="card-title">{{ subscription.plan.name }}</h3>
-                            <p class="card-text text-muted">{{ subscription.plan.description }}</p>
+                            <h3 class="card-title">
+                                {% if subscription.plan %}
+                                    {{ subscription.plan.name }}
+                                {% elseif subscription.cours %}
+                                    Cours : {{ subscription.cours.title }}
+                                {% else %}
+                                    Abonnement
+                                {% endif %}
+                            </h3>
+                            <p class="card-text text-muted">
+                                {% if subscription.plan and subscription.plan.description is not empty %}
+                                    {{ subscription.plan.description }}
+                                {% elseif subscription.cours %}
+                                    Accès au cours individuel.
+                                {% else %}
+                                    
+                                {% endif %}
+                            </p>
                             
                             <div class="mt-4">
                                 <h5>Détails de l'abonnement :</h5>
@@ -47,10 +63,14 @@
                             <div class="mt-4">
                                 <h5>Avantages inclus :</h5>
                                 <ul>
-                                    {% if subscription.plan.maxCourses %}
-                                        <li>Accès à {{ subscription.plan.maxCourses }} cours</li>
-                                    {% else %}
-                                        <li>Accès illimité à tous les cours</li>
+                                    {% if subscription.plan %}
+                                        {% if subscription.plan.maxCourses %}
+                                            <li>Accès à {{ subscription.plan.maxCourses }} cours</li>
+                                        {% else %}
+                                            <li>Accès illimité à tous les cours</li>
+                                        {% endif %}
+                                    {% elseif subscription.cours %}
+                                        <li>Accès à vie au cours "{{ subscription.cours.title }}"</li>
                                     {% endif %}
                                     <li>Support prioritaire</li>
                                     <li>Certificats de formation</li>
@@ -60,12 +80,24 @@
                         
                         <div class="col-md-4 text-center">
                             <div class="border rounded p-4 mb-3">
-                                <h2 class="display-4">{{ subscription.plan.price }}DT</h2>
+                                <h2 class="display-4">
+                                    {% if subscription.plan %}
+                                        {{ subscription.plan.price }}DT
+                                    {% elseif subscription.cours %}
+                                        {{ subscription.cours.price }}DT
+                                    {% else %}
+                                        --
+                                    {% endif %}
+                                </h2>
                                 <p class="text-muted">
-                                    {% if subscription.plan.duration == 'monthly' %}
-                                        /mois
-                                    {% elseif subscription.plan.duration == 'yearly' %}
-                                        /an
+                                    {% if subscription.plan %}
+                                        {% if subscription.plan.duration == 'monthly' %}
+                                            /mois
+                                        {% elseif subscription.plan.duration == 'yearly' %}
+                                            /an
+                                        {% else %}
+                                            unique
+                                        {% endif %}
                                     {% else %}
                                         unique
                                     {% endif %}

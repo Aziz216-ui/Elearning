@@ -4,6 +4,11 @@ namespace App\Controller\Front;
 
 use App\Entity\Cours;
 use App\Repository\CoursRepository;
+use App\Entity\Subscription;
+use App\Entity\Payment;
+use App\Repository\SubscriptionRepository;
+use Doctrine\ORM\EntityManagerInterface;
+
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -91,5 +96,102 @@ class CartController extends AbstractController
         $session->set('cart', []);
         $this->addFlash('warning', 'Panier vidé.');
         return $this->redirectToRoute('app_cart_index');
+    }
+
+    #[Route('/checkout', name: 'checkout', methods: ['GET'])]
+    public function checkout(SessionInterface $session, CoursRepository $coursRepository): Response
+    {
+        $cart = $session->get('cart', []);
+        $items = [];
+        $total = 0.0;
+
+        if (!empty($cart)) {
+            $coursList = $coursRepository->findBy(['id' => array_keys($cart)]);
+            foreach ($coursList as $cours) {
+                $qty = $cart[$cours->getId()] ?? 0;
+                $lineTotal = ($cours->getPrice() ?? 0) * $qty;
+                $items[] = [
+                    'cours' => $cours,
+                    'qty' => $qty,
+                    'line_total' => $lineTotal,
+                ];
+                $total += $lineTotal;
+            }
+        }
+
+        if (empty($items)) {
+            $this->addFlash('info', 'Votre panier est vide.');
+            return $this->redirectToRoute('app_cart_index');
+        }
+
+        if (!$this->getUser()) {
+            $this->addFlash('warning', 'Veuillez vous connecter pour continuer le paiement.');
+            return $this->redirectToRoute('app_login');
+        }
+
+        return $this->render('front/cart/checkout.html.twig', [
+            'items' => $items,
+            'total' => $total,
+        ]);
+    }
+
+    #[Route('/pay', name: 'pay', methods: ['POST'])]
+    public function pay(Request $request, SessionInterface $session, CoursRepository $coursRepository, SubscriptionRepository $subscriptionRepository, EntityManagerInterface $entityManager): RedirectResponse
+    {
+        if (!$this->getUser()) {
+            $this->addFlash('warning', 'Veuillez vous connecter pour effectuer le paiement.');
+            return $this->redirectToRoute('app_login');
+        }
+
+        $verificationCode = $request->request->get('verification_code');
+        if ($verificationCode !== '1234') {
+            $this->addFlash('error', 'Code de vérification invalide. Veuillez réessayer.');
+            return $this->redirectToRoute('app_cart_checkout');
+        }
+
+        $cart = $session->get('cart', []);
+        if (empty($cart)) {
+            $this->addFlash('info', 'Votre panier est vide.');
+            return $this->redirectToRoute('app_cart_index');
+        }
+
+        $coursList = $coursRepository->findBy(['id' => array_keys($cart)]);
+        $user = $this->getUser();
+
+        $now = new \DateTime();
+        $endDate = (clone $now)->modify('+1 month');
+
+        foreach ($coursList as $cours) {
+            // Créer un abonnement spécifique à ce cours (valide 1 mois)
+            $subscription = new Subscription();
+            $subscription->setUser($user);
+            $subscription->setCours($cours);
+            $subscription->setStatus('active');
+            $subscription->setStartDate($now);
+            $subscription->setEndDate($endDate);
+            $subscription->setAutoRenew(false);
+
+            $entityManager->persist($subscription);
+
+            // Enregistrer un paiement lié à cette subscription
+            $payment = new Payment();
+            $payment->setUser($user);
+            $payment->setSubscription($subscription);
+            $payment->setAmount((string) ($cours->getPrice() ?? 0));
+            $payment->setCurrency('TND');
+            $payment->setStatus('completed');
+            $payment->setCreatedAt(new \DateTime());
+
+            $entityManager->persist($payment);
+        }
+
+        $entityManager->flush();
+
+        // Vider le panier de session après paiement
+        $session->set('cart', []);
+
+        $this->addFlash('success', 'Paiement réussi. Les cours ont été ajoutés à vos cours.');
+
+        return $this->redirectToRoute('app_my_courses');
     }
 }

@@ -68,7 +68,7 @@ final class DashboardController extends AbstractController
         ]);
     }
 
-    #[Route('/cours/{id}', name: 'app_cours_show', methods: ['GET'])]
+    #[Route('/dashboard/cours/{id}', name: 'app_dashboard_cours_show', methods: ['GET'])]
     public function showCours(Cours $cours): Response
     {
         return $this->render('dashboard/cours_show.html.twig', [

@@ -3,31 +3,8 @@
 
 {% block title %}Admin Forum Posts{% endblock %}
 
-{% block body %}
+{% block content %}
 <style>
-    .example-wrapper {
-        margin: 1em 0 1em auto;
-        max-width: 800px;
-        width: 95%;
-        font: 18px/1.5 sans-serif;
-    }
-    .table-container {
-        max-width: 1000px;
-        margin: 1em 0 1em auto;
-        padding: 0 20px;
-    }
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-    th, td {
-        border: 1px solid #ccc;
-        padding: 8px;
-        text-align: left;
-    }
-    thead {
-        background-color: #f0f0f0;
-    }
     .badge-published {
         background: #16a34a;
         color: white;
@@ -50,34 +27,49 @@
     }
     .btn-enable { background: #16a34a; }
     .btn-disable { background: #dc2626; }
+    .btn-view {
+        padding: 4px 8px;
+        font-size: 13px;
+    }
 </style>
 
-<div class="p-6">
-    <h1 class="text-2xl font-bold mb-4">Administration des Posts</h1>
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">Posts du forum</h1>
+            <p class="mb-0 text-muted small">Administrez les posts publiés et leur statut.</p>
+        </div>
+       
+    </div>
 
-
-    <div class="table-container overflow-x-auto">
-        <table>
-            <thead>
-                <tr>
-                    <th>ID</th>
-                    <th>Titre</th>
-                    <th>Contenu</th>
-                    <th>Auteur</th>
-                    <th>Commentaires</th>
-                    <th>Statut</th>
-                    <th>Actions</th>
-                    <th>Toggle</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for post in forum_posts %}
-                    <tr>
-                        <td>{{ post.id }}</td>
-                        <td>{{ post.titre }}</td>
-                        <td>{{ post.contenu|length > 50 ? post.contenu|slice(0, 50) ~ '...' : post.contenu }}</td>
-                        <td>{{ post.user.name }}</td>
-                        <td>{{ post.comments|length }}</td>
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Liste des posts</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Titre</th>
+                            <th>Contenu</th>
+                            <th>Auteur</th>
+                            <th>Commentaires</th>
+                            <th>Statut</th>
+                            <th class="text-center">Actions</th>
+                            <th>Toggle</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for post in forum_posts %}
+                            <tr>
+                                <td>{{ post.id }}</td>
+                                <td>{{ post.titre }}</td>
+                                <td>{{ post.contenu|length > 50 ? post.contenu|slice(0, 50) ~ '...' : post.contenu }}</td>
+                                <td>{{ post.user.name }}</td>
+                                <td>{{ post.comments|length }}</td>
 
                         {# ----------- STATUT (enabled) ---------- #}
                         <td>
@@ -88,16 +80,9 @@
                             {% endif %}
                         </td>
 
-                        {# ----------- ACTIONS VIEW / EDIT / DELETE ---------- #}
-                        <td class="actions flex">
-                            <a href="{{ path('app_forum_post_show', {'id': post.id}) }}" class="bg-blue-500 text-white px-2 py-1 rounded text-sm">Voir</a>
-
-                            <a href="{{ path('app_forum_post_edit', {'id': post.id}) }}" class="bg-gray-500 text-white px-2 py-1 rounded text-sm">Modifier</a>
-
-                            <form method="post" action="{{ path('app_forum_post_delete', {'id': post.id}) }}" onsubmit="return confirm('Voulez-vous vraiment supprimer ce post ?');">
-                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ post.id) }}">
-                                <button class="bg-red-500 text-white px-2 py-1 rounded text-sm">Supprimer</button>
-                            </form>
+                        {# ----------- ACTIONS (only Voir) ---------- #}
+                        <td class="text-center">
+                            <a href="{{ path('app_forum_post_show', {'id': post.id}) }}" class="btn btn-info btn-sm btn-view">Voir</a>
                         </td>
 
                         {# ----------- BOUTON ENABLE/DISABLE ---------- #}
@@ -111,7 +96,7 @@
                     </tr>
                 {% else %}
                     <tr>
-                        <td colspan="8" class="text-center">Aucun post trouvé.</td>
+                        <td colspan="7" class="text-center">Aucun post trouvé.</td>
                     </tr>
                 {% endfor %}
             </tbody>

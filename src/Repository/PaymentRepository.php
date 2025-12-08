@@ -106,6 +106,27 @@ class PaymentRepository extends ServiceEntityRepository
             ->getArrayResult();
     }
 
+    /**
+     * Retourne les cours les plus achetés (paiements avec statut "completed" et subscription liée à un cours).
+     *
+     * @param int $limit Nombre maximum de cours à retourner
+     * @return array<array{courseId: int, courseTitle: string, paymentsCount: string}>
+     */
+    public function findTopCoursesByPayments(int $limit = 3): array
+    {
+        return $this->createQueryBuilder('p')
+            ->innerJoin('p.subscription', 's')
+            ->innerJoin('s.cours', 'c')
+            ->andWhere('p.status = :status')
+            ->setParameter('status', 'completed')
+            ->select('c.id AS courseId, c.title AS courseTitle, COUNT(p.id) AS paymentsCount')
+            ->groupBy('c.id, c.title')
+            ->orderBy('paymentsCount', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getArrayResult();
+    }
+
     //    /**
     //     * @return Payment[] Returns an array of Payment objects
     //     */

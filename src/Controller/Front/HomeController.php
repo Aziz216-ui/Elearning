@@ -6,6 +6,7 @@ use App\Entity\Cours;
 use App\Entity\Auteur;
 use App\Repository\CoursRepository;
 use App\Repository\SubscriptionRepository;
+use Knp\Component\Pager\PaginatorInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,7 +27,7 @@ class HomeController extends AbstractController
 
     #[Route('/home/courses', name: 'app_home_courses')]
     #[Route('/home/courses.html', name: 'app_home_courses_html')]
-    public function courses(Request $request, CoursRepository $coursRepository): Response
+    public function courses(Request $request, CoursRepository $coursRepository, PaginatorInterface $paginator): Response
     {
         $currentCategory = $request->query->get('category');
         $currentCategory = ($currentCategory !== null && $currentCategory !== '') ? (string)$currentCategory : null;
@@ -50,7 +51,7 @@ class HomeController extends AbstractController
             $sortOrder = 'DESC';
         }
 
-        $cours = $coursRepository->findAdvanced(
+        $coursQuery = $coursRepository->findAdvanced(
             $currentCategory,
             null,
             null,
@@ -62,8 +63,14 @@ class HomeController extends AbstractController
             $sortOrder
         );
 
+        $pagination = $paginator->paginate(
+            $coursQuery,
+            $request->query->getInt('page', 1),
+            9
+        );
+
         return $this->render('Front/home/courses.html.twig', [
-            'cours' => $cours,
+            'cours' => $pagination,
             'distinctCategories' => $distinctCategories,
             'currentCategory' => $currentCategory,
             'currentType' => $type,
@@ -79,7 +86,7 @@ class HomeController extends AbstractController
     }
 
     #[Route('/home/my-courses', name: 'app_my_courses', methods: ['GET'])]
-    public function myCourses(SubscriptionRepository $subscriptionRepository): Response
+    public function myCourses(SubscriptionRepository $subscriptionRepository, PaginatorInterface $paginator, Request $request): Response
     {
         // Must be authenticated
         $user = $this->getUser();
@@ -87,10 +94,9 @@ class HomeController extends AbstractController
             return $this->redirectToRoute('app_login');
         }
 
-        // Fetch active subscriptions for the user
+        // Subscriptions based on plans
         $subscriptions = $subscriptionRepository->findActiveByUser($user);
 
-        // Aggregate courses from all active plans
         $byId = [];
         foreach ($subscriptions as $sub) {
             $plan = $sub->getPlan();
@@ -100,9 +106,18 @@ class HomeController extends AbstractController
             }
         }
 
+        // Subscriptions based on single courses
+        $courseSubscriptions = $subscriptionRepository->findActiveCourseSubscriptionsByUser($user);
+        foreach ($courseSubscriptions as $sub) {
+            $course = $sub->getCours();
+            if ($course) {
+                $byId[$course->getId()] = $course;
+            }
+        }
+
         $cours = array_values($byId);
 
-        // Build distinct categories from filtered set
+        // Build distinct categories from merged set
         $distinctCategories = [];
         foreach ($cours as $c) {
             $cat = $c->getCategory();
@@ -111,8 +126,14 @@ class HomeController extends AbstractController
             }
         }
 
+        $pagination = $paginator->paginate(
+            $cours,
+            $request->query->getInt('page', 1),
+            9
+        );
+
         return $this->render('Front/home/courses.html.twig', [
-            'cours' => $cours,
+            'cours' => $pagination,
             'distinctCategories' => $distinctCategories,
             'currentCategory' => null,
             'currentType' => 'my',

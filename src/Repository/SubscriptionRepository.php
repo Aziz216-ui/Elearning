@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Subscription;
 use App\Entity\User;
+use App\Entity\Plan;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
@@ -25,6 +26,24 @@ class SubscriptionRepository extends ServiceEntityRepository
         return $this->createQueryBuilder('s')
             ->andWhere('s.user = :user')
             ->setParameter('user', $user)
+            ->orderBy('s.startDate', 'DESC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    /**
+     * @return Subscription[] Returns active subscriptions for single courses (cours not null)
+     */
+    public function findActiveCourseSubscriptionsByUser(User $user): array
+    {
+        return $this->createQueryBuilder('s')
+            ->andWhere('s.user = :user')
+            ->andWhere('s.status = :status')
+            ->andWhere('s.cours IS NOT NULL')
+            ->andWhere('s.endDate IS NULL OR s.endDate >= :now')
+            ->setParameter('user', $user)
+            ->setParameter('status', 'active')
+            ->setParameter('now', new \DateTime())
             ->orderBy('s.startDate', 'DESC')
             ->getQuery()
             ->getResult();

@@ -1,5 +1,4 @@
-{% extends 'admin/layouts/base1_wrapper.html.twig' %}
-
+{% extends 'base1.html.twig' %}
 {% block title %}Subscriptions{% endblock %}
 {% block content %}
 <div class="container-fluid">
@@ -41,17 +40,19 @@
                         </select>
                     </div>
 
-                    <div class="form-group mr-3 mb-2">
-                        <label for="planId" class="mr-2 small mb-0">Plan</label>
-                        <select id="planId" name="planId" class="form-control form-control-sm">
-                            <option value="" {{ app.request.query.get('planId') is empty ? 'selected' : '' }}>Tous</option>
-                            {% for plan in plans %}
-                                <option value="{{ plan.id }}" {{ app.request.query.get('planId') == plan.id ? 'selected' : '' }}>
-                                    {{ plan.name }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    </div>
+                    {% if plans is defined %}
+                        <div class="form-group mr-3 mb-2">
+                            <label for="planId" class="mr-2 small mb-0">Plan</label>
+                            <select id="planId" name="planId" class="form-control form-control-sm">
+                                <option value="" {{ app.request.query.get('planId') is empty ? 'selected' : '' }}>Tous</option>
+                                {% for plan in plans %}
+                                    <option value="{{ plan.id }}" {{ app.request.query.get('planId') == plan.id ? 'selected' : '' }}>
+                                        {{ plan.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    {% endif %}
 
                     <button type="submit" class="btn btn-sm btn-primary mb-2">Filtrer</button>
                 </form>
@@ -62,7 +63,7 @@
                     <thead>
                         <tr>
                             <th>Utilisateur</th>
-                            <th>Plan</th>
+                            <th>Plan / Cours</th>
                             <th>Statut</th>
                             <th>Début</th>
                             <th>Fin</th>
@@ -74,7 +75,15 @@
                     {% for subscription in subscriptions %}
                         <tr>
                             <td>{{ subscription.user.email }}</td>
-                            <td>{{ subscription.plan.name }}</td>
+                            <td>
+                                {% if subscription.plan %}
+                                    Plan : {{ subscription.plan.name }}
+                                {% elseif subscription.cours %}
+                                    Cours : {{ subscription.cours.title }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
                             <td>
                                 <span class="badge {{ subscription.status == 'active' ? 'badge-success' : 'badge-secondary' }}">
                                     {{ subscription.status }}

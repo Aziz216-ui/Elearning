@@ -24,10 +24,12 @@ class PaymentController extends AbstractController
     {
         $payments = $paymentRepository->findAll();
         $topPlans = $paymentRepository->findTopPlansByPayments(3);
+        $topCourses = $paymentRepository->findTopCoursesByPayments(3);
 
         return $this->render('admin/payment/index.html.twig', [
             'payments' => $payments,
             'topPlans' => $topPlans,
+            'topCourses' => $topCourses,
         ]);
     }
 

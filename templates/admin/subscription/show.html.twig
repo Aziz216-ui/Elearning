@@ -1,4 +1,4 @@
-{% extends 'admin/layouts/base1_wrapper.html.twig' %}
+{% extends 'base1.html.twig' %}
 {% block title %}Abonnement #{{ subscription.id }}{% endblock %}
 
 {% block content %}
@@ -34,8 +34,16 @@
                             <td>{{ subscription.user.email }}</td>
                         </tr>
                         <tr>
-                            <th class="bg-light">Plan</th>
-                            <td>{{ subscription.plan.name }}</td>
+                            <th class="bg-light">Plan / Cours</th>
+                            <td>
+                                {% if subscription.plan %}
+                                    Plan : {{ subscription.plan.name }}
+                                {% elseif subscription.cours %}
+                                    Cours : {{ subscription.cours.title }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
                         </tr>
                         <tr>
                             <th class="bg-light">Statut</th>

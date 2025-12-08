@@ -20,8 +20,7 @@ class Subscription
     private ?User $user = null;
 
     #[ORM\ManyToOne]
-    #[ORM\JoinColumn(nullable: false)]
-    #[Assert\NotNull]
+    #[ORM\JoinColumn(nullable: true)]
     private ?Plan $plan = null;
 
     #[ORM\Column(length: 50)]
@@ -42,6 +41,9 @@ class Subscription
     #[ORM\Column]
     #[Assert\NotNull]
     private ?bool $autoRenew = null;
+
+    #[ORM\ManyToOne]
+    private ?Cours $cours = null;
 
     public function getId(): ?int
     {
@@ -123,6 +125,18 @@ class Subscription
     public function setAutoRenew(bool $autoRenew): static
     {
         $this->autoRenew = $autoRenew;
+
+        return $this;
+    }
+
+    public function getCours(): ?Cours
+    {
+        return $this->cours;
+    }
+
+    public function setCours(?Cours $cours): static
+    {
+        $this->cours = $cours;
 
         return $this;
     }
