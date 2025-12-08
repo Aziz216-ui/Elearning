@@ -1,0 +1,226 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║        🎓 SYSTÈME DE NOTIFICATION WEBHOOK POUR QUIZZES - E-LEARNING          ║
+║                                                                              ║
+║                          ✅ INSTALLATION COMPLÉTÉE                          ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 COMPOSANTS INSTALLÉS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Entités Doctrine
+   └─ WebhookSubscription (Nouvelle)
+   └─ QuizResult (Modifiée - startedAt)
+
+✅ Services
+   └─ QuizNotificationService
+   └─ WebhookDispatcher
+
+✅ API Endpoints
+   └─ GET    /api/webhooks
+   └─ POST   /api/webhooks
+   └─ GET    /api/webhooks/{id}
+   └─ PUT    /api/webhooks/{id}
+   └─ DELETE /api/webhooks/{id}
+   └─ POST   /api/webhooks/{id}/test
+
+✅ Database
+   └─ Migration exécutée
+   └─ Tables créées
+   └─ Indexes optimisés
+
+✅ Sécurité
+   └─ HMAC-SHA256 signature
+   └─ Authorization headers
+   └─ Role-based access (ROLE_ADMIN)
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🚀 DÉMARRAGE RAPIDE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1️⃣  Créer un webhook:
+
+    curl -X POST http://localhost:8000/api/webhooks \
+      -H "Content-Type: application/json" \
+      -H "Authorization: Bearer YOUR_TOKEN" \
+      -d '{
+        "url": "https://webhook.site/unique-id",
+        "eventType": "quiz_started"
+      }'
+
+2️⃣  Tester le webhook:
+
+    curl -X POST http://localhost:8000/api/webhooks/1/test \
+      -H "Authorization: Bearer YOUR_TOKEN"
+
+3️⃣  Voir la notification sur webhook.site ✅
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📖 DOCUMENTATION DISPONIBLE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 Documentation complète:
+   └─ WEBHOOK_SYSTEM.md               (Vue d'ensemble + architecture)
+   └─ WEBHOOK_API_REFERENCE.md        (Référence détaillée des endpoints)
+   └─ WEBHOOK_INTEGRATION_GUIDE.md    (Guide pas à pas d'intégration)
+   └─ WEBHOOK_COMPLETE_SUMMARY.md     (Résumé technique complet)
+   └─ README_WEBHOOKS.md              (Quick start)
+
+📊 Ressources supplémentaires:
+   └─ docs/WEBHOOK_SQL_QUERIES.sql    (Requêtes SQL de gestion)
+
+💻 Exemples de code:
+   └─ examples/webhook-receiver-nodejs.js
+   └─ examples/webhook-receiver-python.py
+   └─ examples/webhook-receiver-php.php
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🧪 TESTER IMMÉDIATEMENT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Opttion 1️⃣  webhook.site (aucun setup requis):
+   ✓ Allez sur https://webhook.site
+   ✓ Copiez votre URL unique
+   ✓ Créez un webhook avec POST /api/webhooks
+   ✓ Testez avec POST /api/webhooks/1/test
+   ✓ Voir les requêtes arriver en temps réel
+
+Option 2️⃣  Node.js:
+   $ cd examples
+   $ npm install express
+   $ node webhook-receiver-nodejs.js
+   ✓ Votre serveur écoute sur http://localhost:3000
+
+Option 3️⃣  Python:
+   $ pip install flask
+   $ python examples/webhook-receiver-python.py
+   ✓ Votre serveur écoute sur http://localhost:3000
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 ÉVÉNEMENTS WEBHOOK
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📌 quiz_started:
+   → Envoyé quand un étudiant clique "Commencer Quiz"
+   → Contient: Student, Quiz, Course, startedAt
+   → Format: JSON + en-têtes custom
+
+📌 quiz_completed:
+   → Envoyé quand un étudiant soumet ses réponses
+   → Contient: Student, Quiz, Score, Passed, Dates
+   → Format: JSON + en-têtes custom
+
+📌 all:
+   → Souscrit aux deux événements
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔐 SÉCURITÉ
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Chaque webhook inclut:
+
+   Header: X-Webhook-Signature
+   Value:  sha256=<hmac-sha256-hash>
+   
+   → Vérifiez la signature côté serveur
+   → Exemples Node.js, Python fournis
+   → Utilisez ALWAYS des vérifications timing-safe
+
+✅ Authentification API:
+
+   Tous les endpoints requièrent:
+   1. Bearer token valide
+   2. ROLE_ADMIN sur l'utilisateur
+   
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🎯 CAS D'USAGE TYPIQUES
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+1️⃣  Envoyer des emails aux admins
+    └─ Intégrer avec Mailgun, SendGrid, ou autre
+    └─ Notification instantanée quand un étudiant commence
+
+2️⃣  Dashboard en temps réel
+    └─ Afficher les activités en direct
+    └─ WebSocket/SSE pour mises à jour live
+
+3️⃣  Système d'alertes
+    └─ Alerter si pas d'activité après X minutes
+    └─ Notifier si trop de quizzes en même temps
+
+4️⃣  Statistiques automatiques
+    └─ Collecter les données en temps réel
+    └─ Analytics et rapports
+
+5️⃣  Intégrations externes
+    └─ Slack notifications
+    └─ Google Sheets logging
+    └─ CRM/LMS sync
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+✨ FONCTIONNALITÉS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+✅ Notification instantanée      → En temps réel
+✅ Sécurité HMAC                → Signature sur chaque requête
+✅ Retry automatique            → Jusqu'à 3 tentatives
+✅ Monitoring intégré           → Suivi des erreurs
+✅ Types d'événements flexibles → Configurables
+✅ Architecture scalable        → Par design asynchrone
+✅ Bien documentée              → Guides + exemples
+✅ Prête pour production        → Testée et validée
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🆘 DÉPANNAGE RAPIDE
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+❌ "Access Denied"
+   ✓ Utilisateur doit avoir ROLE_ADMIN
+   ✓ Vérifier: SELECT roles FROM user WHERE id = 1;
+
+❌ "Webhook not found"
+   ✓ Vérifier l'ID du webhook
+   ✓ Vérifier: SELECT id FROM webhook_subscription;
+
+❌ Webhook n'est pas envoyé
+   ✓ is_active doit être 1
+   ✓ URL doit être valide (HTTPS recommandé)
+   ✓ Vérifier les logs: tail -f var/log/dev.log
+
+❌ Échecs d'envoi répétés
+   ✓ Après 10 échecs, webhook est désactivé automatiquement
+   ✓ Réactiver: PUT /api/webhooks/1 avec "isActive": true
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📞 CONTACT & SUPPORT
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+📚 Documentation:
+   → WEBHOOK_API_REFERENCE.md (endpoints)
+   → WEBHOOK_SYSTEM.md (architecture)
+   → WEBHOOK_INTEGRATION_GUIDE.md (intégration)
+
+🔍 Debugging:
+   → Logs: tail -f var/log/dev.log
+   → Profiler: http://localhost:8000/_profiler
+   → Tests: webhook.site
+
+💾 Database:
+   → Queries: docs/WEBHOOK_SQL_QUERIES.sql
+   → Tables: webhook_subscription, quiz_result
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║                                                                              ║
+║                  ✅ SYSTÈME PRÊT POUR LA PRODUCTION! 🚀                      ║
+║                                                                              ║
+║                    Version: 1.0.0                                           ║
+║                    Date: 6 décembre 2025                                    ║
+║                    Statut: COMPLET ET FONCTIONNEL                           ║
+║                                                                              ║
+║                    Commencez par: WEBHOOK_API_REFERENCE.md                  ║
+║                                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝

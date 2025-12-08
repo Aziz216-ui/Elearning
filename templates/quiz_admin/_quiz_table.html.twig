@@ -7,6 +7,7 @@
             <th>Cours associé</th>
             <th>Questions</th>
             <th>Points</th>
+            <th>Temps (min)</th>
             <th>Visibilité</th>
             <th class="text-end">Actions</th>
         </tr>
@@ -19,6 +20,8 @@
             <td>{{ quiz.cours ? quiz.cours.title : 'Aucun cours associé' }}</td>
             <td>{{ quiz.questions|length }}</td>
             <td>{{ quiz.totalPoints }}</td>
+            <td>{{ quiz.timeLimit ?? '-' }}</td>
+
             <td>
                 {% if quiz.isVisible %}
                     <span class="badge-custom badge-visible">

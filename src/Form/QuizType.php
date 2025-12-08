@@ -84,13 +84,14 @@ class QuizType extends AbstractType
             ])
             ->add('timeLimit', IntegerType::class, [
                 'label' => 'Limite de temps (en minutes)',
-                'required' => false,
+                'required' => true,
                 'attr' => [
                     'class' => 'form-control',
                     'min' => '1',
-                    'max' => '120'
+                    'max' => '120',
+                    'required' => 'required'
                 ],
-                'help' => 'Laissez vide pour pas de limite de temps'
+                'help' => 'Durée maximale du quiz en minutes (1-120)'
             ]);
     }
 

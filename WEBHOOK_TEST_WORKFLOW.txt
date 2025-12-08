@@ -1,0 +1,312 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                ║
+║                  ✅ WEBHOOK SYSTEM - SETUP & TEST WORKFLOW                   ║
+║                                                                                ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+═══════════════════════════════════════════════════════════════════════════════════
+🎯 VOTRE OBJECTIF
+═══════════════════════════════════════════════════════════════════════════════════
+
+URL Webhook.site fournie:
+   https://webhook.site/401957a8-71fe-4435-9776-8dfa554dbb5c
+
+But: Tester que chaque quiz événement (début/fin) est envoyé à cette URL
+
+═══════════════════════════════════════════════════════════════════════════════════
+📊 ARCHITECTURE DE TEST
+═══════════════════════════════════════════════════════════════════════════════════
+
+   ┌──────────────┐
+   │  Votre PC    │
+   └──────┬───────┘
+          │
+          ├─────────────────────────────────────────────────────────┐
+          │                                                         │
+          │  Terminal 1: Server                                     │
+          │  ════════════════════════════════════════════════════  │
+          │  $ php -S localhost:8000 -t public                     │
+          │  Symfony API sur http://localhost:8000                │
+          │                                                        │
+          │  Terminal 2: Test                                      │
+          │  ════════════════════════════════════════════════════  │
+          │  $ .\quick_test_webhook.ps1                            │
+          │  Lance les requêtes de test                           │
+          │                                                        │
+          ├─────────────────────────────────────────────────────────┤
+          │                                                         │
+          │  Browser: E-Learning                                    │
+          │  ════════════════════════════════════════════════════  │
+          │  http://localhost:8000/                               │
+          │  Test du vrai flux: quiz start -> quiz complete       │
+          │                                                        │
+          └─────────────────────────────────────────────────────────┘
+                          │
+                          │ Webhooks envoyés
+                          ▼
+          ┌────────────────────────────────────┐
+          │     webhook.site (Internet)         │
+          │  ════════════════════════════════  │
+          │  Affiche toutes les requêtes       │
+          │  reçues depuis votre serveur       │
+          │                                    │
+          │  https://webhook.site/401957a8... │
+          └────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════════
+⏱️  TIMELINE DE DÉMARRAGE
+═══════════════════════════════════════════════════════════════════════════════════
+
+   MINUTE 0: Configuration
+   ───────────────────────────────────────────────────────────────
+   Lancez DANS UN TERMINAL:
+   $ cd "c:\xampp\htdocs\version final\Elearning"
+   $ php setup_webhook_admin.php
+
+   Résultat:
+   ✅ Rôle ROLE_ADMIN assigné à fedi@test.com
+   ✅ Token généré et sauvegardé dans .webhook_token
+   ⏱️  Durée: ~5 secondes
+
+
+   MINUTE 1: Démarrage Symfony
+   ───────────────────────────────────────────────────────────────
+   Lancez DANS UN NOUVEAU TERMINAL:
+   $ cd "c:\xampp\htdocs\version final\Elearning"
+   $ php -S localhost:8000 -t public
+
+   Résultat:
+   ✅ Serveur écoute sur http://localhost:8000
+   ✅ Symfony prêt pour recevoir des requêtes
+   ⏱️  Durée: ~3 secondes
+
+
+   MINUTE 2: Test Automatisé
+   ───────────────────────────────────────────────────────────────
+   Lancez DANS UN TROISIÈME TERMINAL:
+   $ cd "c:\xampp\htdocs\version final\Elearning"
+   $ .\quick_test_webhook.ps1
+
+   Résultat:
+   ✅ Webhook créé avec ID: 1
+   ✅ Test webhook envoyé
+   ✅ Requête visible sur webhook.site
+   ⏱️  Durée: ~30 secondes
+
+
+   MINUTE 3: Vérification
+   ───────────────────────────────────────────────────────────────
+   Allez sur:
+   https://webhook.site/401957a8-71fe-4435-9776-8dfa554dbb5c
+
+   Vous devriez voir:
+   ✅ 1 requête "POST" depuis votre machine
+   ✅ Headers incluant X-Webhook-Signature
+   ✅ Body JSON avec les données du test
+   ⏱️  Durée: instant
+
+
+   TOTAL: ~2 MINUTES POUR AVOIR LE SYSTÈME EN MARCHE!
+
+═══════════════════════════════════════════════════════════════════════════════════
+📝 DÉTAILS DES FICHIERS DE TEST
+═══════════════════════════════════════════════════════════════════════════════════
+
+   🔧 setup_webhook_admin.php (À LANCER UNE FOIS)
+   ──────────────────────────────────────────────────────
+   ✅ Attribue ROLE_ADMIN à l'utilisateur
+   ✅ Génère un token d'authentification
+   ✅ Sauvegarde le token dans .webhook_token
+   
+   Commande: php setup_webhook_admin.php
+   Durée: ~2 secondes
+
+
+   🚀 quick_test_webhook.ps1 (PRINCIPAL)
+   ──────────────────────────────────────────────────────
+   ✅ Crée un webhook automatiquement
+   ✅ Configure-le pour votre URL webhook.site
+   ✅ Envoie un test automatiquement
+   ✅ Affiche les résultats
+   
+   Commande: .\quick_test_webhook.ps1
+   Durée: ~30 secondes
+
+
+   📋 test_curl.bat (ALTERNATIVE)
+   ──────────────────────────────────────────────────────
+   ✅ Version cURL simple (pas PowerShell)
+   ✅ Montre les requêtes brutes
+   ✅ Utile si PowerShell ne fonctionne pas
+   
+   Commande: test_curl.bat
+   Durée: ~30 secondes
+
+
+   🧪 test_webhook.ps1 (DÉTAILS)
+   ──────────────────────────────────────────────────────
+   ✅ Version plus détaillée de quick_test_webhook.ps1
+   ✅ Plus de logs et d'informations
+   ✅ Utile pour déboguer
+   
+   Commande: .\test_webhook.ps1
+   Durée: ~1 minute
+
+═══════════════════════════════════════════════════════════════════════════════════
+✨ VÉRIFICATION ÉTAPE PAR ÉTAPE
+═══════════════════════════════════════════════════════════════════════════════════
+
+   ✅ ÉTAPE 1: Token configuré
+      └─ File exists: .webhook_token
+      └─ Contains: 64 characters (token SHA256)
+
+   ✅ ÉTAPE 2: Serveur lancé
+      └─ Port: 8000 écoute
+      └─ URL: http://localhost:8000 accessible
+      └─ Symfony logs: var/log/dev.log
+
+   ✅ ÉTAPE 3: Webhook créé
+      └─ ID: 1 (ou supérieur)
+      └─ URL: https://webhook.site/401957a8...
+      └─ Événement: all (quiz_started + quiz_completed)
+      └─ Status: isActive = true
+
+   ✅ ÉTAPE 4: Test envoyé
+      └─ POST request envoyé
+      └─ Response: {"success": true}
+      └─ URL webhook.site reçoit la requête
+
+   ✅ ÉTAPE 5: Signature HMAC valide
+      └─ Header: X-Webhook-Signature présent
+      └─ Format: sha256=abcd1234...
+      └─ Peut être vérifié avec le secret du webhook
+
+═══════════════════════════════════════════════════════════════════════════════════
+🎯 TEST COMPLÈTEMENT MANUEL (SI LES SCRIPTS NE FONCTIONNENT PAS)
+═══════════════════════════════════════════════════════════════════════════════════
+
+   TERMINAL 1: Lancer Symfony
+   ───────────────────────────────────────────────────────────────
+   $ cd "c:\xampp\htdocs\version final\Elearning"
+   $ php -S localhost:8000 -t public
+
+
+   TERMINAL 2: Créer le webhook via cURL
+   ───────────────────────────────────────────────────────────────
+   Remplacez YOUR_TOKEN par le contenu de .webhook_token:
+
+   $ curl -X POST http://localhost:8000/api/webhooks `
+     -H "Content-Type: application/json" `
+     -H "Authorization: Bearer YOUR_TOKEN" `
+     -d '{"url":"https://webhook.site/401957a8-71fe-4435-9776-8dfa554dbb5c","eventType":"all"}'
+
+
+   TERMINAL 2: Envoyer un test
+   ───────────────────────────────────────────────────────────────
+   $ curl -X POST http://localhost:8000/api/webhooks/1/test `
+     -H "Authorization: Bearer YOUR_TOKEN"
+
+
+   BROWSER: Vérifier webhook.site
+   ───────────────────────────────────────────────────────────────
+   Allez sur: https://webhook.site/401957a8-71fe-4435-9776-8dfa554dbb5c
+   Vous devriez voir les requêtes!
+
+═══════════════════════════════════════════════════════════════════════════════════
+🔄 FLUX COMPLET (VRAI SCÉNARIO)
+═══════════════════════════════════════════════════════════════════════════════════
+
+   1. Étudiant se connecte à http://localhost:8000/front/
+   2. Étudiant accède au quiz
+   3. Étudiant clique "Commencer Quiz"
+      → Backend crée QuizResult avec startedAt
+      → Service envoie webhook 'quiz_started' à webhook.site
+      → Webhook.site reçoit la requête ✅
+
+   4. Étudiant répond aux questions
+   5. Étudiant clique "Soumettre"
+      → Backend calcule le score
+      → Service envoie webhook 'quiz_completed' à webhook.site
+      → Webhook.site reçoit la requête ✅
+
+   6. Admin regarde webhook.site
+      → Voit que l'étudiant a commencé le quiz
+      → Voit que l'étudiant a complété le quiz
+      → Voit le score et les résultats
+
+═══════════════════════════════════════════════════════════════════════════════════
+📊 PAYLOAD EXEMPLE
+═══════════════════════════════════════════════════════════════════════════════════
+
+   quiz_started (lors du clic "Commencer Quiz"):
+   ───────────────────────────────────────────────────────────────
+   {
+     "event": "quiz_started",
+     "timestamp": "2025-12-06T14:30:00+00:00",
+     "data": {
+       "quiz_result_id": 123,
+       "student": {
+         "id": 1,
+         "email": "student@example.com",
+         "firstName": "Jean",
+         "lastName": "Dupont"
+       },
+       "quiz": {
+         "id": 5,
+         "title": "Quiz de Mathématiques",
+         "duration": 60
+       },
+       "course": {
+         "id": 3,
+         "title": "Mathématiques 101"
+       },
+       "startedAt": "2025-12-06T14:30:00+00:00"
+     }
+   }
+
+
+   quiz_completed (lors de la soumission):
+   ───────────────────────────────────────────────────────────────
+   {
+     "event": "quiz_completed",
+     "timestamp": "2025-12-06T14:35:00+00:00",
+     "data": {
+       "quiz_result_id": 123,
+       "student": {
+         "id": 1,
+         "email": "student@example.com",
+         "firstName": "Jean",
+         "lastName": "Dupont"
+       },
+       "quiz": {
+         "id": 5,
+         "title": "Quiz de Mathématiques",
+         "duration": 60
+       },
+       "course": {
+         "id": 3,
+         "title": "Mathématiques 101"
+       },
+       "score": 85,
+       "maxScore": 100,
+       "percentage": 85.0,
+       "isPassed": true,
+       "completedAt": "2025-12-06T14:35:00+00:00"
+     }
+   }
+
+═══════════════════════════════════════════════════════════════════════════════════
+
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                ║
+║                     🚀 READY TO START?                                        ║
+║                                                                                ║
+║   1. Open PowerShell as Admin                                                ║
+║   2. Run: php setup_webhook_admin.php                                        ║
+║   3. In NEW terminal: php -S localhost:8000 -t public                        ║
+║   4. In ANOTHER terminal: .\quick_test_webhook.ps1                           ║
+║   5. Check: https://webhook.site/401957a8...                                ║
+║                                                                                ║
+║                     ✅ DONE! You see your webhooks!                          ║
+║                                                                                ║
+╚════════════════════════════════════════════════════════════════════════════════╝

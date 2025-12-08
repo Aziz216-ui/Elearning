@@ -4,7 +4,7 @@
 
 {% block page_title %}Gestion des quiz{% endblock %}
 
-{% block content %}
+{% block body %}
 <div class="container mt-4">
     {% for label, messages in app.flashes %}
     {% for message in messages %}
@@ -432,9 +432,33 @@
         <h1>Gestion des quiz</h1>
         <p class="header-subtitle">Visualisez, filtrez et gérez tous vos quiz en un seul endroit.</p>
     </div>
-    <a href="{{ path('app_quiz_admin_new') }}" class="btn-primary-custom">
-        <span>+</span> Créer un nouveau quiz
-    </a>
+    <div style="display: flex; gap: 15px; align-items: center;">
+        <!-- Icône de notification -->
+        <div style="position: relative; display: inline-block;">
+            <i class="fas fa-bell" style="font-size: 20px; color: #333; cursor: pointer;" 
+               onclick="alert('Notifications: ' + (document.getElementById('notificationBadge').textContent || '0'))"></i>
+            <div id="notificationBadge" 
+                 style="display: none; 
+                        position: absolute; 
+                        top: -8px; 
+                        right: -8px; 
+                        background: #dc3545; 
+                        color: white; 
+                        border-radius: 50%; 
+                        width: 20px; 
+                        height: 20px; 
+                        display: flex; 
+                        align-items: center; 
+                        justify-content: center; 
+                        font-size: 12px; 
+                        font-weight: bold;">
+                0
+            </div>
+        </div>
+        <a href="{{ path('app_quiz_admin_new') }}" class="btn-primary-custom">
+            <span>+</span> Créer un nouveau quiz
+        </a>
+    </div>
 </div>
 
 <div class="card-base stats-card">
@@ -553,9 +577,31 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     searchInput.addEventListener('input', fetchQuizzes);
-
     visibilitySelect.addEventListener('change', fetchQuizzes);
+    
+    // Système de notifications
+    checkNotifications();
+    setInterval(checkNotifications, 10000);
 });
+
+function checkNotifications() {
+    fetch('/api/notifications/unread')
+        .then(response => response.json())
+        .then(data => {
+            updateNotificationBadge(data.count);
+        })
+        .catch(error => console.log('Notifications pas encore configurées'));
+}
+
+function updateNotificationBadge(count) {
+    const badge = document.getElementById('notificationBadge');
+    if (count > 0) {
+        badge.textContent = count > 99 ? '99+' : count;
+        badge.style.display = 'flex';
+    } else {
+        badge.style.display = 'none';
+    }
+}
 
 function resetFilters() {
     // Reset the form fields

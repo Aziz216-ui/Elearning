@@ -1,0 +1,197 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                ║
+║              🚀 GUIDE RAPIDE - TEST WEBHOOK AVEC WEBHOOK.SITE                 ║
+║                                                                                ║
+║                     URL: https://webhook.site/401957a8-71fe-4435-9776-8d...   ║
+║                                                                                ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+═══════════════════════════════════════════════════════════════════════════════════
+⚡ DÉMARRAGE RAPIDE (3 ÉTAPES - 2 MINUTES)
+═══════════════════════════════════════════════════════════════════════════════════
+
+   ┌─────────────────────────────────────────────────────────────┐
+   │ ÉTAPE 1: Configurer l'Admin                               │
+   ├─────────────────────────────────────────────────────────────┤
+   │ Windows PowerShell (Admin):                                │
+   │                                                             │
+   │   $ cd "c:\xampp\htdocs\version final\Elearning"           │
+   │   $ php setup_webhook_admin.php                            │
+   │                                                             │
+   │ Résultat: ✅ Token généré et sauvegardé                   │
+   │           ✅ Rôle ROLE_ADMIN attribué                      │
+   └─────────────────────────────────────────────────────────────┘
+
+   ┌─────────────────────────────────────────────────────────────┐
+   │ ÉTAPE 2: Lancer Symfony                                    │
+   ├─────────────────────────────────────────────────────────────┤
+   │ Dans un terminal (NEW):                                     │
+   │                                                             │
+   │   $ cd "c:\xampp\htdocs\version final\Elearning"           │
+   │   $ php -S localhost:8000 -t public                        │
+   │                                                             │
+   │ Résultat: ✅ Serveur sur http://localhost:8000            │
+   └─────────────────────────────────────────────────────────────┘
+
+   ┌─────────────────────────────────────────────────────────────┐
+   │ ÉTAPE 3: Lancer le Test                                    │
+   ├─────────────────────────────────────────────────────────────┤
+   │ Dans un AUTRE terminal:                                    │
+   │                                                             │
+   │   $ cd "c:\xampp\htdocs\version final\Elearning"           │
+   │   $ .\quick_test_webhook.ps1                               │
+   │                                                             │
+   │ Résultat: ✅ Webhook créé et test envoyé                  │
+   │           ✅ Vérifiez webhook.site pour les requêtes       │
+   └─────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════════════════
+📋 FICHIERS DE TEST CRÉÉS
+═══════════════════════════════════════════════════════════════════════════════════
+
+   ✅ setup_webhook_admin.php
+      └─ Configure l'utilisateur admin et génère le token
+      └─ À lancer une fois: php setup_webhook_admin.php
+
+   ✅ quick_test_webhook.ps1
+      └─ Script PowerShell automatisé (RECOMMANDÉ)
+      └─ À lancer: .\quick_test_webhook.ps1
+
+   ✅ test_webhook.ps1
+      └─ Alternative en PowerShell avec plus de détails
+      └─ À lancer: .\test_webhook.ps1
+
+   ✅ run_test.bat
+      └─ Script Batch pour Windows (alternative)
+      └─ À lancer: .\run_test.bat
+
+═══════════════════════════════════════════════════════════════════════════════════
+🎯 QUE FAUT-IL VÉRIFIER APRÈS LE TEST?
+═══════════════════════════════════════════════════════════════════════════════════
+
+   1. Allez sur votre URL webhook.site:
+      https://webhook.site/401957a8-71fe-4435-9776-8dfa554dbb5c
+
+   2. Vous devriez voir des requêtes HTTP POST avec:
+
+      ✅ Headers importants:
+         - X-Webhook-Signature: sha256=abc123... (signature HMAC)
+         - Content-Type: application/json
+         - User-Agent: Symfony-Webhook-Dispatcher/1.0
+
+      ✅ Body JSON ressemble à:
+         {
+           "event": "webhook_test",
+           "timestamp": "2025-12-06T12:34:56+00:00",
+           "data": {
+             "message": "Ceci est un test webhook"
+           }
+         }
+
+═══════════════════════════════════════════════════════════════════════════════════
+🚀 TESTER EN VRAI (SCÉNARIO COMPLET)
+═══════════════════════════════════════════════════════════════════════════════════
+
+   1. Ouvrez votre application E-Learning:
+      http://localhost:8000/
+
+   2. Connectez-vous en tant qu'ÉTUDIANT
+
+   3. Allez sur un Quiz et cliquez "Commencer Quiz"
+      → Un webhook 'quiz_started' doit être envoyé
+      → Allez sur webhook.site pour vérifier ✅
+
+   4. Complétez le quiz et cliquez "Soumettre"
+      → Un webhook 'quiz_completed' doit être envoyé
+      → Allez sur webhook.site pour vérifier ✅
+
+   5. Vous devriez voir deux webhooks différents avec des payloads différentes
+
+═══════════════════════════════════════════════════════════════════════════════════
+🔐 SÉCURITÉ - VÉRIFIER LA SIGNATURE HMAC
+═══════════════════════════════════════════════════════════════════════════════════
+
+   Chaque webhook inclut un header X-Webhook-Signature:
+
+   1. Sur webhook.site, cliquez sur une requête
+   2. Allez dans l'onglet "Raw"
+   3. Trouvez le header: X-Webhook-Signature: sha256=...
+   4. Vous pouvez le vérifier côté serveur avec le secret
+
+   Format de signature:
+   ─────────────────────────────────────────────────────────────
+   X-Webhook-Signature: sha256=HASH
+
+   Où HASH = HMAC-SHA256(json_payload, webhook_secret)
+
+   Cela garantit que le webhook vient bien de votre serveur!
+
+═══════════════════════════════════════════════════════════════════════════════════
+❓ DÉPANNAGE
+═══════════════════════════════════════════════════════════════════════════════════
+
+   ❌ "Token non trouvé"
+      → Lancez: php setup_webhook_admin.php
+
+   ❌ "Serveur Symfony non trouvé"
+      → Lancez: php -S localhost:8000 -t public
+      → Dans UN AUTRE terminal!
+
+   ❌ "Authorization: Bearer token rejected"
+      → Vérifiez que l'utilisateur a ROLE_ADMIN
+      → Lancez: php setup_webhook_admin.php
+
+   ❌ "Webhook not created"
+      → Vérifiez l'URL webhook.site est valide
+      → Vérifiez que curl/PowerShell peut accéder à http://localhost:8000
+
+   ❌ "Aucune requête sur webhook.site"
+      → Vérifiez que Symfony est lancé
+      → Vérifiez que le webhook a été créé avec succès
+      → Vérifiez que l'URL webhook.site est correcte
+      → Vérifiez les logs Symfony: var/log/dev.log
+
+═══════════════════════════════════════════════════════════════════════════════════
+📊 FICHIERS IMPORTANTS
+═══════════════════════════════════════════════════════════════════════════════════
+
+   .webhook_token
+      └─ Contient votre token Bearer
+      └─ NE PAS partager!
+      └─ À regénérer si perdu: php setup_webhook_admin.php
+
+   src/Service/WebhookDispatcher.php
+      └─ Gère l'envoi des webhooks
+      └─ Crée les signatures HMAC
+      └─ Gère les retries
+
+   src/Service/QuizNotificationService.php
+      └─ Coordonne les notifications
+      └─ Récupère les webhooks actifs
+      └─ Appelle le Dispatcher
+
+   src/Controller/Api/WebhookApiController.php
+      └─ API REST pour la gestion des webhooks
+      └─ Endpoints: GET, POST, PUT, DELETE, test
+
+═══════════════════════════════════════════════════════════════════════════════════
+💡 CONSEILS
+═══════════════════════════════════════════════════════════════════════════════════
+
+   1. Gardez webhook.site ouvert pendant que vous testez
+   2. Utilisez F5 pour rafraîchir et voir les nouvelles requêtes
+   3. Cliquez sur une requête pour voir les détails complets
+   4. Copiez les signatures HMAC pour vérifier côté serveur
+   5. Utilisez les logs Symfony pour déboguer: var/log/dev.log
+
+═══════════════════════════════════════════════════════════════════════════════════
+
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                ║
+║                     ✅ PRÊT À TESTER? LANCEZ:                                 ║
+║                                                                                ║
+║              $ .\quick_test_webhook.ps1                                       ║
+║                                                                                ║
+║                    (Après avoir lancé Symfony sur :8000)                       ║
+║                                                                                ║
+╚════════════════════════════════════════════════════════════════════════════════╝

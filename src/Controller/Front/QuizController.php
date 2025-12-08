@@ -10,6 +10,7 @@ use App\Entity\Answer;
 use App\Entity\UserAnswer;
 use App\Repository\PanierRepository;
 use App\Repository\QuizRepository;
+use App\Service\QuizNotificationService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -34,8 +35,11 @@ class QuizController extends AbstractController
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
         $user = $this->getUser();
 
-        // Afficher la liste des quiz même si l'utilisateur n'a pas encore acheté ce cours.
-        // Le contrôle d'accès strict est effectué lors du démarrage du quiz (action start).
+        // Vérifier si l'utilisateur a accès au cours
+        if (!$panierRepository->isCourseInUserPanier($user, $cours)) {
+            $this->addFlash('error', 'Vous devez d\'abord ajouter ce cours à votre panier.');
+            return $this->redirectToRoute('app_dashboard');
+        }
 
         // Gestion du tri
         $sort = $request->query->get('sort');
@@ -64,8 +68,13 @@ class QuizController extends AbstractController
      * Affiche un quiz spécifique pour le passage
      */
     #[Route('/start/{id}', name: 'app_quiz_start')]
-    public function start(Quiz $quiz, EntityManagerInterface $em, PanierRepository $panierRepository): Response
-    {
+    public function start(
+        Quiz $quiz,
+        Request $request,
+        EntityManagerInterface $em,
+        PanierRepository $panierRepository,
+        QuizNotificationService $notificationService
+    ): Response {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
         $user = $this->getUser();
         $cours = $quiz->getCours();
@@ -75,23 +84,84 @@ class QuizController extends AbstractController
             $this->addFlash('error', 'Accès non autorisé à ce quiz.');
             return $this->redirectToRoute('app_dashboard');
         }
-        
+
         if (!$quiz->isVisible()) {
             $this->addFlash('error', 'Ce quiz n\'est pas disponible pour le moment.');
             return $this->redirectToRoute('app_dashboard');
         }
 
-        $questions = $em->getRepository(Question::class)->findBy(['quiz' => $quiz]);
+        // Vérifier si l'étudiant a déjà commencé ce quiz
+        $existingResult = $em->getRepository(QuizResult::class)->findOneBy([
+            'user' => $user,
+            'quiz' => $quiz
+        ]);
 
-        // La limite de temps est stockée en minutes dans le back-office, on la convertit en secondes pour le JS
-        $timeLimitMinutes = $quiz->getTimeLimit() ?? 30; // 30 minutes par défaut si non défini
-        $timeLimitSeconds = $timeLimitMinutes * 60;
+        if ($existingResult === null) {
+            // Créer une nouvelle session de quiz
+            $quizResult = new QuizResult();
+            $quizResult->setUser($user);
+            $quizResult->setQuiz($quiz);
+            $quizResult->setStartedAt(new \DateTimeImmutable());
+
+            $em->persist($quizResult);
+            $em->flush();
+
+            // Stocker l'ID de la session en session utilisateur
+            $request->getSession()->set('quiz_result_id', $quizResult->getId());
+        } else {
+            // L'utilisateur reprend un quiz commencé
+            $request->getSession()->set('quiz_result_id', $existingResult->getId());
+            $quizResult = $existingResult;
+        }
+
+        // Envoyer la notification aux admins via webhook (à chaque fois)
+        try {
+            $notificationService->notifyQuizStarted($quizResult);
+            
+            // Log pour debug
+            error_log('Notification envoyée pour quiz ID: ' . $quiz->getId() . ' par user ID: ' . $user->getId());
+            
+        } catch (\Exception $e) {
+            error_log('ERREUR notification: ' . $e->getMessage());
+        }
+        
+        // Créer une notification directement pour l'admin connecté
+        try {
+            $notification = new \App\Entity\Notification();
+            $notification->setAdmin($user);
+            $notification->setTitle('Quiz commencé');
+            $notification->setMessage(sprintf('L\'étudiant %s a commencé le quiz "%s"', $user->getEmail(), $quiz->getTitle()));
+            $notification->setType('quiz_started');
+            $notification->setData([
+                'quiz_result_id' => $quizResult->getId(),
+                'student' => [
+                    'id' => $user->getId(),
+                    'email' => $user->getEmail(),
+                    'fullName' => $user->getName() . ' ' . $user->getLastname()
+                ],
+                'quiz' => [
+                    'id' => $quiz->getId(),
+                    'title' => $quiz->getTitle()
+                ]
+            ]);
+            
+            $em->persist($notification);
+            $em->flush();
+            
+            $this->addFlash('success', 'Quiz commencé - Notification créée avec succès !');
+            
+        } catch (\Exception $e) {
+            error_log('ERREUR création notification directe: ' . $e->getMessage());
+            $this->addFlash('error', 'Erreur lors de la création de la notification');
+        }
+
+        $questions = $em->getRepository(Question::class)->findBy(['quiz' => $quiz]);
 
         return $this->render('quiz/quiz.html.twig', [
             'cours' => $cours,
             'quiz' => $quiz,
             'questions' => $questions,
-            'timeLimit' => $timeLimitSeconds,
+            'timeLimit' => $quiz->getTimeLimit() ?? 1800
         ]);
     }
 
@@ -99,8 +169,13 @@ class QuizController extends AbstractController
      * Soumettre les réponses d'un quiz
      */
     #[Route('/submit/{id}', name: 'app_quiz_submit', methods: ['POST'])]
-    public function submit(Quiz $quiz, Request $request, EntityManagerInterface $em, PanierRepository $panierRepository): Response
-    {
+    public function submit(
+        Quiz $quiz,
+        Request $request,
+        EntityManagerInterface $em,
+        PanierRepository $panierRepository,
+        QuizNotificationService $notificationService
+    ): Response {
         $this->denyAccessUnlessGranted('IS_AUTHENTICATED_REMEMBERED');
         $user = $this->getUser();
         $cours = $quiz->getCours();
@@ -125,19 +200,53 @@ class QuizController extends AbstractController
         $postData = $request->request->all();
         $answers = $postData['answers'] ?? [];
 
-        // Instrumentation: vérifier la réception des données du formulaire
-        $this->addFlash('info', sprintf('Soumission du quiz: %d réponse(s) reçue(s).', is_array($answers) ? count($answers) : 0));
+        // Récupérer ou créer la session de quiz
+        $quizResultId = $request->getSession()->get('quiz_result_id');
+        $quizResult = null;
+        
+        if ($quizResultId) {
+            $quizResult = $em->getRepository(QuizResult::class)->find($quizResultId);
+        }
+
+        if (!$quizResult) {
+            $quizResult = new QuizResult();
+            $quizResult->setUser($user);
+            $quizResult->setQuiz($quiz);
+            $quizResult->setStartedAt(new \DateTimeImmutable());
+        }
 
         // Traiter chaque question
         foreach ($questions as $question) {
             $totalPoints += $question->getPoints();
             $questionId = $question->getId();
+            $isBooleanQuestion = $question->getType() === 'boolean';
 
             if (isset($answers[$questionId])) {
                 $answerId = $answers[$questionId];
-                $answer = $em->getRepository(Answer::class)->find($answerId);
+                $answer = null;
+                $isCorrect = false;
 
-                if ($answer && $answer->isCorrect()) {
+                if ($isBooleanQuestion) {
+                    // Pour les questions booléennes, on récupère la réponse correcte depuis la base
+                    $correctAnswer = $question->getAnswers()->filter(function($a) {
+                        return $a->isCorrect();
+                    })->first();
+                    
+                    // Si l'utilisateur a coché "Vrai" (réponse non vide), on vérifie si c'est correct
+                    if (!empty($answerId) && $correctAnswer) {
+                        $isCorrect = true;
+                        $answer = $correctAnswer;
+                    } else if (empty($answerId) && !$correctAnswer) {
+                        // Si l'utilisateur a coché "Faux" (réponse vide) et qu'il n'y a pas de réponse correcte
+                        $isCorrect = true;
+                    }
+                } else {
+                    // Comportement normal pour les autres types de questions
+                    $answer = $em->getRepository(Answer::class)->find($answerId);
+                    $isCorrect = $answer && $answer->isCorrect();
+                }
+
+                if ($isCorrect) {
                     $score += $question->getPoints();
                     $correctAnswers++;
                 }
@@ -147,7 +256,7 @@ class QuizController extends AbstractController
                 $userAnswer->setUser($user);
                 $userAnswer->setQuestion($question);
                 $userAnswer->setAnswer($answer);
-                $userAnswer->setIsCorrect($answer && $answer->isCorrect());
+                $userAnswer->setIsCorrect($isCorrect);
                 $em->persist($userAnswer);
             } else {
                 // Créer une réponse vide pour les questions non répondues
@@ -167,9 +276,6 @@ class QuizController extends AbstractController
         $percentage = round($finalScore, 2);
 
         // Enregistrer le résultat du quiz
-        $quizResult = new QuizResult();
-        $quizResult->setUser($user);
-        $quizResult->setQuiz($quiz);
         $quizResult->setScore($score);
         $quizResult->setTotalPoints($totalPoints);
         $quizResult->setPassed($passed);
@@ -177,6 +283,12 @@ class QuizController extends AbstractController
 
         $em->persist($quizResult);
         $em->flush();
+
+        // Envoyer la notification de complétion aux admins
+        $notificationService->notifyQuizCompleted($quizResult);
+
+        // Effacer la session du quiz
+        $request->getSession()->remove('quiz_result_id');
 
         // Afficher les résultats à l'utilisateur
         $this->addFlash('info', sprintf('Votre score : %d / %d (%.0f%%)', $score, $totalPoints, $percentage));

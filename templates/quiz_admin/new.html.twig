@@ -326,6 +326,38 @@
             border-top: 2px solid var(--border);
         }
 
+        /* Styles pour la gestion des erreurs */
+        .has-error .form-control,
+        .has-error .form-check-input {
+            border-color: #dc3545 !important;
+        }
+        
+        .has-error .form-control:focus,
+        .has-error .form-check-input:focus {
+            box-shadow: 0 0 0 0.2rem rgba(220, 53, 69, 0.25);
+        }
+        
+        .error-text {
+            color: #dc3545;
+            font-size: 0.875em;
+            margin-top: 0.25rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-group.has-error {
+            animation: shake 0.5s ease-in-out;
+        }
+        
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+            20%, 40%, 60%, 80% { transform: translateX(5px); }
+        }
+
         @media (max-width: 1024px) {
             .form-layout {
                 grid-template-columns: 1fr;
@@ -357,7 +389,7 @@
     </style>
 {% endblock %}
 
-{% block content %}
+{% block body %}
     <div class="container-fluid">
         <div class="d-sm-flex align-items-center justify-content-between mb-4">
             <div>
@@ -426,6 +458,22 @@
                                 <div class="error-text">{{ form_errors(form.cours) }}</div>
                             </div>
 
+                            {% set totalPointsHasError = not form.totalPoints.vars.valid %}
+                            <div class="form-group {{ totalPointsHasError ? 'has-error' : '' }}">
+                                {{ form_label(form.totalPoints, 'Points totaux *') }}
+                                {{ form_widget(form.totalPoints, {
+                                    'attr': {
+                                        'class': 'form-control' ~ (totalPointsHasError ? ' is-invalid' : ''),
+                                        'min': '1',
+                                        'oninput': 'validateTotalPoints()',
+                                        'onblur': 'validateTotalPoints()'
+                                    }
+                                }) }}
+                                <div class="error-text">{{ form_errors(form.totalPoints) }}</div>
+                            </div>
+                        </div>
+
+                        <div class="form-row">
                             {% set timeHasError = not form.timeLimit.vars.valid %}
                             <div class="form-group {{ timeHasError ? 'has-error' : '' }}">
                                 {{ form_label(form.timeLimit, 'Limite de temps (minutes)') }}
@@ -480,6 +528,81 @@
     <script>
         let questionCounter = 0;
         let formSubmitted = false;
+        
+        // Fonction pour gérer la validation du champ is_visible
+        function validateVisibilityField() {
+            const visibilityField = document.querySelector('select[name="quiz[is_visible]"]');
+            const formGroup = visibilityField.closest('.form-group');
+            
+            if (!visibilityField.value) {
+                formGroup.classList.add('has-error');
+                visibilityField.style.borderColor = 'red';
+                return false;
+            } else {
+                formGroup.classList.remove('has-error');
+                visibilityField.style.borderColor = '';
+                return true;
+            }
+        }
+        
+        // Fonction pour valider le champ totalPoints
+        function validateTotalPoints() {
+            const totalPointsField = document.querySelector('input[name="quiz[totalPoints]"]');
+            const formGroup = totalPointsField.closest('.form-group');
+            const value = parseInt(totalPointsField.value);
+            
+            if (isNaN(value) || value < 1) {
+                formGroup.classList.add('has-error');
+                totalPointsField.style.borderColor = 'red';
+                return false;
+            } else {
+                formGroup.classList.remove('has-error');
+                totalPointsField.style.borderColor = '';
+                return true;
+            }
+        }
+        
+        // Valider le champ is_visible lors du changement de valeur
+        document.addEventListener('DOMContentLoaded', function() {
+            const visibilityField = document.querySelector('select[name="quiz[is_visible]"]');
+            if (visibilityField) {
+                visibilityField.addEventListener('change', validateVisibilityField);
+                
+                // Vérification initiale
+                validateVisibilityField();
+            }
+            
+            // Validation du formulaire avant soumission
+            const form = document.getElementById('quizForm');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    let isValid = true;
+                    
+                    if (!validateVisibilityField()) {
+                        isValid = false;
+                    }
+                    
+                    if (!validateTotalPoints()) {
+                        isValid = false;
+                        const totalPointsField = document.querySelector('input[name="quiz[totalPoints]"]');
+                        const formGroup = totalPointsField.closest('.form-group');
+                        formGroup.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        alert('Veuillez entrer un nombre de points total valide (au moins 1).');
+                    }
+                    
+                    if (!isValid) {
+                        e.preventDefault();
+                    }
+                });
+                
+                // Ajouter la validation en temps réel pour totalPoints
+                const totalPointsField = document.querySelector('input[name="quiz[totalPoints]"]');
+                if (totalPointsField) {
+                    totalPointsField.addEventListener('input', validateTotalPoints);
+                    totalPointsField.addEventListener('blur', validateTotalPoints);
+                }
+            }
+        });
 
         function addQuestion() {
             questionCounter++;

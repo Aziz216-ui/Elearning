@@ -40,15 +40,42 @@ class Quiz
     private ?Cours $cours = null;
 
     #[ORM\Column(type: 'integer', nullable: true)]
+    #[Assert\NotBlank(message: 'Le nombre total de points est obligatoire.')]
+    #[Assert\Type(
+        type: 'integer',
+        message: 'Le nombre total de points doit être un nombre entier.'
+    )]
+    #[Assert\GreaterThanOrEqual(
+        value: 1,
+        message: 'Le nombre total de points doit être d\'au moins 1.'
+    )]
     private ?int $totalPoints = null;
 
     #[ORM\Column(type: 'integer', nullable: true)]
+    #[Assert\NotBlank(message: 'La limite de temps est obligatoire.')]
+    #[Assert\Type(
+        type: 'integer',
+        message: 'La valeur {{ value }} n\'est pas un nombre valide pour la limite de temps.'
+    )]
+    #[Assert\GreaterThanOrEqual(
+        value: 1,
+        message: 'La limite de temps doit être d\'au moins 1 minute.'
+    )]
     private ?int $timeLimit = null;
 
     #[ORM\Column(type: 'boolean')]
+    #[Assert\Type(
+        type: 'bool',
+        message: 'La valeur doit être un booléen (vrai ou faux).'
+    )]
     private bool $isPublished = false;
 
     #[ORM\Column(type: 'boolean')]
+    #[Assert\NotBlank(message: 'La visibilité est obligatoire.')]
+    #[Assert\Type(
+        type: 'bool',
+        message: 'La valeur doit être un booléen (vrai ou faux).'
+    )]
     private ?bool $is_visible = true;
 
     /**

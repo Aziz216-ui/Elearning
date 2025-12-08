@@ -20,11 +20,14 @@ final class DashboardController extends AbstractController
     {
         $user = $this->getUser();
         $cours = $coursRepository->findAll();
-        $panier = $panierRepository->findUserPanier($user);
         $coursInPanier = [];
         
-        foreach ($panier as $item) {
-            $coursInPanier[] = $item->getCours()->getId();
+        // Only fetch panier if user is authenticated
+        if ($user) {
+            $panier = $panierRepository->findUserPanier($user);
+            foreach ($panier as $item) {
+                $coursInPanier[] = $item->getCours()->getId();
+            }
         }
 
         return $this->render('dashboard/index.html.twig', [
@@ -38,6 +41,12 @@ final class DashboardController extends AbstractController
     public function ajouterAuPanier(Cours $cours, EntityManagerInterface $entityManager, PanierRepository $panierRepository): Response
     {
         $user = $this->getUser();
+        
+        // Check if user is authenticated
+        if (!$user) {
+            $this->addFlash('error', 'Vous devez être connecté pour ajouter un cours au panier.');
+            return $this->redirectToRoute('app_login');
+        }
         
         // Vérifier si le cours est déjà dans le panier
         if ($panierRepository->isCourseInUserPanier($user, $cours)) {
