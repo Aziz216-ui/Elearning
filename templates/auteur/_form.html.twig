@@ -1,0 +1,75 @@
+{{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'needs-validation'}}) }}
+  {# Disposition Bootstrap: formulaire à gauche, photo à droite #}
+  <div class="row g-4 align-items-start">
+    {# Colonne gauche: tous les champs sauf _token et photoFile #}
+    <div class="col-12 col-lg-8">
+      <div class="">
+        {% for field in form %}
+          {% set name = field.vars.name %}
+          {% if name == '_token' or name == 'photoFile' %}
+            {# ignoré ici, géré ailleurs #}
+          {% else %}
+            <div class="mb-3">
+              {{ form_label(field, null, {'label_attr': {'class': 'form-label'}}) }}
+              {{ form_widget(field, {'attr': {
+                'class': 'form-control' ~ (form_errors(field) ? ' is-invalid' : ''),
+                'aria-describedby': field.vars.id ~ '_help'
+              }}) }}
+              {% if form_errors(field) %}
+                <div class="invalid-feedback d-block">
+                  {{ form_errors(field) }}
+                </div>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <div class="d-flex justify-content-end pt-2">
+        <button class="{{ button_class|default('btn btn-primary') }}">{{ button_label|default('Ajouter') }}</button>
+      </div>
+    </div>
+
+    {# Colonne droite: aperçu + champ photoFile #}
+    <div class="col-12 col-lg-4">
+      <h2 class="h6 text-secondary mb-3">Photo</h2>
+      <div class="d-flex flex-column align-items-center">
+        {% if auteur is defined and auteur.photo %}
+          <img id="photoPreview" src="{{ asset('uploads/auteurs/' ~ auteur.photo) }}" class="img-thumbnail rounded-circle mb-3" style="width: 96px; height: 96px; object-fit: cover;" alt="">
+        {% else %}
+          <img id="photoPreview" src="{{ asset('admin/img/placeholder-avatar.png') }}" class="img-thumbnail rounded-circle mb-3" style="width: 96px; height: 96px; object-fit: cover;" alt="">
+        {% endif %}
+
+        {% if form.photoFile is defined %}
+          <div class="w-100">
+            {{ form_label(form.photoFile, 'Changer la photo', {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.photoFile, {'attr': {'class': 'form-control'}}) }}
+            {{ form_errors(form.photoFile) }}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  {# CSRF rendu mais caché #}
+  {% if form._token is defined %}
+    {{ form_widget(form._token) }}
+  {% endif %}
+{{ form_end(form, { 'render_rest': false }) }}
+
+{# Aperçu instantané de l'image sélectionnée #}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const input = document.querySelector('input[type="file"][name$="[photoFile]"]');
+    const preview = document.getElementById('photoPreview');
+    if (input && preview) {
+      input.addEventListener('change', function (e) {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => { preview.src = ev.target.result; };
+        reader.readAsDataURL(file);
+      });
+    }
+  });
+ </script>

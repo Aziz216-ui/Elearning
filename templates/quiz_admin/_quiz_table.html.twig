@@ -1,0 +1,54 @@
+{% if quizzes|length > 0 %}
+<table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Titre</th>
+            <th>Cours associé</th>
+            <th>Questions</th>
+            <th>Points</th>
+            <th>Visibilité</th>
+            <th class="text-end">Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for quiz in quizzes %}
+        <tr>
+            <td>{{ quiz.id }}</td>
+            <td>{{ quiz.title }}</td>
+            <td>{{ quiz.cours ? quiz.cours.title : 'Aucun cours associé' }}</td>
+            <td>{{ quiz.questions|length }}</td>
+            <td>{{ quiz.totalPoints }}</td>
+            <td>
+                {% if quiz.isVisible %}
+                    <span class="badge-custom badge-visible">
+                        <span class="icon-circle icon-visible"></span>
+                        Visible
+                    </span>
+                {% else %}
+                    <span class="badge-custom badge-masked">
+                        <span class="icon-circle icon-masked"></span>
+                        Masqué
+                    </span>
+                {% endif %}
+            </td>
+            <td>
+                <div class="actions">
+                    <a href="{{ path('app_quiz_admin_edit', {'id': quiz.id}) }}" class="btn-action btn-edit">Modifier</a>
+                    <form method="post" action="{{ path('app_quiz_admin_delete', {'id': quiz.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce quiz ?');">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ quiz.id) }}">
+                        <button class="btn-action btn-delete">Supprimer</button>
+                    </form>
+                </div>
+            </td>
+        </tr>
+        {% else %}
+        <tr>
+            <td colspan="7" class="no-results">Aucun quiz trouvé.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% else %}
+<p class="no-results">Aucun quiz trouvé.</p>
+{% endif %}

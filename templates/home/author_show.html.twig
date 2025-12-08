@@ -1,0 +1,101 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Auteur{% endblock %}
+
+{% block body %}
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-10 col-xl-9">
+        <!-- Author Info Card -->
+        <div class="card shadow-sm mb-4">
+          <div class="card-body">
+            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-3">
+              <div class="d-flex align-items-center gap-2">
+                {% if auteur.photo is defined and auteur.photo %}
+                  <img src="{{ asset('uploads/auteurs/' ~ auteur.photo) }}" alt="{{ auteur.prenom|default('') }} {{ auteur.nom|default('') }}" class="rounded-circle" style="width:48px;height:48px;object-fit:cover;border:1px solid rgba(0,0,0,.1);" />
+                {% else %}
+                  <div class="rounded-circle d-flex align-items-center justify-content-center bg-light" style="width:48px;height:48px;border:1px solid rgba(0,0,0,.1);">
+                    <span class="text-muted" style="font-size:1rem;">A</span>
+                  </div>
+                {% endif %}
+                <h1 class="h3 mb-0">
+                  {{ auteur.prenom is defined ? auteur.prenom : (auteur.firstName is defined ? auteur.firstName : '') }}
+                  {{ auteur.nom is defined ? auteur.nom : (auteur.lastName is defined ? auteur.lastName : '') }}
+                </h1>
+              </div>
+              {% if auteur.cours is defined %}
+                <span class="badge bg-primary">{{ auteur.cours|length }} cours</span>
+              {% endif %}
+            </div>
+            <div class="row g-3">
+              {% if auteur.email is defined and auteur.email %}
+                <div class="col-12 col-md-6">
+                  <div class="card h-100">
+                    <div class="card-body">
+                      <div class="text-muted small">Email</div>
+                      <div class="fw-semibold">{{ auteur.email }}</div>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+              {% if auteur.bio is defined and auteur.bio %}
+                <div class="col-12">
+                  <div class="card h-100">
+                    <div class="card-body">
+                      <div class="text-muted small mb-1">Bio</div>
+                      <div>{{ auteur.bio }}</div>
+                    </div>
+                  </div>
+                </div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+
+        <!-- Courses Grid -->
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <h2 class="h5 mb-3">Cours de cet auteur</h2>
+            {% if auteur.cours is defined and auteur.cours|length > 0 %}
+              <div class="row row-cols-1 row-cols-md-2 g-3">
+                {% for cour in auteur.cours %}
+                  <div class="col">
+                    <div class="card h-100">
+                      <div class="card-body d-flex flex-column">
+                        <div class="d-flex justify-content-between align-items-start mb-1">
+                          <h5 class="card-title mb-0">{{ cour.title }}</h5>
+                          {% if cour.category is defined and cour.category %}
+                            <span class="badge bg-info text-dark">{{ cour.category }}</span>
+                          {% endif %}
+                        </div>
+                        <p class="card-text small mb-2" style="display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden;">{{ cour.description }}</p>
+                        <div class="mb-2">
+                          <span class="badge bg-primary me-2">{{ cour.price }} DT</span>
+                          <span class="badge bg-secondary">
+                            {% if cour.duration is not null %}
+                              {{ cour.duration|date('H:i') }}
+                            {% else %}
+                              Non défini
+                            {% endif %}
+                          </span>
+                        </div>
+                        <div class="mt-auto d-flex gap-2">
+                          <a href="{{ path('app_home_course_show', { id: cour.id }) }}" class="btn btn-sm btn-primary">Voir le cours</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <div class="alert alert-info mb-0">Aucun cours associé à cet auteur.</div>
+            {% endif %}
+            <div class="mt-3">
+              <a href="{{ path('app_home_courses') }}" class="btn btn-secondary">Retour aux cours</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+{% endblock %}

@@ -1,15 +1,18 @@
 <?php
 
 namespace App\Entity;
+use App\Repository\CoursRepository;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 
-    use App\Repository\CoursRepository;
-    use Doctrine\Common\Collections\ArrayCollection;
-    use Doctrine\Common\Collections\Collection;
-    use Doctrine\DBAL\Types\Types;
-    use Doctrine\ORM\Mapping as ORM;
 
     #[ORM\Entity(repositoryClass: CoursRepository::class)]
     class Cours
+
+   
     {
         #[ORM\Id]
         #[ORM\GeneratedValue]
@@ -17,12 +20,26 @@ namespace App\Entity;
         private ?int $id = null;
 
         #[ORM\Column(length: 255)]
+        #[Assert\NotBlank(message: "Le titre est obligatoire !")]
+        #[Assert\Length(
+            min: 5,
+            max: 255,
+            minMessage: "Le titre doit contenir au moins {{ limit }} caractères",
+            maxMessage: "Le titre ne peut pas dépasser {{ limit }} caractères"
+        )]
         private ?string $title = null;
 
         #[ORM\Column(type: Types::TEXT)]
+        #[Assert\NotBlank(message: "La description est obligatoire !")]
+        #[Assert\Length(
+            min: 10,
+            minMessage: "La description doit contenir au moins {{ limit }} caractères"
+        )]
         private ?string $description = null;
 
         #[ORM\Column]
+        #[Assert\NotBlank(message: "Le prix est obligatoire !")]
+        #[Assert\Positive(message: "Le prix doit être un nombre positif")]
         private ?float $price = null;
         #[ORM\Column(type: "datetime_immutable", nullable: true)]
         private ?\DateTimeImmutable $duration = null;
@@ -30,28 +47,32 @@ namespace App\Entity;
         
 
         #[ORM\Column(length: 255)]
+        #[Assert\NotBlank(message: "La catégorie est obligatoire !")]
         private ?string $category = null;
 
         #[ORM\Column]
         private ?bool $isPublished = null;
-        #[ORM\ManyToOne(inversedBy: 'cours')]
+        #[ORM\ManyToOne(targetEntity: Auteur::class, inversedBy: 'cours')]
         #[ORM\JoinColumn(nullable: false)]
         private ?Auteur $auteur = null;
+         /**
+     * @var Collection<int, Quiz>
+     */
+    #[ORM\OneToMany(targetEntity: Quiz::class, mappedBy: 'cours', cascade: ['persist', 'remove'])]
+    private Collection $quizzes;
 
-        #[ORM\ManyToMany(targetEntity: Plan::class, mappedBy: 'courses')]
-        private Collection $plans;
+    public function __construct()
+    {
+        $this->quizzes = new ArrayCollection();
+    }
 
-        public function __construct()
-        {
-            $this->plans = new ArrayCollection();
-        }
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
 
-        public function getId(): ?int
-        {
-            return $this->id;
-        }
 
-        public function getTitle(): ?string
+     public function getTitle(): ?string
         {
             return $this->title;
         }
@@ -134,31 +155,34 @@ namespace App\Entity;
 
             return $this;
         }
+    
 
-        /**
-         * @return Collection<int, Plan>
-         */
-        public function getPlans(): Collection
-        {
-            return $this->plans;
-        }
-
-        public function addPlan(Plan $plan): static
-        {
-            if (!$this->plans->contains($plan)) {
-                $this->plans->add($plan);
-                $plan->addCourse($this);
-            }
-
-            return $this;
-        }
-
-        public function removePlan(Plan $plan): static
-        {
-            if ($this->plans->removeElement($plan)) {
-                $plan->removeCourse($this);
-            }
-
-            return $this;
-        }
+    /**
+     * @return Collection<int, Quiz>
+     */
+    public function getQuizzes(): Collection
+    {
+        return $this->quizzes;
     }
+
+    public function addQuiz(Quiz $quiz): static
+    {
+        if (!$this->quizzes->contains($quiz)) {
+            $this->quizzes->add($quiz);
+            $quiz->setCours($this);
+        }
+
+        return $this;
+    }
+
+    public function removeQuiz(Quiz $quiz): static
+    {
+        if ($this->quizzes->removeElement($quiz)) {
+            if ($quiz->getCours() === $this) {
+                $quiz->setCours(null);
+            }
+        }
+
+        return $this;
+    }
+}

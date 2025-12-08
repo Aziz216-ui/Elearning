@@ -1,0 +1,108 @@
+{{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'needs-validation'}}) }}
+  {% set forceRight = always_right|default(false) %}
+  {% set bgRight = background_right|default(false) %}
+  <div class="row g-4 align-items-start">
+    {# Colonne gauche: tous les champs sauf _token et imageFile/thumbnail/cover #}
+    <div class="col-12 {% if not bgRight %}col-lg-8{% endif %}">
+      <div>
+        {% for field in form %}
+          {% set name = field.vars.name %}
+          {% if name in ['_token','imageFile','thumbnail','cover'] %}
+            {# ignoré ici, géré ailleurs #}
+          {% else %}
+            <div class="mb-3">
+              {{ form_label(field, null, {'label_attr': {'class': 'form-label'}}) }}
+              {{ form_widget(field, {'attr': {
+                'class': 'form-control' ~ (form_errors(field) ? ' is-invalid' : ''),
+                'aria-describedby': field.vars.id ~ '_help'
+              }}) }}
+              {% if form_errors(field) %}
+                <div class="invalid-feedback d-block">
+                  {{ form_errors(field) }}
+                </div>
+              {% endif %}
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
+
+      <div class="d-flex justify-content-end pt-2">
+        <button class="{{ button_class|default('btn btn-primary') }}">{{ button_label|default('Enregistrer') }}</button>
+      </div>
+    </div>
+
+    {% if not bgRight %}
+    {# Colonne droite: visuel/aperçu + champ image si disponible #}
+    <div class="col-12 col-lg-4">
+      <div class="d-flex flex-column align-items-center h-100">
+        {% set hasImageField = (form.imageFile is defined) or (form.thumbnail is defined) or (form.cover is defined) %}
+        <div class="w-100 mb-3">
+          <img id="courseImagePreview" src="{{ asset('front/img/course-1.jpg') }}" class="img-fluid rounded border" style="min-height: 18rem; object-fit: cover; width: 100%;" alt="">
+        </div>
+
+        {% if form.imageFile is defined %}
+          <div class="w-100">
+            {{ form_label(form.imageFile, 'Image du cours', {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.imageFile, {'attr': {
+              'class': 'form-control' ~ (form_errors(form.imageFile) ? ' is-invalid' : '')
+            }}) }}
+            {% if form_errors(form.imageFile) %}
+              <div class="invalid-feedback d-block">
+                {{ form_errors(form.imageFile) }}
+              </div>
+            {% endif %}
+          </div>
+        {% elseif form.thumbnail is defined %}
+          <div class="w-100">
+            {{ form_label(form.thumbnail, 'Image du cours', {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.thumbnail, {'attr': {
+              'class': 'form-control' ~ (form_errors(form.thumbnail) ? ' is-invalid' : '')
+            }}) }}
+            {% if form_errors(form.thumbnail) %}
+              <div class="invalid-feedback d-block">
+                {{ form_errors(form.thumbnail) }}
+              </div>
+            {% endif %}
+          </div>
+        {% elseif form.cover is defined %}
+          <div class="w-100">
+            {{ form_label(form.cover, 'Image du cours', {'label_attr': {'class': 'form-label'}}) }}
+            {{ form_widget(form.cover, {'attr': {
+              'class': 'form-control' ~ (form_errors(form.cover) ? ' is-invalid' : '')
+            }}) }}
+            {% if form_errors(form.cover) %}
+              <div class="invalid-feedback d-block">
+                {{ form_errors(form.cover) }}
+              </div>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+    {% endif %}
+  </div>
+
+  {# CSRF #}
+  {% if form._token is defined %}
+    {{ form_widget(form._token) }}
+  {% endif %}
+{{ form_end(form, { 'render_rest': false }) }}
+
+{# Aperçu instantané si un input fichier est présent #}
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    const preview = document.getElementById('courseImagePreview');
+    const fileInput = document.querySelector('input[type="file"][name$="[imageFile]"]')
+                    || document.querySelector('input[type="file"][name$="[thumbnail]"]')
+                    || document.querySelector('input[type="file"][name$="[cover]"]');
+    if (preview && fileInput) {
+      fileInput.addEventListener('change', function (e) {
+        const file = e.target.files && e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (ev) => { preview.src = ev.target.result; };
+        reader.readAsDataURL(file);
+      });
+    }
+  });
+ </script>

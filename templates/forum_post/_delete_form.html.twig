@@ -1,0 +1,47 @@
+{# templates/forum_post/_delete_form.html.twig #}
+<style>
+    .forum-delete-form {
+        display: inline-block;
+    }
+
+    .forum-btn-delete {
+        padding: 10px 20px;
+        background: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.9em;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .forum-btn-delete:hover {
+        background: #c82333;
+        transform: translateY(-2px);
+        box-shadow: 0 5px 15px rgba(220, 53, 69, 0.4);
+    }
+
+    .forum-btn-delete:active {
+        transform: translateY(0);
+    }
+
+    /* Style pour le bouton dans la page d'édition */
+    .forum-delete-section .forum-btn-delete {
+        padding: 12px 30px;
+        font-size: 1em;
+    }
+</style>
+
+<form method="post" 
+      action="{{ path('app_forum_post_delete', {'id': forum_post.id}) }}" 
+      onsubmit="return confirm('⚠️ Êtes-vous sûr de vouloir supprimer ce post ?\n\nCette action est irréversible !');"
+      class="forum-delete-form">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ forum_post.id) }}">
+    <button type="submit" class="forum-btn-delete">
+        🗑️ Supprimer
+    </button>
+</form>

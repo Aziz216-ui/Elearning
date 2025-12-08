@@ -1,0 +1,39 @@
+{% extends 'base1.html.twig' %}
+
+{% block title %}Cours de l'utilisateur{% endblock %}
+
+{% block body %}
+<div class="container py-4">
+    <h2 class="mb-3">Cours liés à l'utilisateur</h2>
+
+    {% if tab is empty %}
+        <div class="alert alert-info">Aucun cours trouvé pour cet utilisateur.</div>
+    {% else %}
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Titre</th>
+                    <th>Catégorie</th>
+                    <th>Prix</th>
+                    <th>Durée</th>
+                    <th>Publié</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for c in tab %}
+                    <tr>
+                        <td>{{ c.title }}</td>
+                        <td>{{ c.category }}</td>
+                        <td>{{ c.price|number_format(2, ',', ' ') }} €</td>
+                        <td>{% if c.duration %}{{ c.duration.format('H:i') }}{% endif %}</td>
+                        <td>{{ c.isPublished ? 'Oui' : 'Non' }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% endif %}
+
+    <a href="{{ path('admin_user_index') }}" class="btn btn-secondary mt-3">Retour</a>
+</div>
+{% endblock %}
+

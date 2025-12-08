@@ -1,0 +1,80 @@
+{% extends 'base1.html.twig' %}
+
+{% block title %}Auteur{% endblock %}
+
+{% block body %}
+    <div class="container-fluid py-3">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h1 class="h4 mb-0 text-gray-800">Détails de l'Auteur</h1>
+        <div class="d-flex gap-2">
+          <a href="{{ path('app_auteur_index') }}" class="btn btn-outline-secondary">Retour</a>
+          <a href="{{ path('app_auteur_edit', {'id': auteur.id}) }}" class="btn btn-primary">Modifier</a>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-12 col-lg-8">
+          <div class="card shadow mb-4">
+            <div class="card-body">
+              <div class="row mb-3"><div class="col-4 text-muted small">Id</div><div class="col-8">{{ auteur.id }}</div></div>
+              <div class="row mb-3"><div class="col-4 text-muted small">Nom</div><div class="col-8">{{ auteur.nom }}</div></div>
+              <div class="row mb-3"><div class="col-4 text-muted small">Prénom</div><div class="col-8">{{ auteur.prenom }}</div></div>
+              <div class="row mb-3"><div class="col-4 text-muted small">Email</div><div class="col-8">{{ auteur.email }}</div></div>
+              <div class="row mb-3"><div class="col-4 text-muted small">Spécialité</div><div class="col-8">{{ auteur.specialite ?? '—' }}</div></div>
+              <div class="row mb-3"><div class="col-4 text-muted small">Bio courte</div><div class="col-8">{{ auteur.bio ?? '—' }}</div></div>
+              <div class="row mb-3"><div class="col-4 text-muted small">Total cours</div><div class="col-8"><span class="badge badge-info">{{ totalCours ?? auteur.cours|length }}</span></div></div>
+              <div class="row mb-0"><div class="col-4 text-muted small">Possède des cours ?</div><div class="col-8">{% if hasCourses %}<span class="badge badge-success">Oui</span>{% else %}<span class="badge badge-secondary">Non</span>{% endif %}</div></div>
+            </div>
+          </div>
+
+          <div class="card shadow mb-4">
+            <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Cours assignés</h6></div>
+            <div class="card-body">
+              <ul class="mb-0 ps-3">
+              {% for cours in auteur.cours %}
+                <li><strong>{{ cours.title }}</strong> - {{ cours.description }}</li>
+              {% else %}
+                <li class="text-muted">Aucun cours assigné</li>
+              {% endfor %}
+              </ul>
+            </div>
+          </div>
+
+          <div class="d-flex justify-content-end pt-2">
+            {{ include('auteur/_delete_form.html.twig') }}
+          </div>
+        </div>
+
+        <div class="col-12 col-lg-4">
+          <div class="card shadow mb-4">
+            <div class="card-body text-center">
+              {% if auteur.photo %}
+                <img src="{{ asset('uploads/auteurs/' ~ auteur.photo) }}" alt="{{ auteur.prenom }} {{ auteur.nom }}" class="rounded-circle border mb-3" style="width: 112px; height: 112px; object-fit: cover;" />
+              {% else %}
+                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center border mx-auto mb-3" style="width: 112px; height: 112px;">
+                  <span class="h4 mb-0 text-muted">{{ (auteur.prenom|first ~ auteur.nom|first)|upper }}</span>
+                </div>
+              {% endif %}
+              <div class="fw-semibold">{{ auteur.prenom }} {{ auteur.nom }}</div>
+              {% if auteur.specialite %}<div class="text-muted small mt-1">{{ auteur.specialite }}</div>{% endif %}
+            </div>
+          </div>
+          <div class="card shadow mb-4">
+            <div class="card-header py-3"><h6 class="m-0 font-weight-bold text-primary">Top auteurs</h6></div>
+            <div class="card-body">
+              {% if topAuthors is defined and topAuthors %}
+                <ol class="mb-0">
+                  {% for row in topAuthors %}
+                    <li>{{ row.auteur.prenom }} {{ row.auteur.nom }} — <span class="badge badge-info">{{ row.nbCours }}</span></li>
+                  {% endfor %}
+                </ol>
+              {% else %}
+                <div class="text-muted small">Aucune donnée</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock %}
+
