@@ -1,102 +1,196 @@
 {% extends 'base1.html.twig' %}
 
 {% block title %}Créer un utilisateur{% endblock %}
-{% block page_title %}Nouvel utilisateur{% endblock %}
+{% block page_title %}Création d'un nouvel utilisateur{% endblock %}
 
 {% block body %}
-<div class="w-full">
-    <div class="flex flex-wrap -mx-3">
-        <div class="w-full max-w-4xl px-3 mx-auto">
-             <div class="card-body">
+    <style>
+        .card-modern {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            background: white;
+            transition: box-shadow 0.3s ease;
+        }
 
-                <div class="flex items-center justify-between p-6 pb-0 border-b-0 rounded-t-2xl">
-                    <h6 class="text-lg font-bold dark:text-white">Créer un nouvel utilisateur</h6>
+        .form-label-custom {
+            font-weight: 600;
+            color: #4b5563;
+            font-size: 0.875rem;
+            margin-bottom: 0.5rem;
+        }
 
-                    {# Bouton Retour dans l'en-tête #}
-                    <a href="{{ path('admin_user_index') }}">
-                        <button type="button" class="btn btn-danger">Retour</button>
+        .form-control-modern {
+            border: 1px solid #e3e6f0;
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.2s;
+            background-color: #f8f9fc;
+        }
 
-                    </a>
+        .form-control-modern:focus {
+            background-color: #fff;
+            border-color: #4e73df;
+            box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.15);
+        }
 
+        .section-header {
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: #b7b9cc;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid #eaecf4;
+        }
 
+        .btn-modern-primary {
+            background-color: #4e73df;
+            border-color: #4e73df;
+            border-radius: 8px;
+            padding: 10px 24px;
+            font-weight: 600;
+            box-shadow: 0 4px 6px rgba(50, 50, 93, 0.11), 0 1px 3px rgba(0, 0, 0, 0.08);
+            transition: all 0.2s;
+        }
 
+        .btn-modern-primary:hover {
+            background-color: #2e59d9;
+            transform: translateY(-1px);
+        }
 
+        .btn-modern-light {
+            background-color: #f8f9fc;
+            color: #858796;
+            border: 1px solid #e3e6f0;
+            border-radius: 8px;
+            padding: 10px 24px;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
 
-                </div>
+        .btn-modern-light:hover {
+            background-color: #eaecf4;
+            color: #5a5c69;
+        }
+    </style>
 
-                {# Formulaire : form_start avant les champs #}
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
             {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
-            <div class="card-footer d-flex justify-content-between p-4">
-                    <button type="submit" class="btn btn-primary">Confirmer</button>
+            
+            <div class="card-modern mb-4">
+                <div class="card-header py-3 bg-white border-bottom-0 rounded-top" style="border-radius: 12px 12px 0 0;">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h6 class="m-0 font-weight-bold text-primary">Informations de l'utilisateur</h6>
+                        <span class="badge badge-soft-info" style="background: rgba(54, 185, 204, 0.1); color: #36b9cc;">Nouveau</span>
+                    </div>
+                </div>
+                
+                <div class="card-body p-4">
+                    {# Global Errors #}
+                    {{ form_errors(form) }}
+
+                    <div class="section-header mt-0">Identité</div>
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            {{ form_label(form.name, 'Prénom', {'label_attr': {'class': 'form-label-custom'}}) }}
+                            {{ form_widget(form.name, {
+                                'attr': {
+                                    'class': 'form-control form-control-modern',
+                                    'placeholder': 'Ex: Jean'
+                                }
+                            }) }}
+                            <small class="form-text text-danger">{{ form_errors(form.name) }}</small>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            {{ form_label(form.lastname, 'Nom', {'label_attr': {'class': 'form-label-custom'}}) }}
+                            {{ form_widget(form.lastname, {
+                                'attr': {
+                                    'class': 'form-control form-control-modern',
+                                    'placeholder': 'Ex: Dupont'
+                                }
+                            }) }}
+                            <small class="form-text text-danger">{{ form_errors(form.lastname) }}</small>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            {{ form_label(form.birthdate, 'Date de naissance', {'label_attr': {'class': 'form-label-custom'}}) }}
+                            {{ form_widget(form.birthdate, {
+                                'attr': {
+                                    'class': 'form-control form-control-modern'
+                                }
+                            }) }}
+                            <small class="form-text text-danger">{{ form_errors(form.birthdate) }}</small>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            {{ form_label(form.sexe, 'Sexe', {'label_attr': {'class': 'form-label-custom'}}) }}
+                            {{ form_widget(form.sexe, {
+                                'attr': {
+                                    'class': 'form-control form-control-modern'
+                                }
+                            }) }}
+                            <small class="form-text text-danger">{{ form_errors(form.sexe) }}</small>
+                        </div>
+                    </div>
+
+                    <div class="section-header mt-4">Compte & Sécurité</div>
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            {{ form_label(form.email, 'Adresse Email', {'label_attr': {'class': 'form-label-custom'}}) }}
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-light border-0" style="border: 1px solid #e3e6f0 !important; border-right: 0 !important; border-top-left-radius: 8px; border-bottom-left-radius: 8px;">
+                                        <i class="fas fa-envelope text-gray-500"></i>
+                                    </span>
+                                </div>
+                                {{ form_widget(form.email, {
+                                    'attr': {
+                                        'class': 'form-control form-control-modern border-left-0',
+                                        'placeholder': 'exemple@email.com',
+                                        'style': 'border-top-left-radius: 0; border-bottom-left-radius: 0;'
+                                    }
+                                }) }}
+                            </div>
+                            <small class="form-text text-danger">{{ form_errors(form.email) }}</small>
+                        </div>
+                        <div class="col-md-6 mb-4">
+                            {{ form_label(form.plainPassword, 'Mot de passe', {'label_attr': {'class': 'form-label-custom'}}) }}
+                            <div class="input-group">
+                                <div class="input-group-prepend">
+                                    <span class="input-group-text bg-light border-0" style="border: 1px solid #e3e6f0 !important; border-right: 0 !important; border-top-left-radius: 8px; border-bottom-left-radius: 8px;">
+                                        <i class="fas fa-lock text-gray-500"></i>
+                                    </span>
+                                </div>
+                                {{ form_widget(form.plainPassword, {
+                                    'attr': {
+                                        'class': 'form-control form-control-modern border-left-0',
+                                        'placeholder': '••••••••',
+                                        'style': 'border-top-left-radius: 0; border-bottom-left-radius: 0;'
+                                    }
+                                }) }}
+                            </div>
+                             <small class="text-muted mt-1" style="font-size: 0.75rem;">Le mot de passe doit contenir au moins 6 caractères.</small>
+                            <small class="form-text text-danger">{{ form_errors(form.plainPassword) }}</small>
+                        </div>
+                    </div>
                 </div>
 
-                {# Affichage global des erreurs (contraintes d'entité) #}
-                {% if form.vars.errors|length > 0 %}
-                    <div class="alert alert-danger">
-                        {{ form_errors(form) }}
-                    </div>
-                {% endif %}
-
-
-                <div class="card-body">
-
-                    <div class="mb-3">
-                        {{ form_label(form.email, 'Email address', {'label_attr': {'class': 'form-label'}}) }}
-                        {{ form_widget(form.email , {
-                            'attr': {
-                                'class': 'form-control',
-                                'placeholder': 'Enter email',
-                                'id': 'emailInput'
-                            }
-                        }) }}
-                        {{ form_errors(form.email) }}
-                    </div>
-
-                    <div class="mb-3">
-                        {{ form_label(form.name, 'First Name' , {'label_attr': {'class': 'form-label'}}) }}
-                        {{ form_widget(form.name , { 'attr': { 'class': 'form-control', 'placeholder': 'Enter first name', 'id': 'nameInput' } }) }}
-                        {{ form_errors(form.name) }}
-                    </div>
-
-                    <div class="mb-3">
-                        {{ form_label(form.lastname, 'Last Name' , {'label_attr': {'class': 'form-label'}}) }}
-                        {{ form_widget(form.lastname , { 'attr': { 'class': 'form-control', 'placeholder': 'Enter last name', 'id': 'lastnameInput' } }) }}
-                        {{ form_errors(form.lastname) }}
-                    </div>
-
-                    <div class="mb-3">
-                        {{ form_label(form.birthdate, 'Birthdate' , {'label_attr': {'class': 'form-label'}}) }}
-                        {{ form_widget(form.birthdate , { 'attr': { 'class': 'form-control', 'placeholder': 'Enter birthdate', 'id': 'birthdateInput' } }) }}
-                        {{ form_errors(form.birthdate) }}
-                    </div>
-
-                    <div class="mb-3">
-                        {{ form_label(form.sexe, 'Sexe' , {'label_attr': {'class': 'form-label'}}) }}
-                        {{ form_widget(form.sexe , { 'attr': { 'class': 'form-control', 'placeholder': 'Choisir', 'id': 'sexeInput' } }) }}
-                        {{ form_errors(form.sexe) }}
-                    </div>
-
-                    <div class="mb-3">
-                        {{ form_label(form.plainPassword, 'Password', {'label_attr': {'class': 'form-label'}}) }}
-                        {{ form_widget(form.plainPassword, { 'attr': { 'class': 'form-control', 'placeholder': 'Enter password', 'id': 'passwordInput' } }) }}
-                        {{ form_errors(form.plainPassword) }}
-                    </div>
-
-
-
+                <div class="card-footer bg-white border-top-0 d-flex justify-content-end pb-4 pr-4 rounded-bottom" style="border-radius: 0 0 12px 12px;">
+                    <a href="{{ path('admin_user_index') }}" class="btn btn-modern-light mr-3">
+                        <i class="fas fa-times mr-2"></i> Annuler
+                    </a>
+                    <button type="submit" class="btn btn-primary btn-modern-primary">
+                        <i class="fas fa-check mr-2"></i> Confirmer
+                    </button>
                 </div>
-
-                {# PIED DE FORMULAIRE: boutons Annuler / Confirmer #}
-
-
-            {{ form_end(form) }}
-
             </div>
-
-
+            
+            {{ form_end(form) }}
         </div>
     </div>
-
-</div>
-
 {% endblock %}

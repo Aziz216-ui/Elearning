@@ -1,133 +1,314 @@
 {% extends 'base1.html.twig' %}
 
-{% block title %}Gestion des utilisateurs{% endblock %}
+{% block title %}Dashboard Utilisateurs{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
 
-{% block content %}
-<div class="container-fluid">
-    <!-- Page Heading -->
-    <div class="d-sm-flex align-items-center justify-content-between mb-4">
-        <div>
-            <h1 class="h3 mb-0 text-gray-800">Utilisateurs</h1>
-            <p class="mb-0 text-muted small">Gérez vos utilisateurs et recherchez facilement par email ou nom.</p>
+
+{% block body %}
+    <style>
+        .dashboard-container {
+            padding: 1.5rem;
+        }
+        
+        /* Stats Cards */
+        .stat-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            background: white;
+            transition: transform 0.2s;
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+        
+        .stat-card.primary { border-left: 5px solid #4e73df; }
+        .stat-card.success { border-left: 5px solid #1cc88a; }
+        .stat-card.info { border-left: 5px solid #36b9cc; }
+        .stat-card.warning { border-left: 5px solid #f6c23e; }
+
+        .stat-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #5a5c69;
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            opacity: 0.3;
+        }
+
+        /* Search Bar */
+        .search-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .search-input-modern {
+            border: 2px solid #f3f4f6;
+            border-radius: 10px;
+            padding: 1rem 1.5rem;
+            font-size: 1rem;
+            width: 100%;
+            transition: all 0.2s;
+            background: #f8f9fc;
+        }
+
+        .search-input-modern:focus {
+            outline: none;
+            border-color: #4e73df;
+            background: white;
+            box-shadow: 0 0 0 4px rgba(78, 115, 223, 0.1);
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: #4e73df;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+
+        .search-btn:hover {
+            color: #224abe;
+        }
+
+        /* Table Styles (Consistent with User Index) */
+        .card-table-modern {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            background: white;
+            overflow: hidden;
+        }
+
+        .table-modern {
+            width: 100%;
+        }
+
+        .table-modern thead th {
+            background-color: #f8f9fc;
+            color: #4e73df;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            padding: 16px 24px;
+            border-bottom: 2px solid #e3e6f0;
+            white-space: nowrap;
+        }
+
+        .table-modern td {
+            padding: 16px 24px;
+            vertical-align: middle;
+            border-bottom: 1px solid #e3e6f0;
+            color: #5a5c69;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .table-modern tbody tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .table-modern tbody tr:hover {
+            background-color: #f8f9fc;
+        }
+
+        .avatar-circle-sm {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #eaecf4;
+            color: #858796;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 0.75rem;
+            margin-right: 12px;
+        }
+    </style>
+
+    <div class="container-fluid dashboard-container">
+        
+        <!-- Stats Row -->
+        <div class="row mb-4">
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card stat-card primary h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="stat-title text-primary">Utilisateurs (Total)</div>
+                                <div class="stat-value">{{ users|length }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-users stat-icon text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card stat-card success h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="stat-title text-success">Utilisateurs Actifs</div>
+                                <div class="stat-value">--</div> {# Placeholder #}
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-user-check stat-icon text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+             <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card stat-card info h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="stat-title text-info">Nouveaux (Mois)</div>
+                                <div class="stat-value">--</div> {# Placeholder #}
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-calendar-plus stat-icon text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+             <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card stat-card warning h-100 py-2">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="stat-title text-warning">En Attente</div>
+                                <div class="stat-value">--</div> {# Placeholder #}
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-clock stat-icon text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Bar -->
+        <div class="search-card">
+            <form id="searchForm" method="get" action="{{ path('admin_user_search') }}" class="position-relative">
+                <input id="searchInput" type="text" class="search-input-modern" name="q" placeholder="Rechercher un utilisateur par nom, email..." value="{{ term|default('') }}">
+                <button type="submit" class="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+             {% if term is defined and term is not empty %}
+                 <div class="mt-3">
+                    <span class="text-muted small">Résultats pour : <strong>{{ term }}</strong></span>
+                    <a href="{{ path('app_admin') }}" class="ml-2 btn btn-sm btn-light text-danger shadow-sm py-0 px-2" style="font-size: 0.8rem;">
+                        <i class="fas fa-times mr-1"></i>Effacer
+                    </a>
+                 </div>
+            {% endif %}
+        </div>
+
+        <!-- Recent Users Table -->
+        <div class="card card-table-modern mb-4">
+            <div class="card-header py-3 bg-white border-bottom-0 d-flex justify-content-between align-items-center">
+                <h6 class="m-0 font-weight-bold text-primary">Aperçu des utilisateurs</h6>
+                <a href="{{ path('admin_user_index') }}" class="btn btn-sm btn-primary shadow-sm">
+                    Voir tout <i class="fas fa-arrow-right ml-1"></i>
+                </a>
+            </div>
+            <div class="table-responsive">
+                <table class="table-modern">
+                    <thead>
+                        <tr>
+                            <th>Utilisateur</th>
+                            <th>Email</th>
+                            <th>ID</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users|slice(0, 10) %} {# Show only last 10 or partial list #}
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <div class="avatar-circle-sm">
+                                        {{ user.name|first|upper }}{{ user.lastname|first|upper }}
+                                    </div>
+                                    <div>
+                                        <div class="font-weight-bold text-dark">{{ user.name }} {{ user.lastname }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>{{ user.email }}</td>
+                            <td><span class="badge badge-light border">#{{ user.id }}</span></td>
+                             <td>
+                                <a href="{{ path('admin_user_edit', {'id': user.id}) }}" class="text-primary mr-2" title="Modifier">
+                                    <i class="fas fa-pen"></i>
+                                </a>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center py-5 text-muted">
+                                <i class="fas fa-inbox fa-3x mb-3 text-gray-300"></i>
+                                <p class="mb-0">Aucun utilisateur trouvé.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
         </div>
         <a href="{{ path('admin_user_new') }}" class="btn btn-primary btn-sm shadow-sm">
             <i class="fas fa-user-plus fa-sm text-white-50"></i> Nouvel utilisateur
         </a>
     </div>
 
-    <!-- Users Table -->
-    <div class="card shadow mb-4">
-        <div class="card-header py-3 d-flex justify-content-between align-items-center">
-            <h6 class="m-0 font-weight-bold text-primary">Liste des utilisateurs</h6>
-        </div>
-        <div class="card-body">
-            <!-- Barre de recherche stylée -->
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-            <form id="searchForm" method="get" action="{{ path('admin_user_search') }}" class="mb-4 d-flex justify-content-center">
-                <div class="search" style="margin:0 auto;">
-                    <input id="searchInput" type="text" class="search-input" name="q" placeholder="Rechercher un utilisateur..." value="{{ term|default('') }}">
-                    <button type="submit" class="search-icon"><i class="fa fa-search"></i></button>
-                </div>
-            </form>
 
-            <style>
-            .search{
-                display:flex;
-                align-items:center;
-                height:50px;
-                background-color: #fff;
-                padding: 6px 8px;
-                border-radius: 6px;
-                box-shadow: 0 2px 6px rgba(0,0,0,0.06);
-            }
-            .search-input{
-                border:0;
-                outline: 0;
-                background: none;
-                width: 420px;
-                margin-left:8px;
-                caret-color: #536bf6;
-                line-height: 40px;
-                transition: width 0.4s linear;
-                font-size:16px;
-            }
-            .search-icon{
-                height: 36px;
-                width: 36px;
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                color: white;
-                background-color: #536bf6;
-                border: none;
-                border-radius:4px;
-                cursor:pointer;
-            }
-            .search-icon i{ font-size:14px; }
-            @media (max-width:768px){
-                .search-input{ width:200px; }
-            }
-            </style>
+    <script>
+    // Auto-search script
+    (function(){
+        const input = document.getElementById('searchInput');
+        const form = document.getElementById('searchForm');
+        if (!input || !form) return;
 
-            <script>
-            // Soumet automatiquement le formulaire quand le champ est vidé (UX)
-            (function(){
-                const input = document.getElementById('searchInput');
-                const form = document.getElementById('searchForm');
-                if (!input || !form) return;
-
-                let debounce;
-                input.addEventListener('input', function() {
-                    clearTimeout(debounce);
-                    debounce = setTimeout(() => {
-                        if (input.value.trim() === '') {
-                            form.submit();
-                        }
-                    }, 300);
-                });
-            })();
-            </script>
-
-            <div class="table-responsive">
-                <table class="table table-bordered" width="100%" cellspacing="0">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>Email</th>
-                            <th>Nom</th>
-                            <th>Prénom</th>
-                            <th class="text-center">Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                    {% for user in users %}
-                        <tr>
-                            <td>#{{ user.id }}</td>
-                            <td>{{ user.email }}</td>
-                            <td>{{ user.name }}</td>
-                            <td>{{ user.lastname }}</td>
-                            <td class="text-center">
-                                <div class="btn-group btn-group-sm" role="group">
-                                    <a href="{{ path('admin_user_courses', {'id': user.id}) }}" class="btn btn-info btn-sm">Voir</a>
-                                    <a href="{{ path('admin_user_edit', {'id': user.id}) }}" class="btn btn-primary btn-sm">Éditer</a>
-                                </div>
-                            </td>
-                        </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="5" class="text-center text-muted py-3">Aucun utilisateur trouvé.</td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-
-            <div class="mt-3 d-flex justify-content-end">
-                <a href="{{ path('app_admin') }}" class="btn btn-primary btn-sm shadow-sm">
-                    <i class="fas fa-undo fa-sm text-white-50"></i> Réinitialiser
-                </a>
-            </div>
-        </div>
-    </div>
-</div>
+        let debounce;
+        input.addEventListener('input', function() {
+            clearTimeout(debounce);
+            debounce = setTimeout(() => {
+                if (input.value.trim() === '') {
+                    // soumettre pour récupérer la liste complète
+                     // Optional: form.submit(); if you want auto-refresh on clear
+                }
+            }, 500);
+        });
+    })();
+    </script>
 {% endblock %}

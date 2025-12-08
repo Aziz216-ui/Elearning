@@ -49,6 +49,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private bool $isVerified = false;
 
     #[ORM\Column(type: 'date', nullable: true)]
+    #[Assert\NotBlank(message: "la date de naissance est obligatoire !")]
     private ?\DateTimeInterface $birthdate = null;
 
     #[ORM\Column(length: 255)]
