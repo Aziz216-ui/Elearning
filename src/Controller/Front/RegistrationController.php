@@ -38,17 +38,7 @@ class RegistrationController extends AbstractController
             }
         }
 
-        // If submitted but invalid, store readable errors in a flash so user sees them in UI
-        if ($form->isSubmitted() && ! $form->isValid()) {
-            $messages = [];
-            foreach ($form->getErrors(true, true) as $error) {
-                $origin = $error->getOrigin()?->getName() ?? 'form';
-                $messages[] = sprintf('%s: %s', $origin, $error->getMessage());
-            }
-            if (count($messages) > 0) {
-                $this->addFlash('error', implode("\n", $messages));
-            }
-        }
+
 
         if ($form->isSubmitted() && $form->isValid()) {
             // hash password
@@ -81,7 +71,16 @@ class RegistrationController extends AbstractController
                 ]);
             }
 
-            $this->addFlash('success', 'Votre compte a été créé avec succès.');
+            // generate a signed url and email it to the user
+            $this->emailVerifier->sendEmailConfirmation('app_verify_email', $user,
+                (new \Symfony\Bridge\Twig\Mime\TemplatedEmail())
+                    ->from(new \Symfony\Component\Mime\Address('melkimohamedaziz1@gmail.com', 'Elearning Access'))
+                    ->to((string) $user->getEmail())
+                    ->subject('Veuillez confirmer votre email')
+                    ->htmlTemplate('emails/comfirmation_email.html.twig')
+            );
+
+            $this->addFlash('success', 'Votre compte a été créé avec succès. Veuillez vérifier votre email pour le confirmer.');
 
             return $this->redirectToRoute('app_login');
         }

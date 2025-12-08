@@ -26,7 +26,7 @@ class RegistrationFormType extends AbstractType
 
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        // read NotNull message from entity property metadata if present
+        
         $invalidMessage = null;
 
 
@@ -39,7 +39,7 @@ class RegistrationFormType extends AbstractType
                 ],
             ])
             ->add('plainPassword', PasswordType::class, [
-                // Map to the entity's transient property so entity constraints apply
+                
                 'mapped' => true,
                 'required' => true,
                 'attr' => ['autocomplete' => 'new-password'],
@@ -57,7 +57,6 @@ class RegistrationFormType extends AbstractType
                 'attr' => [
                     'placeholder' => 'AAAA-MM-JJ'
                 ],
-
             ])
             ->add('sexe', ChoiceType::class, [
                 'label' => 'Sexe',
@@ -78,4 +77,15 @@ class RegistrationFormType extends AbstractType
 
         ]);
     }
+
+     public function checkPassport(Passport $passport)
+{
+    $user = $passport->getUser();
+
+    if (!$user->isVerified()) {
+        throw new CustomUserMessageAuthenticationException(
+            'Veuillez vérifier votre email avant de vous connecter.'
+        );
+    }
+}
 }

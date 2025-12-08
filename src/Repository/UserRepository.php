@@ -32,13 +32,11 @@ class UserRepository extends ServiceEntityRepository implements PasswordUpgrader
 
     public function showAllCoursesByUser(int $userId): array
     {
-        // On utilise l'EntityManager pour créer un QueryBuilder qui sélectionne depuis l'entité Cours
-        // (le repository courant est pour User, donc createQueryBuilder('c') renverrait un builder sur User).
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select('c')
             ->from(Cours::class, 'c')
-            ->join('c.user', 'u')
-            ->where('u.id = :userId')
+            ->join('c.paniers', 'p') // Assuming Cours has OneToMany to Panier
+            ->where('p.user = :userId')
             ->setParameter('userId', $userId)
             ->orderBy('c.title', 'ASC');
 

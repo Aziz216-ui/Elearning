@@ -61,9 +61,17 @@ use Doctrine\Common\Collections\Collection;
     #[ORM\OneToMany(targetEntity: Quiz::class, mappedBy: 'cours', cascade: ['persist', 'remove'])]
     private Collection $quizzes;
 
+    #[ORM\OneToMany(mappedBy: 'cours', targetEntity: Panier::class, orphanRemoval: true)]
+    private Collection $paniers;
+
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'courses')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
     public function __construct()
     {
         $this->quizzes = new ArrayCollection();
+        $this->paniers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -182,6 +190,18 @@ use Doctrine\Common\Collections\Collection;
                 $quiz->setCours(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }
