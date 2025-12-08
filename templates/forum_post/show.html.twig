@@ -6,74 +6,52 @@
     {{ include('_flash_messages.html.twig') }}
     
     <style>
-        .edit-comment-form {
-            background: #f8f9fa;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 10px;
-            border: 1px solid #dee2e6;
+        .forum-show-wrapper * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        .edit-comment-form textarea {
-            width: 100%;
-            min-height: 100px;
-            padding: 10px;
-            border: 1px solid #dee2e6;
-            border-radius: 4px;
-            margin-bottom: 10px;
-        }
-        .comment-actions {
-            margin-top: 10px;
-            display: flex;
-            gap: 10px;
-        }
-        .edit-notification {
-            padding: 5px 10px;
-            background: #d4edda;
-            color: #155724;
-            border-radius: 4px;
-            font-size: 0.9em;
-            margin-top: 5px;
-            display: inline-block;
-        }
-    </style>
-    <style>
+
         .forum-show-wrapper {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #f5f7fa;
             min-height: 100vh;
             padding: 40px 20px;
         }
 
         .forum-show-container {
-            max-width: 1000px;
+            max-width: 900px;
             margin: 0 auto;
         }
 
         .forum-post-main {
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
             overflow: hidden;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .forum-post-header-section {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: linear-gradient(135deg, #17bebb 0%, #14a8a5 100%);
             color: white;
             padding: 40px;
         }
 
         .forum-post-title {
-            font-size: 2.2em;
+            font-size: 2em;
             margin: 0 0 20px 0;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+            font-weight: 600;
             line-height: 1.3;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
         }
 
         .forum-post-metadata {
             display: flex;
-            gap: 30px;
+            gap: 25px;
             flex-wrap: wrap;
             opacity: 0.95;
+            font-size: 0.95em;
         }
 
         .forum-meta-item {
@@ -82,21 +60,29 @@
             gap: 8px;
         }
 
+        .forum-meta-item svg {
+            flex-shrink: 0;
+        }
+
         .forum-post-body {
             padding: 40px;
         }
 
         .forum-post-content {
-            font-size: 1.1em;
+            font-size: 1.05em;
             line-height: 1.8;
-            color: #495057;
+            color: #24292e;
             margin-bottom: 30px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
         }
 
         .forum-post-image-container {
             margin: 30px 0;
-            border-radius: 15px;
+            border-radius: 10px;
             overflow: hidden;
+            border: 1px solid #e1e4e8;
         }
 
         .forum-post-image-container img {
@@ -106,39 +92,47 @@
         }
 
         .forum-post-dates {
-            background: #f8f9fa;
+            background: #f6f8fa;
             padding: 20px;
-            border-radius: 10px;
+            border-radius: 8px;
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
             margin: 30px 0;
+            border: 1px solid #e1e4e8;
         }
 
         .forum-date-item {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             gap: 10px;
-            color: #6c757d;
+            color: #586069;
+            font-size: 0.9em;
+        }
+
+        .forum-date-item svg {
+            flex-shrink: 0;
+            margin-top: 2px;
         }
 
         .forum-post-actions {
             display: flex;
             justify-content: space-between;
-            padding: 20px 40px;
-            border-top: 2px solid #e9ecef;
+            padding: 25px 40px;
+            border-top: 1px solid #e1e4e8;
             flex-wrap: wrap;
             gap: 15px;
+            background: #fafbfc;
         }
 
         .forum-btn {
-            padding: 12px 25px;
+            padding: 10px 20px;
             border: none;
-            border-radius: 10px;
+            border-radius: 8px;
             font-size: 0.95em;
-            font-weight: 600;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s;
             text-decoration: none;
             display: inline-flex;
             align-items: center;
@@ -146,26 +140,27 @@
         }
 
         .forum-btn-back {
-            background: #6c757d;
+            background: #586069;
             color: white;
         }
 
         .forum-btn-back:hover {
-            background: #5a6268;
+            background: #444d56;
             color: white;
             text-decoration: none;
+            transform: translateY(-1px);
         }
 
         .forum-btn-edit {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #17bebb;
             color: white;
         }
 
         .forum-btn-edit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+            background: #14a8a5;
             color: white;
             text-decoration: none;
+            transform: translateY(-1px);
         }
 
         .forum-btn-delete {
@@ -176,18 +171,19 @@
         .forum-btn-delete:hover {
             background: #c82333;
             color: white;
+            transform: translateY(-1px);
         }
 
         .forum-comment-section {
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
             overflow: hidden;
-            margin-bottom: 30px;
+            margin-bottom: 25px;
         }
 
         .forum-comment-header {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            background: #17bebb;
             color: white;
             padding: 20px 30px;
             display: flex;
@@ -197,7 +193,8 @@
 
         .forum-comment-header h3 {
             margin: 0;
-            font-size: 1.4em;
+            font-size: 1.3em;
+            font-weight: 600;
         }
 
         .forum-comment-form {
@@ -207,43 +204,45 @@
         .forum-comment-textarea {
             width: 100%;
             padding: 15px;
-            border: 2px solid #dee2e6;
-            border-radius: 10px;
-            font-size: 1em;
+            border: 1px solid #e1e4e8;
+            border-radius: 8px;
+            font-size: 0.95em;
             font-family: inherit;
             resize: vertical;
             min-height: 120px;
-            transition: all 0.3s;
+            transition: all 0.2s;
+            background: #fafbfc;
         }
 
         .forum-comment-textarea:focus {
             outline: none;
-            border-color: #28a745;
-            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+            border-color: #17bebb;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(23, 190, 187, 0.1);
         }
 
         .forum-btn-submit {
-            background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+            background: #17bebb;
             color: white;
             margin-top: 15px;
         }
 
         .forum-btn-submit:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.4);
+            background: #14a8a5;
             color: white;
+            transform: translateY(-1px);
         }
 
         .forum-comments-list-section {
             background: white;
-            border-radius: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
             overflow: hidden;
         }
 
         .forum-comments-list-header {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: #f6f8fa;
+            border-bottom: 1px solid #e1e4e8;
             padding: 20px 30px;
             display: flex;
             align-items: center;
@@ -252,17 +251,21 @@
 
         .forum-comments-list-header h3 {
             margin: 0;
-            font-size: 1.4em;
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #24292e;
             display: flex;
             align-items: center;
             gap: 10px;
         }
 
         .forum-comment-count {
-            background: rgba(255,255,255,0.2);
+            background: #17bebb;
+            color: white;
             padding: 5px 15px;
             border-radius: 20px;
             font-size: 0.9em;
+            font-weight: 500;
         }
 
         .forum-comments-body {
@@ -270,67 +273,164 @@
         }
 
         .forum-comment-item {
-            background: #f8f9fa;
-            border-left: 4px solid #667eea;
-            border-radius: 10px;
+            background: #fafbfc;
+            border-left: 3px solid #17bebb;
+            border-radius: 8px;
             padding: 20px;
             margin-bottom: 20px;
-            transition: all 0.3s;
+            transition: all 0.2s;
+            border: 1px solid #e1e4e8;
+            border-left: 3px solid #17bebb;
         }
 
         .forum-comment-item:hover {
-            transform: translateX(5px);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transform: translateX(3px);
+            box-shadow: 0 4px 12px rgba(23, 190, 187, 0.1);
         }
 
         .forum-comment-author {
             display: flex;
             align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
+            gap: 12px;
+            margin-bottom: 12px;
         }
 
         .forum-comment-avatar {
             width: 40px;
             height: 40px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
+            background: linear-gradient(135deg, #17bebb, #14a8a5);
             border-radius: 50%;
             display: flex;
             align-items: center;
             justify-content: center;
             color: white;
-            font-weight: bold;
+            font-weight: 600;
             font-size: 1.1em;
+            flex-shrink: 0;
         }
 
         .forum-comment-username {
             font-weight: 600;
-            color: #495057;
-            font-size: 1.05em;
+            color: #24292e;
+            font-size: 1em;
+        }
+
+        .forum-comment-username small {
+            display: block;
+            font-weight: 400;
+            color: #586069;
+            font-size: 0.85em;
+            margin-top: 2px;
         }
 
         .forum-comment-text {
-            color: #6c757d;
+            color: #24292e;
             line-height: 1.6;
-            font-size: 0.98em;
+            font-size: 0.95em;
+            margin-bottom: 12px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 0.85em;
+            border-radius: 6px;
+            border: 1px solid;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .btn-outline-primary {
+            background: white;
+            border-color: #17bebb;
+            color: #17bebb;
+        }
+
+        .btn-outline-primary:hover {
+            background: #17bebb;
+            color: white;
+        }
+
+        .btn-outline-danger {
+            background: white;
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+
+        .btn-outline-danger:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+        .edit-comment-form {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 12px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .edit-comment-form textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 12px;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-family: inherit;
+            font-size: 0.95em;
+            background: #fafbfc;
+        }
+
+        .edit-comment-form textarea:focus {
+            outline: none;
+            border-color: #17bebb;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(23, 190, 187, 0.1);
+        }
+
+        .edit-notification {
+            padding: 6px 12px;
+            background: #d1f2f1;
+            color: #17bebb;
+            border-radius: 6px;
+            font-size: 0.85em;
+            margin-top: 8px;
+            display: inline-block;
+            border: 1px solid #17bebb;
         }
 
         .forum-empty-comments {
             text-align: center;
-            padding: 40px 20px;
-            color: #6c757d;
+            padding: 50px 20px;
+            color: #586069;
         }
 
         .forum-empty-comments svg {
-            width: 80px;
-            height: 80px;
+            width: 70px;
+            height: 70px;
             margin-bottom: 15px;
-            opacity: 0.5;
+            opacity: 0.4;
+        }
+
+        .forum-empty-comments h4 {
+            color: #24292e;
+            margin-bottom: 8px;
+            font-size: 1.2em;
         }
 
         @media (max-width: 768px) {
             .forum-post-header-section {
-                padding: 25px 20px;
+                padding: 30px 25px;
             }
 
             .forum-post-title {
@@ -338,7 +438,7 @@
             }
 
             .forum-post-body {
-                padding: 25px 20px;
+                padding: 25px;
             }
 
             .forum-post-actions {
@@ -349,6 +449,14 @@
             .forum-btn {
                 width: 100%;
                 justify-content: center;
+            }
+
+            .forum-comment-form {
+                padding: 20px;
+            }
+
+            .forum-comments-body {
+                padding: 20px;
             }
         }
     </style>
@@ -436,15 +544,18 @@
             <!-- Formulaire d'ajout de commentaire -->
             <div class="forum-comment-section">
                 <div class="forum-comment-header">
-                    <span style="font-size: 1.5em;">💬</span>
+                    <span style="font-size: 1.4em;">💬</span>
                     <h3>Ajouter un commentaire</h3>
                 </div>
-                <form method="post" action="{{ path('app_forul_comment_add', {'postId': forum_post.id}) }}">
-                 <textarea name="contenu" class="forum-comment-textarea" placeholder="Partagez votre avis, posez une question..." required ></textarea> 
-                 <button type="submit" class="forum-btn forum-btn-submit"> 
-                 ✨ Publier le commentaire </button> </form> </div> 
-                
-                
+                <div class="forum-comment-form">
+                    <form method="post" action="{{ path('app_forul_comment_add', {'postId': forum_post.id}) }}">
+                        <textarea name="contenu" class="forum-comment-textarea" placeholder="Partagez votre avis, posez une question..." required></textarea>
+                        <button type="submit" class="forum-btn forum-btn-submit">
+                            ✨ Publier le commentaire
+                        </button>
+                    </form>
+                </div>
+            </div>
 
             <!-- Liste des commentaires -->
             <div class="forum-comments-list-section">
@@ -465,8 +576,8 @@
                                     </div>
                                     <span class="forum-comment-username">
                                         {{ comment.user.username ?? 'Utilisateur inconnu' }}
-                                        <small class="text-muted">
-                                            - {{ comment.createdAt|date('d/m/Y H:i') }}
+                                        <small>
+                                            {{ comment.createdAt|date('d/m/Y H:i') }}
                                             {% if comment.updatedAt and comment.updatedAt != comment.createdAt %}
                                                 (modifié le {{ comment.updatedAt|date('d/m/Y H:i') }})
                                             {% endif %}
@@ -477,20 +588,19 @@
                                     {{ comment.contenu|nl2br }}
                                 </div>
                                 
-                                {# Boutons d'action pour le commentaire #}
                                 {% if app.user and (app.user == comment.user or is_granted('ROLE_ADMIN')) %}
                                 <div class="comment-actions">
-                                    <button class="btn btn-sm btn-outline-primary edit-comment" 
+                                    <button class="btn-sm btn-outline-primary edit-comment" 
                                             data-comment-id="{{ comment.id }}"
                                             data-original-content="{{ comment.contenu|e('html_attr') }}">
-                                        <i class="fas fa-edit"></i> Modifier
+                                        ✏️ Modifier
                                     </button>
                                     <form method="post" action="{{ path('app_forul_comment_delete', {'id': comment.id}) }}" 
                                           onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?');" 
                                           style="display: inline-block;">
                                         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ comment.id) }}">
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">
-                                            <i class="fas fa-trash"></i> Supprimer
+                                        <button type="submit" class="btn-sm btn-outline-danger">
+                                            🗑️ Supprimer
                                         </button>
                                     </form>
                                 </div>

@@ -38,7 +38,7 @@ class ForumPost
     #[ORM\Column(type: Types::TEXT)]
     #[Assert\NotBlank(message: "Le contenu est obligatoire.")]
     #[Assert\Length(
-        min: 50,
+        min: 9,
         minMessage: "Le contenu doit contenir au minimum {{ limit }} caractères."
     )]
     private ?string $contenu = null;

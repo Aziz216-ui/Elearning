@@ -19,6 +19,15 @@ services:
             - '../src/DependencyInjection/'
             - '../src/Entity/'
             - '../src/Kernel.php'
+   # Configuration du service de modération (FRANÇAIS)
+    App\Service\HuggingFaceModerationService:
+        arguments:
+            $huggingfaceApiKey: '%env(HUGGINGFACE_API_KEY)%'
+            $moderationConfig:
+                model: 'facebook/xlm-roberta-base' # Modèle multilingue
+                toxicity_threshold: 70  # Bloquer si score >= 70
+                warning_threshold: 50   # Avertir si score >= 50
+
 
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
