@@ -83,6 +83,29 @@ class PaymentRepository extends ServiceEntityRepository
             ->getResult();
     }
 
+    /**
+     * Retourne les plans les plus achetés (paiements avec statut "completed").
+     *
+     * @param int $limit Nombre maximum de plans à retourner
+     * @return array<array{planId: int, planName: string, paymentsCount: string}>
+     */
+    public function findTopPlansByPayments(int $limit = 3): array
+    {
+        return $this->createQueryBuilder('p')
+            ->innerJoin('p.subscription', 's')
+            ->innerJoin('s.plan', 'pl')
+            ->andWhere('p.status = :status')
+            ->setParameter('status', 'completed')
+            // On ne retourne que des champs scalaires pour éviter les problèmes d'hydratation
+            // d'entités partielles.
+            ->select('pl.id AS planId, pl.name AS planName, COUNT(p.id) AS paymentsCount')
+            ->groupBy('pl.id, pl.name')
+            ->orderBy('paymentsCount', 'DESC')
+            ->setMaxResults($limit)
+            ->getQuery()
+            ->getArrayResult();
+    }
+
     //    /**
     //     * @return Payment[] Returns an array of Payment objects
     //     */

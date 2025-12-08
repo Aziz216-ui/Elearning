@@ -84,7 +84,7 @@ class PaymentController extends AbstractController
         $payment->setSubscription($subscription);
         $payment->setAmount((string) $plan->getPrice());
         $payment->setCurrency('TND');
-        $payment->setStatus('success');
+        $payment->setStatus('completed');
         $payment->setCreatedAt(new \DateTime());
 
         $this->entityManager->persist($payment);
