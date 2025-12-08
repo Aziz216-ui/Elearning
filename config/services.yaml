@@ -7,13 +7,24 @@ services:
     autowire: true
     autoconfigure: true
 
-  # Rendre les classes du dossier src/ disponibles comme services automatiquement
-  App\:
-    resource: '../src/'
-    exclude:
-      - '../src/DependencyInjection/'
-      - '../src/Entity/'
-      - '../src/Kernel.php'
+
+    # makes classes in src/ available to be used as services
+    # this creates a service per class whose id is the fully-qualified class name
+    App\:
+        resource: '../src/'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Entity/'
+            - '../src/Kernel.php'
+   # Configuration du service de modération (FRANÇAIS)
+    App\Service\HuggingFaceModerationService:
+        arguments:
+            $huggingfaceApiKey: '%env(HUGGINGFACE_API_KEY)%'
+            $moderationConfig:
+                model: 'facebook/xlm-roberta-base' # Modèle multilingue
+                toxicity_threshold: 70  # Bloquer si score >= 70
+                warning_threshold: 50   # Avertir si score >= 50
+
 
   # Définir explicitement le service PaymeeService
   App\Service\PaymeeService:

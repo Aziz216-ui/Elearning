@@ -48,7 +48,6 @@ class SecurityControllerAuthenticator extends AbstractLoginFormAuthenticator
             return new RedirectResponse($targetPath);
         }
 
-        // Redirection vers le tableau de bord après connexion réussie
         return new RedirectResponse($this->urlGenerator->generate('app_dashboard'));
     }
 
