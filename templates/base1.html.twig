@@ -36,24 +36,6 @@
             <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{{ asset('admin/index.html') }}">
                 <div class="sidebar-brand-icon rotate-n-15">
                     <i class="fas fa-graduation-cap"></i>
-
-        <!-- Nav Item - Notifications -->
-        <li class="nav-item {% if app.request.get('_route') == 'admin_notifications' %}active{% endif %}">
-          <a class="nav-link" href="{{ path('admin_notifications') }}">
-            <i class="fas fa-fw fa-bell"></i>
-            <span>Notifications</span>
-          </a>
-        </li>
-
-        <!-- Divider -->
-        <hr class="sidebar-divider d-none d-md-block">
-
-        <!-- Sidebar Toggler (Sidebar) -->
-        <div class="text-center d-none d-md-inline">
-          <button class="rounded-circle border-0" id="sidebarToggle"></button>
-        </div>
-      </ul>
-      <!-- End of Sidebar -->
                 </div>
                 <div class="sidebar-brand-text mx-3"> E-learning Admin </div>
             </a>
@@ -65,58 +47,73 @@
             <li class="nav-item active">
                 <a class="nav-link" href="{{ path('admin_user_stats') }}">
                     <i class="fas fa-fw fa-tachometer-alt"></i>
-                    <span>Dashboard</span></a>
+                    <span>Dashboard</span>
+                </a>
             </li>
 
             <li class="nav-item">
                 <a class="nav-link" href="{{ path('app_admin') }}">
                     <i class="fas fa-fw fa-users"></i>
-                    <span>Users</span></a>
+                    <span>Users</span>
+                </a>
             </li>
 
             <li class="nav-item">
                 <a class="nav-link" href="{{ path('app_cours_index') }}">
                     <i class="fas fa-fw fa-book-open"></i>
-                    <span>Cours</span></a>
+                    <span>Cours</span>
+                </a>
             </li>
 
             <li class="nav-item">
                 <a class="nav-link" href="{{ path('app_quiz_admin_index') }}">
                     <i class="fas fa-fw fa-question-circle"></i>
-                    <span>Quiz</span></a>
+                    <span>Quiz</span>
+                </a>
             </li>
 
             <li class="nav-item">
                 <a class="nav-link" href="{{ path('app_auteur_index') }}">
                     <i class="fas fa-fw fa-user-edit"></i>
-                    <span>Authors</span></a>
+                    <span>Authors</span>
+                </a>
             </li>
 
             <li class="nav-item">
                 <a class="nav-link" href="{{ path('app_dashboard_forum') }}">
                     <i class="fas fa-fw fa-comments"></i>
-                    <span>Posts de forum</span></a>
+                    <span>Posts de forum</span>
+                </a>
             </li>
-
 
             <li class="nav-item">
                 <a class="nav-link" href="{{ path('admin_plan_index') }}">
                     <i class="fas fa-fw fa-layer-group"></i>
-                    <span>Plans</span></a>
+                    <span>Plans</span>
+                </a>
             </li>
 
             <li class="nav-item">
                 <a class="nav-link" href="{{ path('admin_payment_index') }}">
                     <i class="fas fa-fw fa-credit-card"></i>
-                    <span>Payments</span></a>
+                    <span>Payments</span>
+                </a>
             </li>
 
             <li class="nav-item">
                 <a class="nav-link" href="{{ path('admin_subscription_index') }}">
                     <i class="fas fa-fw fa-sync-alt"></i>
-                    <span>Subscriptions</span></a>
+                    <span>Subscriptions</span>
+                </a>
             </li>
 
+            <!-- Nav Item - Notifications -->
+            <li class="nav-item {% if app.request.get('_route') == 'admin_notifications' %}active{% endif %}">
+                <a class="nav-link" href="{{ path('admin_notifications') }}">
+                    <i class="fas fa-fw fa-bell"></i>
+                    <span>Notifications</span>
+                </a>
+            </li>
 
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
@@ -125,7 +122,6 @@
             <div class="text-center d-none d-md-inline">
                 <button class="rounded-circle border-0" id="sidebarToggle"></button>
             </div>
-
 
         </ul>
         <!-- End of Sidebar -->

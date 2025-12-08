@@ -4,7 +4,7 @@
 
 {% block page_title %}Notifications{% endblock %}
 
-{% block body %}
+{% block content %}
 <div class="container mt-4">
     <div class="header-section">
         <div class="header-text">
@@ -159,87 +159,43 @@
     </style>
 
     <div class="notification-container" id="notificationList">
-        <div class="no-notifications">
-            <i class="fas fa-bell-slash"></i>
-            <h3>Aucune notification</h3>
-            <p>Vous n'avez pas encore de notifications.</p>
-        </div>
-    </div>
-</div>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    loadNotifications();
-});
-
-function loadNotifications() {
-    fetch('/api/notifications/recent?limit=50')
-        .then(response => response.json())
-        .then(data => {
-            renderNotifications(data.notifications);
-        })
-        .catch(error => {
-            console.error('Error loading notifications:', error);
-            document.getElementById('notificationList').innerHTML = `
-                <div class="no-notifications">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <h3>Erreur de chargement</h3>
-                    <p>Impossible de charger les notifications.</p>
-                </div>
-            `;
-        });
-}
-
-function renderNotifications(notifications) {
-    const container = document.getElementById('notificationList');
-    
-    if (notifications.length === 0) {
-        container.innerHTML = `
+        {% if notifications is empty %}
             <div class="no-notifications">
                 <i class="fas fa-bell-slash"></i>
                 <h3>Aucune notification</h3>
                 <p>Vous n'avez pas encore de notifications.</p>
             </div>
-        `;
-        return;
-    }
+        {% else %}
+            {% for notification in notifications %}
+                <div class="notification-item {{ notification.isRead ? '' : 'unread' }}"
+                     onclick="markAsRead({{ notification.id }})">
+                    <div class="notification-header">
+                        <div class="notification-title">{{ notification.title }}</div>
+                        <div class="notification-time">{{ notification.createdAt|date('d/m/Y H:i') }}</div>
+                    </div>
+                    <div class="notification-message">{{ notification.message }}</div>
+                    <div class="notification-meta">
+                        <span class="notification-type type-{{ notification.type }}">{{ notification.type }}</span>
+                        {% if notification.data is not null and notification.data.student is defined %}
+                            <span class="notification-meta-item">
+                                <i class="fas fa-user"></i>
+                                {{ notification.data.student.fullName ?? notification.data.student.email ?? '' }}
+                            </span>
+                        {% endif %}
+                        {% if notification.data is not null and notification.data.quiz is defined %}
+                            <span class="notification-meta-item">
+                                <i class="fas fa-question-circle"></i>
+                                {{ notification.data.quiz.title ?? '' }}
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>
 
-    container.innerHTML = notifications.map(notification => `
-        <div class="notification-item ${notification.isRead ? '' : 'unread'}" 
-             onclick="markAsRead(${notification.id})">
-            <div class="notification-header">
-                <div class="notification-title">${notification.title}</div>
-                <div class="notification-time">${formatTime(notification.createdAt)}</div>
-            </div>
-            <div class="notification-message">${notification.message}</div>
-            <div class="notification-meta">
-                <span class="notification-type type-${notification.type}">${notification.type}</span>
-                ${notification.data && notification.data.student ? `
-                    <span class="notification-meta-item">
-                        <i class="fas fa-user"></i> ${notification.data.student.fullName || notification.data.student.email}
-                    </span>
-                ` : ''}
-                ${notification.data && notification.data.quiz ? `
-                    <span class="notification-meta-item">
-                        <i class="fas fa-question-circle"></i> ${notification.data.quiz.title}
-                    </span>
-                ` : ''}
-            </div>
-        </div>
-    `).join('');
-}
-
-function formatTime(dateString) {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diff = Math.floor((now - date) / 1000); // seconds
-    
-    if (diff < 60) return 'à l\'instant';
-    if (diff < 3600) return `il y a ${Math.floor(diff / 60)} min`;
-    if (diff < 86400) return `il y a ${Math.floor(diff / 3600)} h`;
-    return `il y a ${Math.floor(diff / 86400)} j`;
-}
-
+<script>
 function markAsRead(notificationId) {
     fetch(`/api/notifications/mark-read/${notificationId}`, {
         method: 'POST'
@@ -247,7 +203,7 @@ function markAsRead(notificationId) {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            loadNotifications(); // Refresh the list
+            window.location.reload();
         }
     })
     .catch(error => console.error('Error marking notification as read:', error));
@@ -260,7 +216,7 @@ function markAllAsRead() {
     .then(response => response.json())
     .then(data => {
         if (data.success) {
-            loadNotifications(); // Refresh the list
+            window.location.reload();
         }
     })
     .catch(error => console.error('Error marking all notifications as read:', error));

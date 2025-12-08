@@ -27,8 +27,9 @@ function number_format(number, decimals, dec_point, thousands_sep) {
   return s.join(dec);
 }
 
-// Area Chart Example
+// Area Chart Example (only if the canvas exists on the page)
 var ctx = document.getElementById("myAreaChart");
+if (ctx) {
 var myLineChart = new Chart(ctx, {
   type: 'line',
   data: {
@@ -116,3 +117,4 @@ var myLineChart = new Chart(ctx, {
     }
   }
 });
+}

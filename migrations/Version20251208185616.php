@@ -19,10 +19,7 @@ final class Version20251208185616 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
-        // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE subscription ADD cours_id INT DEFAULT NULL, CHANGE plan_id plan_id INT DEFAULT NULL');
-        $this->addSql('ALTER TABLE subscription ADD CONSTRAINT FK_A3C664D37ECF78B0 FOREIGN KEY (cours_id) REFERENCES cours (id)');
-        $this->addSql('CREATE INDEX IDX_A3C664D37ECF78B0 ON subscription (cours_id)');
+        // Intentionally left blank: subscription.cours_id already exists and FK/index are managed by a later migration.
     }
 
     public function down(Schema $schema): void
