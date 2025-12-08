@@ -124,75 +124,7 @@
 
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
-                    <!-- DataTales Example -->
-                    <div class="card shadow mb-4">
-                        <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Liste des posts de forum</h6>
-                        </div>
-                        <div class="card-body">
-                            <div class="table-responsive">
-                                <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                    <thead>
-                                        <tr>
-                                            <th>ID</th>
-                                            <th>Titre</th>
-                                            <th>Contenu</th>
-                                            <th>Auteur</th>
-                                            <th>Commentaires</th>
-                                            <th>Statut</th>
-                                            <th>Actions</th>
-                                            <th>Toggle</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {% for post in forum_posts %}
-                                            <tr>
-                                                <td>{{ post.id }}</td>
-                                                <td>{{ post.titre }}</td>
-                                                <td>{{ post.contenu|length > 50 ? post.contenu|slice(0, 50) ~ '...' : post.contenu }}</td>
-                                                <td>{{ post.user.username }}</td>
-                                                <td>{{ post.comments|length }}</td>
-                                                <td>
-                                                    {% if post.enabled %}
-                                                        <span class="badge badge-success">Actif</span>
-                                                    {% else %}
-                                                        <span class="badge badge-danger">Désactivé</span>
-                                                    {% endif %}
-                                                </td>
-                                                <td>
-                                                    <a href="#" class="btn btn-info btn-circle btn-sm">
-                                                        <i class="fas fa-eye"></i>
-                                                    </a>
-                                                    <a href="#" class="btn btn-warning btn-circle btn-sm">
-                                                        <i class="fas fa-edit"></i>
-                                                    </a>
-                                                    <a href="#" class="btn btn-danger btn-circle btn-sm">
-                                                        <i class="fas fa-trash"></i>
-                                                    </a>
-                                                </td>
-                                                <td>
-    <form method="post"
-          action="{{ path('app_post_toggle', {'id': post.id}) }}"
-          style="display:inline">
-        <input type="hidden" name="_token" value="{{ csrf_token('toggle' ~ post.id) }}">
-        <button type="submit"
-                class="btn btn-sm {% if post.enabled %}btn-warning{% else %}btn-success{% endif %}">
-            {% if post.enabled %}Désactiver{% else %}Activer{% endif %}
-        </button>
-    </form>
-</td>
-
-                                            </tr>
-                                        {% else %}
-                                            <tr>
-                                                <td colspan="7" class="text-center">Aucun post trouvé</td>
-                                            </tr>
-                                        {% endfor %}
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
+                    {% block content %}{% endblock %}
                 </div>
                 <!-- /.container-fluid -->
             </div>
