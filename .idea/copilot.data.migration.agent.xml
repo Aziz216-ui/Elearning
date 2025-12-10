@@ -6,7 +6,7 @@
       <option value="0fd3df7a-dcdd-4f81-8fea-faeed454943b" />
       <option value="40518c38-ff9e-4db7-a406-225601396b74" />
       <option value="7e855847-1817-4a18-8df2-dbaa457f3ac6" />
-      <option value="820874ee-74d5-4589-954e-40f1dea40178" />
+
       <option value="9805fe7d-99a9-44d3-8eb4-11f2d58d284b" />
       <option value="bec32839-5997-4383-a86b-41d073d4b718" />
       <option value="bf431552-1b19-47cf-81f7-d4e2dc998e56" />
@@ -69,23 +69,8 @@
             </set>
           </value>
         </entry>
-        <entry key="7e855847-1817-4a18-8df2-dbaa457f3ac6">
-          <value>
-            <set>
-              <option value="9c525300-29d5-4d02-83f4-ab8d9fc11d6f" />
-            </set>
-          </value>
-        </entry>
-        <entry key="820874ee-74d5-4589-954e-40f1dea40178">
-          <value>
-            <set>
-              <option value="9451f438-cad4-4f73-8e14-0815ae76aba1" />
-              <option value="753566b0-4d30-4711-ae41-d8b0ec9033aa" />
-              <option value="92d254a0-e12e-4e69-a026-e950bfd3be21" />
-              <option value="86ccf3e0-4e33-4027-b613-b096e6dd1bd2" />
-            </set>
-          </value>
-        </entry>
+
+
         <entry key="9805fe7d-99a9-44d3-8eb4-11f2d58d284b">
           <value>
             <set>
@@ -152,10 +137,6 @@
           <option value="file://$PROJECT_DIR$/templates/admin/user/index.html.twig" />
         </set>
       </entry>
-      <entry key="9805fe7d-99a9-44d3-8eb4-11f2d58d284b" />
-      <entry key="bec32839-5997-4383-a86b-41d073d4b718" />
-      <entry key="cb087831-08c5-4d58-99cd-ef8b01a4665f" />
-      <entry key="d59f5847-e3d2-4b01-b5fa-8c483fdd5914" />
       <entry key="9805fe7d-99a9-44d3-8eb4-11f2d58d284b" />
       <entry key="bec32839-5997-4383-a86b-41d073d4b718" />
       <entry key="cb087831-08c5-4d58-99cd-ef8b01a4665f" />
