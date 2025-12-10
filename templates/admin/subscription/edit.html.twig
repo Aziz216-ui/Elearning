@@ -1,0 +1,27 @@
+{% extends 'base1.html.twig' %}
+{% block title %}Edit Subscription{% endblock %}
+
+{% block header_subtitle %}Update subscription information{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-0">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">Edit Subscription</h1>
+            <p class="mb-0 text-muted small">Update subscription information</p>
+        </div>
+        <a href="{{ path('admin_subscription_index') }}" class="btn btn-secondary btn-sm shadow-sm">
+            <i class="fas fa-arrow-left fa-sm"></i> Back
+        </a>
+    </div>
+
+    <div class="card shadow mt-0 mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Subscription form</h6>
+        </div>
+        <div class="card-body">
+            {{ include('admin/subscription/_form.html.twig', {form: form, button_label: 'Update'}) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends 'base1.html.twig' %}
+{% block title %}New Plan{% endblock %}
+{% block header_subtitle %}Create a new plan{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-0">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">New Plan</h1>
+            <p class="mb-0 text-muted small">Create a new plan</p>
+        </div>
+        <a href="{{ path('admin_plan_index') }}" class="btn btn-secondary btn-sm shadow-sm">
+            <i class="fas fa-arrow-left fa-sm"></i> Back
+        </a>
+    </div>
+
+    <div class="card shadow mt-0 mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Plan form</h6>
+        </div>
+        <div class="card-body">
+            {{ include('admin/plan/_form.html.twig', {form: form, button_label: 'Create'}) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

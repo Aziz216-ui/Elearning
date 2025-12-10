@@ -1,0 +1,208 @@
+<?php
+
+namespace App\Entity;
+use App\Repository\CoursRepository;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
+
+
+    #[ORM\Entity(repositoryClass: CoursRepository::class)]
+    class Cours
+
+   
+    {
+        #[ORM\Id]
+        #[ORM\GeneratedValue]
+        #[ORM\Column]
+        private ?int $id = null;
+
+        #[ORM\Column(length: 255)]
+        #[Assert\NotBlank(message: "Le titre est obligatoire !")]
+        #[Assert\Length(
+            min: 5,
+            max: 255,
+            minMessage: "Le titre doit contenir au moins {{ limit }} caractères",
+            maxMessage: "Le titre ne peut pas dépasser {{ limit }} caractères"
+        )]
+        private ?string $title = null;
+
+        #[ORM\Column(type: Types::TEXT)]
+        #[Assert\NotBlank(message: "La description est obligatoire !")]
+        #[Assert\Length(
+            min: 10,
+            minMessage: "La description doit contenir au moins {{ limit }} caractères"
+        )]
+        private ?string $description = null;
+
+        #[ORM\Column]
+        #[Assert\NotBlank(message: "Le prix est obligatoire !")]
+        #[Assert\Positive(message: "Le prix doit être un nombre positif")]
+        private ?float $price = null;
+        #[ORM\Column(type: "datetime_immutable", nullable: true)]
+        private ?\DateTimeImmutable $duration = null;
+        
+        
+
+        #[ORM\Column(length: 255)]
+        #[Assert\NotBlank(message: "La catégorie est obligatoire !")]
+        private ?string $category = null;
+
+        #[ORM\Column]
+        private ?bool $isPublished = null;
+        #[ORM\ManyToOne(targetEntity: Auteur::class, inversedBy: 'cours')]
+        #[ORM\JoinColumn(nullable: false)]
+        private ?Auteur $auteur = null;
+         /**
+     * @var Collection<int, Quiz>
+     */
+    #[ORM\OneToMany(targetEntity: Quiz::class, mappedBy: 'cours', cascade: ['persist', 'remove'])]
+    private Collection $quizzes;
+
+    #[ORM\OneToMany(mappedBy: 'cours', targetEntity: Panier::class, orphanRemoval: true)]
+    private Collection $paniers;
+
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'courses')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
+
+    public function __construct()
+    {
+        $this->quizzes = new ArrayCollection();
+        $this->paniers = new ArrayCollection();
+    }
+
+    public function getId(): ?int
+    {
+        return $this->id;
+    }
+
+
+     public function getTitle(): ?string
+        {
+            return $this->title;
+        }
+
+        public function setTitle(string $title): static
+        {
+            $this->title = $title;
+
+            return $this;
+        }
+
+        public function getDescription(): ?string
+        {
+            return $this->description;
+        }
+
+        public function setDescription(string $description): static
+        {
+            $this->description = $description;
+
+            return $this;
+        }
+
+        public function getPrice(): ?float
+        {
+            return $this->price;
+        }
+
+        public function setPrice(float $price): static
+        {
+            $this->price = $price;
+
+            return $this;
+        }
+
+        public function getCategory(): ?string
+        {
+            return $this->category;
+        }
+
+        public function setCategory(?string $category): static
+        {
+            $this->category = $category;
+
+            return $this;
+        }
+        public function getDuration(): ?\DateTimeImmutable
+        {
+            return $this->duration;
+        }
+        
+        public function setDuration(?\DateTimeImmutable $duration): static
+        {
+            $this->duration = $duration;
+        
+            return $this;
+        }
+        
+
+        public function isPublished(): ?bool
+        {
+            return $this->isPublished;
+        }
+
+        public function setIsPublished(bool $isPublished): static
+        {
+            $this->isPublished = $isPublished;
+
+            return $this;
+        }
+
+        public function getAuteur(): ?Auteur
+        {
+            return $this->auteur;
+        }
+
+        public function setAuteur(?Auteur $auteur): static
+        {
+            $this->auteur = $auteur;
+
+            return $this;
+        }
+    
+
+    /**
+     * @return Collection<int, Quiz>
+     */
+    public function getQuizzes(): Collection
+    {
+        return $this->quizzes;
+    }
+
+    public function addQuiz(Quiz $quiz): static
+    {
+        if (!$this->quizzes->contains($quiz)) {
+            $this->quizzes->add($quiz);
+            $quiz->setCours($this);
+        }
+
+        return $this;
+    }
+
+    public function removeQuiz(Quiz $quiz): static
+    {
+        if ($this->quizzes->removeElement($quiz)) {
+            if ($quiz->getCours() === $this) {
+                $quiz->setCours(null);
+            }
+        }
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
+
+        return $this;
+    }
+}

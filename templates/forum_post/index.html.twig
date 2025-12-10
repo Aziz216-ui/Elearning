@@ -1,0 +1,254 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Forum {% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <!-- Header -->
+    <div class=" text-black rounded p-4 mb-4 shadow-sm">
+        <h1 class="mb-2">📚 Forum</h1>
+        <p class="mb-0">Partagez vos connaissances et apprenez ensemble</p>
+    </div>
+
+    <!-- Search Bar and Create Button -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="row g-3">
+                <div class="col-md-8">
+                    <form method="get" action="{{ path('app_forum_post_index') }}">
+                        <div class="input-group">
+                            <input type="text" 
+                                   name="q" 
+                                   class="form-control" 
+                                   placeholder="Rechercher un post par titre, auteur ou tag..." 
+                                   value="{{ app.request.get('q') }}">
+                            <button type="submit" class="btn btn-primary">🔍 Rechercher</button>
+                        </div>
+                    </form>
+                </div>
+                <div class="col-md-4 text-md-end">
+                    <a href="{{ path('app_forum_post_new') }}" class="btn btn-primary w-100 w-md-auto">
+                        ➕ Créer un nouveau post
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Category Filters -->
+    {% if categories is defined and categories is not empty %}
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <div class="btn-group flex-wrap" role="group" aria-label="Filtrer par catégorie">
+                <a href="{{ path('app_forum_post_index') }}" 
+                   class="btn btn-sm {{ app.request.get('category') is null ? 'btn-primary' : 'btn-outline-secondary' }}">
+                    Tous
+                </a>
+                {% for category in categories %}
+                    <a href="{{ path('app_forum_post_index', {'category': category.slug}) }}" 
+                       class="btn btn-sm {{ app.request.get('category') == category.slug ? 'btn-primary' : 'btn-outline-secondary' }}">
+                        {{ category.icone ?? '📁' }} {{ category.nom }}
+                    </a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    {% endif %}
+
+
+    <!-- Posts Container -->
+    <div class="row g-4">
+        {% if forum_posts is empty %}
+            <div class="col-12">
+                <div class="alert alert-warning">
+                    <h4 class="alert-heading">Aucun post trouvé</h4>
+                    <p>{% if app.request.get('q') %}Aucun résultat pour votre recherche.{% else %}Soyez le premier à créer un post !{% endif %}</p>
+                    <hr>
+                    <a href="{{ path('app_forum_post_new') }}" class="btn btn-primary">
+                        ➕ Créer le premier post
+                    </a>
+                </div>
+            </div>
+        {% else %}
+            {% for post in forum_posts %}
+                <div class="col-md-6 col-lg-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body">
+                            <!-- Post Header -->
+                            <div class="d-flex align-items-center mb-3">
+                                <div class="bg-primary text-white rounded-circle d-flex align-items-center justify-content-center" 
+                                     style="width: 42px; height: 42px; font-weight: 600;">
+                                    {{ post.user.username|first|upper }}
+                                </div>
+                                <div class="ms-3">
+                                    <div class="fw-bold">{{ post.user.username }}</div>
+                                    <small class="text-muted">{{ post.createdAt|date('d/m/Y H:i') }}</small>
+                                </div>
+                            </div>
+                            
+                            <!-- Post Title -->
+                            <h5 class="card-title">{{ post.titre }}</h5>
+                            
+                            <!-- Post Image -->
+                            {% if post.image %}
+                                <img src="{{ asset('uploads/' ~ post.image) }}" 
+                                     class="img-fluid rounded mb-3" 
+                                     alt="{{ post.titre }}"
+                                     style="max-height: 200px; width: 100%; object-fit: cover;"
+                                     onerror="this.style.display='none'">
+                            {% endif %}
+                            
+                            <!-- Post Excerpt -->
+                            <p class="card-text text-muted">
+                                {{ post.contenu|striptags|slice(0, 150) }}...
+                            </p>
+                            
+                            <!-- Category Tag -->
+                            {% if post.category %}
+                                <div class="mb-3">
+                                    <span class="badge bg-primary">
+                                        {{ post.category.icone ?? '📁' }} {{ post.category.nom }}
+                                    </span>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Post Stats -->
+                            <div class="d-flex gap-3 mb-3 text-muted small">
+                                <span>
+                                    <i class="bi bi-eye"></i> {{ post.vues|default(0) }} vues
+                                </span>
+                                <span>
+                                    <i class="bi bi-chat"></i> 
+                                    {% if post.comments|length > 0 %}
+                                        {{ post.comments|length }} commentaire{{ post.comments|length > 1 ? 's' : '' }}
+                                    {% else %}
+                                        Soyez le premier !
+                                    {% endif %}
+                                </span>
+                                <span data-post-id="{{ post.id }}">
+                                    <button class="btn btn-sm btn-link p-0 text-muted forum-like-btn" 
+                                            onclick="toggleLike({{ post.id }})"
+                                            style="text-decoration: none;">
+                                        <i class="bi bi-hand-thumbs-up"></i> 
+                                        <span class="like-count">{{ post.likes|default(0) }}</span>
+                                    </button>
+                                </span>
+                            </div>
+
+                            <!-- Comments Preview -->
+                            {% if post.comments|length > 0 %}
+                                <div class="bg-light rounded p-3 mb-3">
+                                    <strong class="small">💬 Derniers commentaires :</strong>
+                                    {% for comment in post.comments|slice(0, 2) %}
+
+                                        <div class="mt-2 pb-2 {% if not loop.last %}border-bottom{% endif %}">
+                                            <div class="fw-bold small">{{ comment.user.username }}</div>
+                                            <div class="text-muted small">{{ comment.contenu|slice(0, 80) }}...</div>
+                                        </div>
+                                    {% endfor %}
+                                    {% if post.comments|length > 2 %}
+                                        <small class="text-muted">+ {{ post.comments|length - 2 }} autre(s) commentaire(s)</small>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Action Buttons -->
+                            <div class="d-grid gap-2">
+                                <a href="{{ path('app_forum_post_show', {'id': post.id}) }}" 
+                                   class="btn btn-primary btn-sm">
+                                    👁️ Voir plus
+                                </a>
+                                {% if app.user and post.user is not null and app.user.id == post.user.id %}
+                                <a href="{{ path('app_forum_post_edit', {'id': post.id}) }}" 
+                                   class="btn btn-outline-secondary btn-sm">
+                                    ✏️ Modifier
+                                </a>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>
+
+<style>
+    .forum-like-btn.liked {
+        color: #0d6efd !important;
+        font-weight: 600;
+    }
+    
+    .forum-like-btn {
+        transition: all 0.2s;
+    }
+    
+    .forum-like-btn:hover {
+        color: #0d6efd !important;
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.querySelector('input[name="q"]');
+        if (searchInput) {
+            searchInput.addEventListener('keyup', function(e) {
+                if (e.key === 'Enter') {
+                    e.target.closest('form').submit();
+                }
+            });
+        }
+    });
+
+    async function toggleLike(postId) {
+        const likeContainer = document.querySelector(`[data-post-id="${postId}"]`);
+        const likeBtn = likeContainer.querySelector('.forum-like-btn');
+        const likeCount = likeContainer.querySelector('.like-count');
+        
+        const isLiked = localStorage.getItem(`post_${postId}_liked`) === 'true';
+        const action = isLiked ? 'unlike' : 'like';
+        
+        try {
+            const response = await fetch(`/forum/post/${postId}/${action}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                likeCount.textContent = data.likes;
+                
+                if (isLiked) {
+                    likeBtn.classList.remove('liked');
+                    localStorage.removeItem(`post_${postId}_liked`);
+                } else {
+                    likeBtn.classList.add('liked');
+                    localStorage.setItem(`post_${postId}_liked`, 'true');
+                }
+                
+                likeBtn.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    likeBtn.style.transform = 'scale(1)';
+                }, 200);
+            }
+        } catch (error) {
+            console.error('Erreur lors du like:', error);
+            alert('Vous devez être connecté pour liker un post');
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        document.querySelectorAll('[data-post-id]').forEach(container => {
+            const postId = container.dataset.postId;
+            const likeBtn = container.querySelector('.forum-like-btn');
+            
+            if (localStorage.getItem(`post_${postId}_liked`) === 'true') {
+                likeBtn.classList.add('liked');
+            }
+        });
+    });
+</script>
+{% endblock %}

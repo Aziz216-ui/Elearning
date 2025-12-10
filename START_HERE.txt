@@ -1,0 +1,163 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                ║
+║                     ⚡ COPY-PASTE QUICK START ⚡                              ║
+║                                                                                ║
+║              https://webhook.site/401957a8-71fe-4435-9776-8d...              ║
+║                                                                                ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+🚀 3 ÉTAPES - COPIER-COLLER - 3 MINUTES
+═══════════════════════════════════════════════════════════════════════════════════
+
+
+TERMINAL 1 - CONFIGURATION
+═════════════════════════════════════════════════════════════════════════════════
+
+cd "c:\xampp\htdocs\version final\Elearning"
+php setup_webhook_admin.php
+
+
+TERMINAL 2 - SERVEUR (NEW WINDOW)
+═════════════════════════════════════════════════════════════════════════════════
+
+cd "c:\xampp\htdocs\version final\Elearning"
+php -S localhost:8000 -t public
+
+
+TERMINAL 3 - TEST (NEW WINDOW)
+═════════════════════════════════════════════════════════════════════════════════
+
+cd "c:\xampp\htdocs\version final\Elearning"
+.\quick_test_webhook.ps1
+
+
+BROWSER - VÉRIFICATION
+═════════════════════════════════════════════════════════════════════════════════
+
+1. Go to: https://webhook.site/401957a8-71fe-4435-9776-8dfa554dbb5c
+2. Refresh (F5)
+3. You should see your webhook!
+4. Click it to see details
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+✅ COMPLETE! WHAT'S NEXT?
+═══════════════════════════════════════════════════════════════════════════════════
+
+Test the real flow:
+
+1. BROWSER: Go to http://localhost:8000/front/
+2. LOGIN: Use any student account
+3. FIND QUIZ: Click on a quiz
+4. START: Click "Commencer Quiz"
+   → Webhook 'quiz_started' sent
+5. ANSWER: Answer the questions
+6. SUBMIT: Click "Soumettre"
+   → Webhook 'quiz_completed' sent
+7. VERIFY: Check webhook.site
+   → You should see both webhooks!
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+📋 REFERENCE - ALL COMMANDS
+═══════════════════════════════════════════════════════════════════════════════════
+
+Setup (one time):
+  php setup_webhook_admin.php
+
+Server:
+  php -S localhost:8000 -t public
+
+Quick Test:
+  .\quick_test_webhook.ps1
+
+Alternative Tests:
+  .\test_webhook.ps1
+  .\test_curl.bat
+
+Manual cURL (replace TOKEN with token from .webhook_token):
+  curl -X GET http://localhost:8000/api/webhooks -H "Authorization: Bearer TOKEN"
+  curl -X POST http://localhost:8000/api/webhooks/1/test -H "Authorization: Bearer TOKEN"
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+🎯 ENDPOINT REFERENCE
+═══════════════════════════════════════════════════════════════════════════════════
+
+List webhooks:
+  GET http://localhost:8000/api/webhooks
+
+Create webhook:
+  POST http://localhost:8000/api/webhooks
+  Body: {"url":"https://...","eventType":"all"}
+
+Get one:
+  GET http://localhost:8000/api/webhooks/1
+
+Update:
+  PUT http://localhost:8000/api/webhooks/1
+  Body: {"eventType":"quiz_started"}
+
+Delete:
+  DELETE http://localhost:8000/api/webhooks/1
+
+Test:
+  POST http://localhost:8000/api/webhooks/1/test
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+📊 EXPECTED OUTPUT
+═══════════════════════════════════════════════════════════════════════════════════
+
+After Terminal 1:
+  ✅ Rôle ROLE_ADMIN attribué avec succès!
+  ✅ Token généré: ecc1ba064152f19c0f6b623eec249a31b3d41b09...
+
+After Terminal 2:
+  ✅ Symfony Development Server started
+  ✅ Listening on http://127.0.0.1:8000
+
+After Terminal 3:
+  ✅ Webhook créé avec succès!
+  ✅ ID: 1
+  ✅ Secret: abc123def456ghij789klmn...
+  ✅ Test envoyé avec succès!
+
+On webhook.site:
+  ✅ You see a POST request
+  ✅ With X-Webhook-Signature header
+  ✅ With JSON body containing quiz data
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+❓ IF SOMETHING GOES WRONG
+═══════════════════════════════════════════════════════════════════════════════════
+
+Script error?
+  → Make sure you're in the right directory
+  → cd "c:\xampp\htdocs\version final\Elearning"
+  → Try: .\test_webhook.ps1 (more detailed)
+
+Port 8000 busy?
+  → Kill it: netstat -ano | findstr :8000
+  → Then: taskkill /PID <PID> /F
+  → Retry: php -S localhost:8000 -t public
+
+No webhooks on webhook.site?
+  → Check that Symfony is running on Terminal 2
+  → Check that the test ran on Terminal 3
+  → Try the test again: .\quick_test_webhook.ps1
+  → Check logs: tail var/log/dev.log
+
+PowerShell execution error?
+  → Run as Administrator
+  → Then: Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+
+🎉 THAT'S IT! You now have a working webhook system!
+
+Next: See WEBHOOK_API_REFERENCE.md for all endpoint details

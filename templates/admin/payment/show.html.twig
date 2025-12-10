@@ -1,0 +1,103 @@
+{% extends 'base1.html.twig' %}
+{% block title %}Paiement #{{ payment.id }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Détails du paiement</h1>
+        <a href="{{ path('admin_payment_index') }}" class="btn btn-secondary btn-sm shadow-sm">
+            <i class="fas fa-arrow-left fa-sm"></i> Retour
+        </a>
+    </div>
+
+    <!-- Payment Details Card -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Paiement #{{ payment.id }}</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered mb-0">
+                    <tbody>
+                        <tr>
+                            <th class="bg-light" style="width: 30%;">ID</th>
+                            <td>{{ payment.id }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Utilisateur</th>
+                            <td>{{ payment.user ? payment.user.email : '—' }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Abonnement</th>
+                            <td>
+                                {% if payment.subscription %}
+                                    #{{ payment.subscription.id }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Montant</th>
+                            <td>{{ payment.amount }} {{ payment.currency }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Statut</th>
+                            <td>
+                                <span class="badge {{ payment.status == 'completed' ? 'badge-success' : 'badge-secondary' }}">
+                                    {{ payment.status }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Créé le</th>
+                            <td>{{ payment.createdAt ? payment.createdAt|date('Y-m-d H:i') : '' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    {% if userPayments is defined and userPayments is not empty %}
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">Autres paiements de l'utilisateur</h6>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered" width="100%" cellspacing="0">
+                        <thead>
+                            <tr>
+                                <th>ID</th>
+                                <th>Montant</th>
+                                <th>Statut</th>
+                                <th>Créé le</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        {% for p in userPayments %}
+                            <tr>
+                                <td>{{ p.id }}</td>
+                                <td>{{ p.amount }} {{ p.currency }}</td>
+                                <td>
+                                    <span class="badge {{ p.status == 'completed' ? 'badge-success' : 'badge-secondary' }}">
+                                        {{ p.status }}
+                                    </span>
+                                </td>
+                                <td>{{ p.createdAt ? p.createdAt|date('Y-m-d H:i') : '' }}</td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td colspan="4" class="text-center">Aucun autre paiement trouvé.</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

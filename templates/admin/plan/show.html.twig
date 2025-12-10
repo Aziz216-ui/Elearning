@@ -1,0 +1,123 @@
+{% extends 'base1.html.twig' %}
+{% block title %}Plan {{ plan.name }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Détails du plan</h1>
+        <div>
+            <a href="{{ path('admin_plan_edit', {id: plan.id}) }}" class="btn btn-primary btn-sm shadow-sm mr-2">
+                <i class="fas fa-edit fa-sm"></i> Éditer
+            </a>
+            <a href="{{ path('admin_plan_index') }}" class="btn btn-secondary btn-sm shadow-sm">
+                <i class="fas fa-arrow-left fa-sm"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    <!-- Plan Details Card -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Plan: {{ plan.name }}</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th class="bg-light" style="width: 30%;">Identifiant</th>
+                            <td>{{ plan.id }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Nom</th>
+                            <td>{{ plan.name }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Description</th>
+                            <td>{{ plan.description }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Prix (DT)</th>
+                            <td>{{ plan.price }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Durée</th>
+                            <td>{{ plan.duration }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Actif</th>
+                            <td>
+                                <span class="badge {{ plan.isActive ? 'badge-success' : 'badge-secondary' }}">
+                                    {{ plan.isActive ? 'Actif' : 'Inactif' }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Max cours</th>
+                            <td>{{ plan.maxCourses ?? '∞' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Subscriptions using this Plan -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Abonnements utilisant ce plan</h6>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <form class="form-inline" method="get" action="{{ path('admin_plan_show', {id: plan.id}) }}">
+                    <div class="form-group mr-3 mb-2">
+                        <label for="status" class="mr-2 small mb-0">Statut</label>
+                        <select id="status" name="status" class="form-control form-control-sm">
+                            <option value="" {{ app.request.query.get('status') is empty ? 'selected' : '' }}>Tous</option>
+                            <option value="active" {{ app.request.query.get('status') == 'active' ? 'selected' : '' }}>Actifs</option>
+                            <option value="canceled" {{ app.request.query.get('status') == 'canceled' ? 'selected' : '' }}>Annulés</option>
+                            <option value="pending" {{ app.request.query.get('status') == 'pending' ? 'selected' : '' }}>En attente</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-sm btn-primary mb-2">Filtrer</button>
+                </form>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Utilisateur</th>
+                            <th>Statut</th>
+                            <th>Début</th>
+                            <th>Fin</th>
+                            <th>Auto-renouvellement</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for subscription in subscriptions %}
+                        <tr>
+                            <td>{{ subscription.user ? subscription.user.email : '—' }}</td>
+                            <td>{{ subscription.status }}</td>
+                            <td>{{ subscription.startDate ? subscription.startDate|date('Y-m-d H:i') : '' }}</td>
+                            <td>{{ subscription.endDate ? subscription.endDate|date('Y-m-d H:i') : '' }}</td>
+                            <td>{{ subscription.autoRenew ? 'Oui' : 'Non' }}</td>
+                            <td>
+                                <a class="btn btn-info btn-sm" href="{{ path('admin_subscription_show', {id: subscription.id}) }}">Voir</a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center">Aucun abonnement pour ce plan.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

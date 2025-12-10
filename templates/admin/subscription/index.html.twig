@@ -1,0 +1,115 @@
+{% extends 'base1.html.twig' %}
+{% block title %}Subscriptions{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-0">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">Subscriptions</h1>
+            <p class="mb-0 text-muted small">Gérez les abonnements des utilisateurs</p>
+        </div>
+        <a href="{{ path('admin_subscription_new') }}" class="btn btn-primary btn-sm shadow-sm">
+            <i class="fas fa-plus fa-sm text-white-50"></i> Nouvel abonnement
+        </a>
+    </div>
+
+    <!-- Subscriptions Table -->
+    <div class="card shadow mt-0 mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Liste des abonnements</h6>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <form class="form-inline" method="get" action="{{ path('admin_subscription_filter') }}">
+                    <div class="form-group mr-3 mb-2">
+                        <label for="status" class="mr-2 small mb-0">Statut</label>
+                        <select id="status" name="status" class="form-control form-control-sm">
+                            <option value="" {{ app.request.query.get('status') is empty ? 'selected' : '' }}>Tous</option>
+                            <option value="active" {{ app.request.query.get('status') == 'active' ? 'selected' : '' }}>Actifs</option>
+                            <option value="canceled" {{ app.request.query.get('status') == 'canceled' ? 'selected' : '' }}>Annulés</option>
+                            <option value="pending" {{ app.request.query.get('status') == 'pending' ? 'selected' : '' }}>En attente</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group mr-3 mb-2">
+                        <label for="autoRenew" class="mr-2 small mb-0">Auto-renouvellement</label>
+                        <select id="autoRenew" name="autoRenew" class="form-control form-control-sm">
+                            <option value="" {{ app.request.query.get('autoRenew') is empty ? 'selected' : '' }}>Tous</option>
+                            <option value="1" {{ app.request.query.get('autoRenew') == '1' ? 'selected' : '' }}>Actif</option>
+                            <option value="2" {{ app.request.query.get('autoRenew') == '2' ? 'selected' : '' }}>Inactif</option>
+                        </select>
+                    </div>
+
+                    {% if plans is defined %}
+                        <div class="form-group mr-3 mb-2">
+                            <label for="planId" class="mr-2 small mb-0">Plan</label>
+                            <select id="planId" name="planId" class="form-control form-control-sm">
+                                <option value="" {{ app.request.query.get('planId') is empty ? 'selected' : '' }}>Tous</option>
+                                {% for plan in plans %}
+                                    <option value="{{ plan.id }}" {{ app.request.query.get('planId') == plan.id ? 'selected' : '' }}>
+                                        {{ plan.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    {% endif %}
+
+                    <button type="submit" class="btn btn-sm btn-primary mb-2">Filtrer</button>
+                </form>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>Utilisateur</th>
+                            <th>Plan / Cours</th>
+                            <th>Statut</th>
+                            <th>Début</th>
+                            <th>Fin</th>
+                            <th>Auto-renouvellement</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for subscription in subscriptions %}
+                        <tr>
+                            <td>{{ subscription.user.email }}</td>
+                            <td>
+                                {% if subscription.plan %}
+                                    Plan : {{ subscription.plan.name }}
+                                {% elseif subscription.cours %}
+                                    Cours : {{ subscription.cours.title }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                            <td>
+                                <span class="badge {{ subscription.status == 'active' ? 'badge-success' : 'badge-secondary' }}">
+                                    {{ subscription.status }}
+                                </span>
+                            </td>
+                            <td>{{ subscription.startDate ? subscription.startDate|date('Y-m-d H:i') : '' }}</td>
+                            <td>{{ subscription.endDate ? subscription.endDate|date('Y-m-d H:i') : '' }}</td>
+                            <td>{{ subscription.autoRenew ? 'Oui' : 'Non' }}</td>
+                            <td>
+                                <a class="btn btn-info btn-sm" href="{{ path('admin_subscription_show', {id: subscription.id}) }}">Voir</a>
+                                <a class="btn btn-primary btn-sm" href="{{ path('admin_subscription_edit', {id: subscription.id}) }}">Éditer</a>
+                                <form method="post" action="{{ path('admin_subscription_delete', {id: subscription.id}) }}" onsubmit="return confirm('Supprimer cet abonnement ?');" style="display:inline">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ subscription.id) }}">
+                                    <button class="btn btn-danger btn-sm">Supprimer</button>
+                                </form>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="7" class="text-center">Aucun abonnement trouvé.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

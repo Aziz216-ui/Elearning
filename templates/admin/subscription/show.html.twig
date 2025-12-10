@@ -1,0 +1,74 @@
+{% extends 'base1.html.twig' %}
+{% block title %}Abonnement #{{ subscription.id }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <h1 class="h3 mb-0 text-gray-800">Détails de l'abonnement</h1>
+        <div>
+            <a href="{{ path('admin_subscription_edit', {id: subscription.id}) }}" class="btn btn-primary btn-sm shadow-sm mr-2">
+                <i class="fas fa-edit fa-sm"></i> Éditer
+            </a>
+            <a href="{{ path('admin_subscription_index') }}" class="btn btn-secondary btn-sm shadow-sm">
+                <i class="fas fa-arrow-left fa-sm"></i> Retour
+            </a>
+        </div>
+    </div>
+
+    <!-- Subscription Details Card -->
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Abonnement #{{ subscription.id }}</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered">
+                    <tbody>
+                        <tr>
+                            <th class="bg-light" style="width: 30%;">Identifiant</th>
+                            <td>{{ subscription.id }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Utilisateur</th>
+                            <td>{{ subscription.user.email }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Plan / Cours</th>
+                            <td>
+                                {% if subscription.plan %}
+                                    Plan : {{ subscription.plan.name }}
+                                {% elseif subscription.cours %}
+                                    Cours : {{ subscription.cours.title }}
+                                {% else %}
+                                    -
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Statut</th>
+                            <td>
+                                <span class="badge {{ subscription.status == 'active' ? 'badge-success' : 'badge-secondary' }}">
+                                    {{ subscription.status }}
+                                </span>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Début</th>
+                            <td>{{ subscription.startDate ? subscription.startDate|date('Y-m-d H:i') : '' }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Fin</th>
+                            <td>{{ subscription.endDate ? subscription.endDate|date('Y-m-d H:i') : 'N/A' }}</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">Renouvellement auto</th>
+                            <td>{{ subscription.autoRenew ? 'Oui' : 'Non' }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

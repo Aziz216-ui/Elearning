@@ -1,0 +1,5 @@
+# Webhook NinjaRMM
+webhook_ninjarmm:
+    path: /webhook/ninjarmm
+    controller: App\Controller\Webhook\NinjaRMMWebhookController::handle
+    methods: [POST]

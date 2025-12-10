@@ -1,0 +1,192 @@
+{% extends 'base1.html.twig' %}
+
+{% block title %}Admin Forum Posts{% endblock %}
+
+{% block content %}
+<style>
+    .badge-published {
+        background: #16a34a;
+        color: white;
+        padding: 3px 6px;
+        border-radius: 4px;
+        font-size: 12px;
+    }
+    .badge-disabled {
+        background: #dc2626;
+        color: white;
+        padding: 3px 6px;
+        border-radius: 4px;
+        font-size: 12px;
+    }
+    .toggle-btn {
+        padding: 4px 7px;
+        border-radius: 4px;
+        color: white;
+        font-size: 12px;
+    }
+    .btn-enable { background: #16a34a; }
+    .btn-disable { background: #dc2626; }
+    .btn-view {
+        padding: 4px 8px;
+        font-size: 13px;
+    }
+</style>
+
+<div class="container-fluid">
+    <!-- Page Heading -->
+    <div class="d-sm-flex align-items-center justify-content-between mb-4">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">Posts du forum</h1>
+            <p class="mb-0 text-muted small">Administrez les posts publiés et leur statut.</p>
+        </div>
+
+    </div>
+
+    {% if (mostLiked is defined and mostLiked is not empty) or (mostCommented is defined and mostCommented is not empty) %}
+        <div class="row mb-3">
+            {% if mostLiked is defined and mostLiked is not empty %}
+                <div class="col-md-6 mb-3">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header py-2">
+                            <h6 class="m-0 font-weight-bold text-primary">Posts les plus likés</h6>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mb-0">
+                                {% for post in mostLiked %}
+                                    <li class="mb-2">
+                                        <div class="font-weight-bold">{{ post.titre }}</div>
+                                        <div class="small text-muted">Likes : {{ post.likes ?? 0 }}</div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if mostCommented is defined and mostCommented is not empty %}
+                <div class="col-md-6 mb-3">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header py-2">
+                            <h6 class="m-0 font-weight-bold text-primary">Posts les plus commentés</h6>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mb-0">
+                                {% for post in mostCommented %}
+                                    <li class="mb-2">
+                                        <div class="font-weight-bold">{{ post.titre }}</div>
+                                        <div class="small text-muted">Commentaires : {{ post.comments|length }}</div>
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <div class="mb-3 d-flex flex-wrap align-items-center">
+                <form class="form-inline" method="get" action="{{ path('app_dashboard_forum') }}">
+                    <div class="form-group mr-2 mb-2">
+                        <label for="filter_category" class="mr-2 small mb-0">Catégorie</label>
+                        <select id="filter_category" name="category" class="form-control form-control-sm">
+                            <option value="" {{ app.request.query.get('category') is empty ? 'selected' : '' }}>Toutes</option>
+                            {% if categories is defined %}
+                                {% for category in categories %}
+                                    <option value="{{ category.id }}" {{ app.request.query.get('category') == category.id ? 'selected' : '' }}>
+                                        {{ category.nom }}
+                                    </option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                    </div>
+
+                    <div class="form-group mr-2 mb-2">
+                        <label for="filter_user" class="mr-2 small mb-0">Utilisateur</label>
+                        <select id="filter_user" name="user" class="form-control form-control-sm">
+                            <option value="" {{ app.request.query.get('user') is empty ? 'selected' : '' }}>Tous</option>
+                            {% if users is defined %}
+                                {% for u in users %}
+                                    <option value="{{ u.id }}" {{ app.request.query.get('user') == u.id ? 'selected' : '' }}>
+                                        {{ u.name ?? u.email }}
+                                    </option>
+                                {% endfor %}
+                            {% endif %}
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn btn-sm btn-primary mb-2 mr-2">Filtrer</button>
+                    <a href="{{ path('app_dashboard_forum') }}" class="btn btn-sm btn-outline-secondary mb-2">Réinitialiser</a>
+                </form>
+            </div>
+        </div>
+    </div>
+
+>>>>>>> origin/Forum
+    <div class="card shadow mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Liste des posts</h6>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-bordered" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Titre</th>
+                            <th>Contenu</th>
+                            <th>Auteur</th>
+                            <th>Commentaires</th>
+                            <th>Statut</th>
+                            <th class="text-center">Actions</th>
+                            <th>Toggle</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for post in forum_posts %}
+                            <tr>
+                                <td>{{ post.id }}</td>
+                                <td>{{ post.titre }}</td>
+                                <td>{{ post.contenu|length > 50 ? post.contenu|slice(0, 50) ~ '...' : post.contenu }}</td>
+                                <td>{{ post.user.name }}</td>
+
+                                <td>{{ post.comments|length }}</td>
+
+                        {# ----------- STATUT (enabled) ---------- #}
+                        <td>
+                            {% if post.enabled %}
+                                <span class="badge-published">Publié</span>
+                            {% else %}
+                                <span class="badge-disabled">Désactivé</span>
+                            {% endif %}
+                        </td>
+
+                        {# ----------- ACTIONS (only Voir) ---------- #}
+                        <td class="text-center">
+                            <a href="{{ path('app_forum_post_show', {'id': post.id}) }}" class="btn btn-info btn-sm btn-view">Voir</a>
+                        </td>
+
+                        {# ----------- BOUTON ENABLE/DISABLE ---------- #}
+                        <td>
+                            <a href="{{ path('app_post_toggle', {'id': post.id}) }}"
+                               class="toggle-btn {% if post.enabled %}btn-disable{% else %}btn-enable{% endif %}">
+                                {% if post.enabled %}Désactiver{% else %}Activer{% endif %}
+                            </a>
+                        </td>
+
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center">Aucun post trouvé.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <a href="{{ path('app_forum_post_new') }}" class="mt-4 inline-block bg-green-500 text-white px-4 py-2 rounded">Créer un nouveau post</a>
+</div>
+{% endblock %}

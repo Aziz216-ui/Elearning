@@ -1,0 +1,11 @@
+# Routes API
+api_ninjarmm:
+    resource: ../../src/Controller/Api/
+    type: attribute
+    prefix: /api
+
+# Webhooks
+webhook_ninjarmm:
+    resource: ../../src/Controller/Api/WebhookController.php
+    type: attribute
+    prefix: /webhook

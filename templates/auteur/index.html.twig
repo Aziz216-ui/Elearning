@@ -1,0 +1,107 @@
+{% extends 'base1.html.twig' %}
+
+{% block title %}Auteur index{% endblock %}
+
+{% block content %}
+    <div class="container-fluid py-3">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <h1 class="h4 mb-0 text-gray-800">Auteurs</h1>
+        <a href="{{ path('app_auteur_new') }}" class="btn btn-primary"><i class="fa fa-plus mr-1"></i> Nouvel auteur</a>
+      </div>
+
+      <div class="card shadow mb-4">
+        <div class="card-body">
+          <form method="get" action="{{ path('app_auteur_index') }}" class="row g-3 align-items-end">
+            <div class="col-12 col-md-4">
+              <label class="form-label">Mot-clé</label>
+              <input type="text" name="q" class="form-control" placeholder="Nom, prénom, email, spécialité, bio" value="{{ app.request.get('q') }}">
+            </div>
+            <div class="col-6 col-md-3">
+              <label class="form-label">Spécialité</label>
+              <input type="text" name="specialite" class="form-control" placeholder="ex: Programmation" value="{{ app.request.get('specialite') }}">
+            </div>
+            <div class="col-6 col-md-3">
+              <label class="form-label">Min. cours</label>
+              <input type="number" min="0" step="1" name="minCourses" class="form-control" value="{{ app.request.get('minCourses') }}">
+            </div>
+            <div class="col-12 col-md-2 text-end">
+              <button type="submit" class="btn btn-outline-primary w-100"><i class="fa fa-filter mr-1"></i> Filtrer</button>
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="card shadow mb-4">
+        <div class="card-body">
+          <div class="table-responsive">
+            <table class="table table-striped align-middle mb-0">
+              <thead class="thead-light">
+                <tr>
+                  <th>Avatar</th>
+                  <th>Id</th>
+                  <th>Nom</th>
+                  <th>Prénom</th>
+                  <th>Email</th>
+                  <th>Spécialité</th>
+                  <th class="text-center">Nb cours</th>
+                  <th class="text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+              {% for auteur in auteurs %}
+                <tr>
+                  <td>
+                    {% if auteur.photo %}
+                      <img src="{{ asset('uploads/auteurs/' ~ auteur.photo) }}" alt="{{ auteur.prenom }} {{ auteur.nom }}" class="rounded-circle border" style="width:40px; height:40px; object-fit:cover;" />
+                    {% else %}
+                      <div class="rounded-circle bg-light d-flex align-items-center justify-content-center border" style="width:40px; height:40px;">
+                        <small class="text-muted fw-semibold">{{ (auteur.prenom|first ~ auteur.nom|first)|upper }}</small>
+                      </div>
+                    {% endif %}
+                  </td>
+                  <td>{{ auteur.id }}</td>
+                  <td class="fw-semibold">{{ auteur.nom }}</td>
+                  <td>{{ auteur.prenom }}</td>
+                  <td>{{ auteur.email }}</td>
+                  <td>{{ auteur.specialite ?? '' }}</td>
+                  <td class="text-center">
+                    <span class="badge badge-info">{{ countsByAuteurId[auteur.id] ?? 0 }}</span>
+                  </td>
+                  <td class="text-right">
+                    <div class="btn-group btn-group-sm" role="group">
+                      <a href="{{ path('app_auteur_show', {'id': auteur.id}) }}" class="btn btn-outline-secondary"><i class="fa fa-eye"></i> Voir</a>
+                      <a href="{{ path('app_auteur_edit', {'id': auteur.id}) }}" class="btn btn-outline-primary"><i class="fa fa-pen"></i> Modifier</a>
+                    </div>
+                  </td>
+                </tr>
+              {% else %}
+                <tr>
+                  <td colspan="8" class="text-center text-muted py-4">Aucun enregistrement</td>
+                </tr>
+              {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="row">
+        <div class="col-12 col-lg-12">
+          <div class="card shadow mb-4">
+            <div class="card-header py-2"><strong>Top auteurs (par nombre de cours)</strong></div>
+            <div class="card-body">
+              {% if topAuthors is defined and topAuthors %}
+                <ol class="mb-0">
+                  {% for row in topAuthors %}
+                    <li>{{ row.auteur.prenom }} {{ row.auteur.nom }} — <span class="badge badge-info">{{ row.nbCours }}</span></li>
+                  {% endfor %}
+                </ol>
+              {% else %}
+                <div class="text-muted small">Aucune donnée</div>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+{% endblock %}

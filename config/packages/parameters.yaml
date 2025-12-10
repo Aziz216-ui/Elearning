@@ -1,0 +1,2 @@
+parameters:
+  auteur_upload_dir: '%kernel.project_dir%/public/uploads/auteurs'

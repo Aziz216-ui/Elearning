@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Réinitialiser votre mot de passe{% endblock %}
+
+{% block body %}
+    <div class="container mt-5">
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-header">
+                        <h1 class="h3 mb-0">Réinitialisation du mot de passe</h1>
+                    </div>
+                    <div class="card-body">
+                        {{ form_start(resetForm) }}
+                            <div class="mb-3">
+                                {{ form_label(resetForm.plainPassword.first, 'Nouveau mot de passe', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(resetForm.plainPassword.first, {
+                                    'attr': {
+                                        'class': 'form-control',
+                                        'placeholder': 'Entrez votre nouveau mot de passe'
+                                    }
+                                }) }}
+                                <small class="form-text text-muted">Le mot de passe doit contenir au moins 6 caractères.</small>
+                                {{ form_errors(resetForm.plainPassword.first) }}
+                            </div>
+                            <div class="mb-4">
+                                {{ form_label(resetForm.plainPassword.second, 'Confirmer le mot de passe', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(resetForm.plainPassword.second, {
+                                    'attr': {
+                                        'class': 'form-control',
+                                        'placeholder': 'Confirmez votre nouveau mot de passe'
+                                    }
+                                }) }}
+                                {{ form_errors(resetForm.plainPassword.second) }}
+                            </div>
+                            <div class="form-actions" style="display: flex; justify-content: space-between; margin-top: 1.5rem;">
+                                <button type="submit" class="btn btn-primary" style="order: 1; margin-right: 10px;">Confirmer</button>
+                                <a href="{{ path('app_login') }}" class="btn btn-outline-secondary" style="order: 2;">Annuler</a>
+                            </div>
+                        {{ form_end(resetForm) }}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

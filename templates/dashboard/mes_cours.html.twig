@@ -1,0 +1,44 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes cours{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Mes cours</h1>
+        <a href="{{ path('app_dashboard') }}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left"></i> Retour au catalogue
+        </a>
+    </div>
+
+    {% if panier is empty %}
+        <div class="alert alert-info">
+            Vous n'avez encore aucun cours. Rendez-vous sur le catalogue pour en ajouter.
+        </div>
+    {% else %}
+        <div class="row">
+            {% for item in panier %}
+                {% set cour = item.cours %}
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ cour.title }}</h5>
+                            <p class="card-text">{{ cour.description|slice(0, 120) }}...</p>
+                            <p class="card-text">
+                                <strong>Prix :</strong> {{ cour.price }} €<br>
+                                <strong>Catégorie :</strong> {{ cour.category ?? cour.categorie ?? 'Non définie' }}
+                            </p>
+                            <a href="{{ path('app_cours_show', {'id': cour.id}) }}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-eye"></i> Voir le cours
+                            </a>
+                            <a href="{{ path('app_quiz_list', {'id': cour.id}) }}" class="btn btn-outline-secondary btn-sm">
+                                Voir les quiz
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

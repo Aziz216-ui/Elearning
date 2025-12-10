@@ -1,0 +1,183 @@
+{% extends 'base1.html.twig' %}
+{% block title %}Payments{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-sm-flex align-items-center justify-content-between mb-0">
+        <div>
+            <h1 class="h3 mb-0 text-gray-800">Payments</h1>
+            <p class="mb-0 text-muted small">Historique des paiements</p>
+        </div>
+        <div class="mt-3 mt-sm-0">
+            <a href="{{ path('admin_payment_export_csv', app.request.query.all) }}" class="btn btn-sm btn-outline-success mr-2">
+                Exporter Excel
+            </a>
+            <a href="{{ path('admin_payment_export_pdf', app.request.query.all) }}" class="btn btn-sm btn-outline-danger" target="_blank">
+                Exporter PDF
+            </a>
+        </div>
+    </div>
+
+    {% if (topPlans is defined and topPlans is not empty) or (topCourses is defined and topCourses is not empty) %}
+        <div class="row mt-3 mb-3">
+            {% if topPlans is defined and topPlans is not empty %}
+                <div class="col-md-6 mb-3">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header py-2">
+                            <h6 class="m-0 font-weight-bold text-primary">Plans les plus achetés</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                {% for item in topPlans %}
+                                    <div class="col-12 mb-3">
+                                        <div class="border-left-primary rounded pl-3 pr-3 pt-2 pb-2 h-100">
+                                            <div class="small text-muted">Plan</div>
+                                            <div class="h5 mb-1 font-weight-bold text-gray-800">
+                                                {{ item.planName }}
+                                            </div>
+                                            <div class="small text-muted">Nombre de paiements complétés</div>
+                                            <div class="h5 mb-0 font-weight-bold text-success">
+                                                {{ item.paymentsCount }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if topCourses is defined and topCourses is not empty %}
+                <div class="col-md-6 mb-3">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-header py-2">
+                            <h6 class="m-0 font-weight-bold text-primary">Cours les plus achetés</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                {% for item in topCourses %}
+                                    <div class="col-12 mb-3">
+                                        <div class="border-left-success rounded pl-3 pr-3 pt-2 pb-2 h-100">
+                                            <div class="small text-muted">Cours</div>
+                                            <div class="h5 mb-1 font-weight-bold text-gray-800">
+                                                {{ item.courseTitle }}
+                                            </div>
+                                            <div class="small text-muted">Nombre de paiements complétés</div>
+                                            <div class="h5 mb-0 font-weight-bold text-success">
+                                                {{ item.paymentsCount }}
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    <div class="card shadow mt-0 mb-4">
+        <div class="card-header py-3">
+            <h6 class="m-0 font-weight-bold text-primary">Table des paiements</h6>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <div class="row">
+                    <div class="col-md-4 mb-2">
+                        <form class="form-inline" method="get" action="{{ path('admin_payment_date_range') }}">
+                            <div class="form-group mr-2 mb-2">
+                                <label for="dmin" class="mr-2 small mb-0">Date min</label>
+                                <input type="date" id="dmin" name="dmin" class="form-control form-control-sm" value="{{ app.request.query.get('dmin') }}">
+                            </div>
+                            <div class="form-group mr-2 mb-2">
+                                <label for="dmax" class="mr-2 small mb-0">Date max</label>
+                                <input type="date" id="dmax" name="dmax" class="form-control form-control-sm" value="{{ app.request.query.get('dmax') }}">
+                            </div>
+                            <button type="submit" class="btn btn-sm btn-primary mb-2">Filtrer dates</button>
+                        </form>
+                    </div>
+
+                    <div class="col-md-4 mb-2">
+                        <form class="form-inline" method="get" action="{{ path('admin_payment_amount_range') }}">
+                            <div class="form-group mr-2 mb-2">
+                                <label for="min" class="mr-2 small mb-0">Montant min</label>
+                                <input type="number" step="0.01" id="min" name="min" class="form-control form-control-sm" value="{{ app.request.query.get('min') }}">
+                            </div>
+                            <div class="form-group mr-2 mb-2">
+                                <label for="max" class="mr-2 small mb-0">Montant max</label>
+                                <input type="number" step="0.01" id="max" name="max" class="form-control form-control-sm" value="{{ app.request.query.get('max') }}">
+                            </div>
+                            <button type="submit" class="btn btn-sm btn-primary mb-2">Filtrer montants</button>
+                        </form>
+                    </div>
+
+                    <div class="col-md-4 mb-2">
+                        <form class="form-inline" method="get" action="{{ path('admin_payment_status') }}">
+                            <div class="form-group mr-2 mb-2">
+                                <label for="status" class="mr-2 small mb-0">Status</label>
+                                <select id="status" name="status" class="form-control form-control-sm">
+                                    <option value="">Tous</option>
+                                    <option value="completed" {{ app.request.query.get('status') == 'completed' ? 'selected' : '' }}>Complété</option>
+                                    <option value="pending" {{ app.request.query.get('status') == 'pending' ? 'selected' : '' }}>En attente</option>
+                                    <option value="failed" {{ app.request.query.get('status') == 'failed' ? 'selected' : '' }}>Échoué</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-sm btn-primary mb-2">Filtrer status</button>
+                        </form>
+                        <form class="form-inline mt-2" method="get" action="{{ path('admin_payment_user') }}">
+                            <div class="form-group mr-2 mb-2">
+                                <label for="userEmail" class="mr-2 small mb-0">Utilisateur</label>
+                                <input type="email" id="userEmail" name="userEmail" class="form-control form-control-sm" value="{{ app.request.query.get('userEmail') }}" placeholder="email utilisateur">
+                            </div>
+                            <button type="submit" class="btn btn-sm btn-primary mb-2">Filtrer utilisateur</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-bordered" width="100%" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Utilisateur</th>
+                            <th>Abonnement</th>
+                            <th>Montant (DT)</th>
+                            <th>Status</th>
+                            <th>Créé le</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% for payment in payments %}
+                        <tr>
+                            <td>{{ payment.id }}</td>
+                            <td>{{ payment.user ? payment.user.email : '—' }}</td>
+                            <td>{{ payment.subscription ? ('#' ~ payment.subscription.id) : '—' }}</td>
+                            <td>{{ payment.amount }}</td>
+                            <td>
+                                <span class="badge {{ payment.status == 'completed' ? 'badge-success' : 'badge-secondary' }}">
+                                    {{ payment.status }}
+                                </span>
+                            </td>
+                            <td>{{ payment.createdAt ? payment.createdAt|date('Y-m-d H:i') : '' }}</td>
+                            <td>
+                                <a href="{{ path('admin_payment_show', {id: payment.id}) }}" class="btn btn-sm btn-outline-primary">
+                                    Voir
+                                </a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="8" class="text-center">Aucun paiement trouvé.</td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

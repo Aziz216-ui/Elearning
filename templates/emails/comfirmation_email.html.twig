@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Confirmation de votre adresse e‑mail</title>
+</head>
+<body>
+    <p>Bonjour {{ user.name }},</p>
+
+    <p>Merci de vous être inscrit·e. Cliquez sur le lien ci‑dessous pour confirmer votre adresse e‑mail :</p>
+
+    <p>
+        <a href="{{ signedUrl }}" style="background-color: #4CAF50; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px; display: inline-block; font-weight: bold;">
+            Vérifier mon e‑mail
+        </a>
+    </p>
+
+    <p>
+        Si le lien ne fonctionne pas, copiez-collez l'adresse suivante dans votre navigateur :<br>
+        {{ signedUrl }}
+    </p>
+
+    <p>Ce lien expirera dans {{ expiresAtMessageKey|trans(expiresAtMessageData, 'VerifyEmailBundle') }}.</p>
+
+    <p>Si vous n’avez pas créé de compte, ignorez simplement cet e‑mail.</p>
+
+    <p>À bientôt,<br>L’équipe Elearning</p>
+</body>
+</html>

@@ -1,0 +1,11 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}New ForulComment{% endblock %}
+
+{% block body %}
+    <h1>Create new ForulComment</h1>
+
+    {{ include('forul_comment/_form.html.twig') }}
+
+    <a href="{{ path('app_forul_comment_index') }}">back to list</a>
+{% endblock %}

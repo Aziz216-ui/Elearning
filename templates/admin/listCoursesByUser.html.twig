@@ -1,0 +1,61 @@
+{% extends 'base1.html.twig' %}
+{% block title %}Mes Cours - {{ app.user.name }}{% endblock %}
+{% block page_title %}Cours de l'utilisateur{% endblock %}
+
+{% block body %}
+    <style>
+        .course-card {
+            transition: transform 0.2s;
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .course-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+
+    <div class="row">
+        <div class="col-12 mb-4">
+            <a href="{{ path('admin_user_index') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left mr-2"></i> Retour à la liste
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for cours in tab %}
+            <div class="col-xl-3 col-md-6 mb-4">
+                <div class="card course-card h-100">
+                    <div class="card-body">
+                        <div class="no-gutters align-items-center">
+                            <div class="mr-2">
+                                <span class="badge badge-info mb-2">{{ cours.category }}</span>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ cours.title }}</div>
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1 mt-2">
+                                    {{ cours.price }} TND
+                                </div>
+                                <p class="mt-3 text-muted small">
+                                    {{ cours.description|u.truncate(60, '...') }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-white border-top-0 d-flex justify-content-between">
+                         <small class="text-muted"><i class="far fa-clock mr-1"></i> {{ cours.duration ? cours.duration|date('H:i') : '--:--' }}</small>
+                         <small class="text-muted"><i class="fas fa-user-edit mr-1"></i> {{ cours.auteur ? cours.auteur.nom : 'N/A' }}</small>
+                    </div>
+                </div>
+            </div>
+        {% else %}
+            <div class="col-12">
+                <div class="alert alert-info text-center py-5">
+                    <i class="fas fa-book-open fa-3x mb-3"></i>
+                    <h4>Aucun cours trouvé pour cet utilisateur.</h4>
+                    <p>Cet utilisateur n'a pas encore ajouté de cours à son panier.</p>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -1,0 +1,293 @@
+{% extends 'base1.html.twig' %}
+
+{% block title %}Gestion des Auteurs{% endblock %}
+{% block page_title %}Gestion des Auteurs{% endblock %}
+
+{% block actions %}{% endblock %}
+
+{% block body %}
+    <style>
+        :root {
+            --primary-color: #4e73df;
+            --secondary-color: #858796;
+            --success-color: #1cc88a;
+            --info-color: #36b9cc;
+            --warning-color: #f6c23e;
+            --danger-color: #e74a3b;
+            --light-bg: #f8f9fc;
+            --border-color: #e3e6f0;
+        }
+
+        .hover-scale {
+            transition: transform 0.2s ease-in-out;
+        }
+        .hover-scale:hover {
+            transform: translateY(-2px);
+        }
+
+        .card-modern {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            background: white;
+            transition: box-shadow 0.3s ease;
+            margin-bottom: 24px;
+        }
+        
+        .card-modern:hover {
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+
+        .form-control-modern {
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 10px 15px;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            background-color: #FAFAFA;
+        }
+
+        .form-control-modern:focus {
+            background-color: #fff;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.15);
+        }
+
+
+        .btn-red {
+            background-color: var(--danger-color) !important;
+            border-color: var(--danger-color) !important;
+            border-radius: 8px;
+            color: #fff !important;
+            padding: .5rem 1rem;
+        }
+
+        .table-modern {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+
+        .table-modern thead th {
+            background-color: #F8F9FC;
+            color: #4e73df;
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 0.05em;
+            padding: 16px 24px;
+            border-bottom: 2px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        .table-modern tbody tr {
+            transition: all 0.2s;
+        }
+
+        .table-modern tbody tr:hover {
+            background-color: #F8F9FC;
+            transform: scale(1.001);
+        }
+
+        .table-modern td {
+            padding: 16px 24px;
+            vertical-align: middle;
+            border-bottom: 1px solid var(--border-color);
+            color: #5a5c69;
+            font-size: 0.9rem;
+            white-space: nowrap;
+        }
+
+        .table-modern tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .avatar-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 14px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .badge-soft {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+
+        .badge-soft-primary {
+            background-color: rgba(78, 115, 223, 0.1);
+            color: var(--primary-color);
+        }
+
+        .btn-action {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            margin: 0 4px;
+            border: none;
+            background: transparent;
+        }
+
+        .btn-action:hover {
+            background-color: var(--light-bg);
+            transform: translateY(-1px);
+        }
+
+        .btn-action.edit { color: var(--primary-color); }
+        .btn-action.courses { color: var(--info-color); }
+        .btn-action.delete { color: var(--danger-color); }
+        
+        .btn-action.edit:hover { background-color: rgba(78, 115, 223, 0.1); }
+        .btn-action.courses:hover { background-color: rgba(54, 185, 204, 0.1); }
+        .btn-action.delete:hover { background-color: rgba(231, 74, 59, 0.1); }
+
+        .empty-state-icon {
+            font-size: 48px;
+            color: var(--border-color);
+            margin-bottom: 16px;
+        }
+    </style>
+
+    {# Table Section #}
+    <div class="row">
+            <div class="col-12 mb-4">
+                <a href="{{ path('app_admin') }}" class="btn btn-primary shadow hover-scale px-4 btn-red">
+                    <i class="fas fa-arrow-left mr-2"></i> Retour
+                </a>
+            </div>
+        </div>
+    <div class="container-fluid">
+        <div class="card-modern">
+            <div class="d-flex justify-content-between align-items-center px-4 py-4 border-bottom">
+                <div>
+                    <h5 class="font-weight-bold text-dark mb-1">Liste des Utilisateurs</h5>
+                    <p class="small text-muted mb-0">Gérez les comptes et les accès de vos collaborateurs</p>
+                </div>
+                <a href="{{ path('admin_user_new') }}" class="btn btn-primary shadow hover-scale px-4" style="background-color: #4e73df; border-color: #4e73df; border-radius: 8px;">
+                    <i class="fas fa-plus mr-2"></i> Nouvel User
+                </a>
+            </div>
+            <div class="table-responsive" style="border-radius: 0 0 12px 12px;">
+                <table class="table-modern">
+                    <thead>
+                        <tr>
+                            <th width="80">Avatar</th>
+                            <th>Utilisateur</th>
+                            <th>Contact</th>
+                            <th>Statut</th>
+                            <th>Rôle</th>
+                            <th class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>
+                                <div class="avatar-circle">
+                                    {{ user.name|first|upper }}{{ user.lastname|first|upper }}
+                                </div>
+                            </td>
+                            <td>
+                                <div class="font-weight-bold text-dark mb-1">{{ user.name }} {{ user.lastname }}</div>
+                                <div class="small text-muted">ID: #{{ user.id }}</div>
+                            </td>
+                            <td>
+                                <div class="d-flex align-items-center">
+                                    <i class="fas fa-envelope text-gray-400 mr-2"></i>
+                                    {{ user.email }}
+                                </div>
+                            </td>
+                            <td>
+                                <span class="badge badge-soft badge-soft-primary">
+                                    <i class="fas fa-check-circle mr-1"></i> Actif
+                                </span>
+                            </td>
+                            <td>
+                                {% for role in user.roles %}
+                                    {% if role == 'ROLE_ADMIN' %}
+                                        <span class="badge badge-danger">Admin</span>
+                                    {% elseif role == 'ROLE_USER' %}
+                                        <span class="badge badge-secondary">Utilisateur</span>
+                                    {% else %}
+                                        <span class="badge badge-info">{{ role }}</span>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                            <td class="text-right">
+                                <a href="{{ path('admin_user_courses', {'id': user.id}) }}" class="btn-action courses" data-toggle="tooltip" title="Voir les cours">
+                                    <i class="fas fa-book-open"></i>
+                                </a>
+                                <a href="{{ path('admin_user_edit', {'id': user.id}) }}" class="btn-action edit" data-toggle="tooltip" title="Modifier">
+                                    <i class="fas fa-pen"></i>
+                                </a>
+                                <form action="{{ path('admin_user_delete', {'id': user.id}) }}" method="post" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')" style="display: inline;">
+                                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ user.id) }}">
+                                    <button type="submit" class="btn-action delete" data-toggle="tooltip" title="Supprimer">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center py-5">
+                                <div class="empty-state-icon">
+                                    <i class="fas fa-users-slash"></i>
+                                </div>
+                                <h5 class="text-gray-800 font-weight-bold">Aucun utilisateur trouvé</h5>
+                                <p class="text-gray-500 mb-0">Essayez de modifier vos filtres ou ajoutez un nouvel utilisateur.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            
+            {# Pagination (Mock UI for now) #}
+            <div class="d-flex align-items-center justify-content-between px-4 py-3 border-top">
+                <div class="small text-gray-500">Affichage de {{ users|length }} utilisateurs</div>
+                <nav aria-label="Page navigation">
+                    <ul class="pagination pagination-sm mb-0">
+                        <li class="page-item disabled"><a class="page-link" href="#">Précédent</a></li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item"><a class="page-link" href="#">Suivant</a></li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    
+        {# Top Stats Section #}
+        <div class="row">
+             <div class="col-xl-4 col-md-6 mb-4">
+                <div class="card-modern h-100 py-2 border-left-primary">
+                    <div class="card-body">
+                        <div class="row no-gutters align-items-center">
+                            <div class="col mr-2">
+                                <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Total Utilisateurs</div>
+                                <div class="h5 mb-0 font-weight-bold text-gray-800">{{ users|length }}</div>
+                            </div>
+                            <div class="col-auto">
+                                <i class="fas fa-users fa-2x text-gray-300"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

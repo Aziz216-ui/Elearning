@@ -1,0 +1,49 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ cours.title }}{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>{{ cours.title }}</h1>
+        <a href="{{ path('app_mes_cours') }}" class="btn btn-outline-primary">
+            <i class="fas fa-arrow-left"></i> Retour à mes cours
+        </a>
+    </div>
+
+    <div class="card">
+        <div class="card-body">
+            <h5 class="card-title">{{ cours.title }}</h5>
+            <p class="card-text">{{ cours.description }}</p>
+            
+            <div class="row mt-4">
+                <div class="col-md-6">
+                    <h6>Informations sur le cours</h6>
+                    <ul class="list-unstyled">
+                        <li><strong>Catégorie :</strong> {{ cours.categorie ?? 'Non définie' }}</li>
+                        <li><strong>Prix :</strong> {{ cours.price ?? 0 }} €</li>
+                        <li><strong>Date d'ajout :</strong> {{ "now"|date('d/m/Y') }}</li>
+                    </ul>
+                </div>
+                <div class="col-md-6">
+                    <h6>Quiz disponibles</h6>
+                    {% if cours.quizzes|length > 0 %}
+                        <p>Ce cours contient {{ cours.quizzes|length }} quiz(s).</p>
+                        <a href="{{ path('app_quiz_list', {'id': cours.id}) }}" class="btn btn-primary btn-sm">
+                            <i class="fas fa-list"></i> Voir les quiz
+                        </a>
+                    {% else %}
+                        <p>Aucun quiz n'est encore disponible pour ce cours.</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="mt-4">
+                <a href="{{ path('app_mes_cours') }}" class="btn btn-secondary">
+                    <i class="fas fa-arrow-left"></i> Retour à la liste
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,226 @@
+{% extends 'base1.html.twig' %}
+
+{% block title %}Notifications{% endblock %}
+
+{% block page_title %}Notifications{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="header-section">
+        <div class="header-text">
+            <h1>Notifications</h1>
+            <p class="header-subtitle">Consultez toutes vos notifications en un seul endroit.</p>
+        </div>
+        <button class="btn-primary-custom" onclick="markAllAsRead()">
+            <i class="fas fa-check"></i> Tout marquer comme lu
+        </button>
+    </div>
+
+    <style>
+        .notification-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+            border: 1px solid #e5e7eb;
+            overflow: hidden;
+        }
+
+        .notification-item {
+            padding: 20px 24px;
+            border-bottom: 1px solid #eee;
+            transition: background 0.2s;
+            cursor: pointer;
+        }
+
+        .notification-item:hover {
+            background: #f8f9fa;
+        }
+
+        .notification-item.unread {
+            background: #e3f2fd;
+            border-left: 4px solid #2196f3;
+        }
+
+        .notification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .notification-title {
+            font-weight: 600;
+            font-size: 16px;
+            color: #333;
+        }
+
+        .notification-time {
+            font-size: 12px;
+            color: #999;
+        }
+
+        .notification-message {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 8px;
+        }
+
+        .notification-type {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .type-quiz_started {
+            background: #e3f2fd;
+            color: #1976d2;
+        }
+
+        .type-quiz_completed {
+            background: #e8f5e8;
+            color: #2e7d32;
+        }
+
+        .type-info {
+            background: #f3e5f5;
+            color: #7b1fa2;
+        }
+
+        .no-notifications {
+            padding: 60px 20px;
+            text-align: center;
+            color: #999;
+        }
+
+        .no-notifications i {
+            font-size: 48px;
+            color: #ddd;
+            margin-bottom: 16px;
+        }
+
+        .notification-meta {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .notification-meta-item {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .btn-primary-custom {
+            background-color: #2563eb;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 999px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 500;
+            display: inline-flex;
+            align-items: centerWT;
+            gap: 8px;
+            transition: background-color 0.18s, transform 0.05s;
+            text-decoration: none;
+        }
+
+        .btn-primary-custom:hover {
+            background-color: #1d4ed8;
+            color: white;
+        }
+
+        .header-section {
+            background: white;
+            padding: 24px 24px 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            box-shadow: 0 8px 20px rgba(15, 23, 42, 0.06);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+        }
+
+        .header-text {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .header-subtitle {
+            color: #6b7280;
+            font-size: 14px;
+        }
+    </style>
+
+    <div class="notification-container" id="notificationList">
+        {% if notifications is empty %}
+            <div class="no-notifications">
+                <i class="fas fa-bell-slash"></i>
+                <h3>Aucune notification</h3>
+                <p>Vous n'avez pas encore de notifications.</p>
+            </div>
+        {% else %}
+            {% for notification in notifications %}
+                <div class="notification-item {{ notification.isRead ? '' : 'unread' }}"
+                     onclick="markAsRead({{ notification.id }})">
+                    <div class="notification-header">
+                        <div class="notification-title">{{ notification.title }}</div>
+                        <div class="notification-time">{{ notification.createdAt|date('d/m/Y H:i') }}</div>
+                    </div>
+                    <div class="notification-message">{{ notification.message }}</div>
+                    <div class="notification-meta">
+                        <span class="notification-type type-{{ notification.type }}">{{ notification.type }}</span>
+                        {% if notification.data is not null and notification.data.student is defined %}
+                            <span class="notification-meta-item">
+                                <i class="fas fa-user"></i>
+                                {{ notification.data.student.fullName ?? notification.data.student.email ?? '' }}
+                            </span>
+                        {% endif %}
+                        {% if notification.data is not null and notification.data.quiz is defined %}
+                            <span class="notification-meta-item">
+                                <i class="fas fa-question-circle"></i>
+                                {{ notification.data.quiz.title ?? '' }}
+                            </span>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+</div>
+
+<script>
+function markAsRead(notificationId) {
+    fetch(`/api/notifications/mark-read/${notificationId}`, {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        }
+    })
+    .catch(error => console.error('Error marking notification as read:', error));
+}
+
+function markAllAsRead() {
+    fetch('/api/notifications/mark-all-read', {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        }
+    })
+    .catch(error => console.error('Error marking all notifications as read:', error));
+}
+</script>
+
+{% endblock %}

@@ -1,0 +1,98 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mon panier{% endblock %}
+
+{% block body %}
+  <div class="container py-5">
+    <h1 class="mb-4">Mon panier</h1>
+
+    {% for label, messages in app.flashes %}
+      {% for message in messages %}
+        <div class="alert alert-{{ label }}">{{ message }}</div>
+      {% endfor %}
+    {% endfor %}
+
+    {% if items is empty %}
+      <div class="alert alert-info">Votre panier est vide.</div>
+      <a href="{{ path('app_home_courses') }}" class="btn btn-primary">Voir les cours</a>
+    {% else %}
+      <div class="list-group mb-3">
+        {% for row in items %}
+          {% set cour = row.cours %}
+          <div class="list-group-item d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center">
+              {% if cour.auteur is defined and cour.auteur and cour.auteur.photo is defined and cour.auteur.photo %}
+                <img src="{{ asset('uploads/auteurs/' ~ cour.auteur.photo) }}" alt="{{ cour.auteur.prenom|default('') }} {{ cour.auteur.nom|default('') }}" class="rounded-circle me-3" style="width:40px;height:40px;object-fit:cover;border:1px solid rgba(0,0,0,.1);" />
+              {% else %}
+                <div class="rounded-circle me-3 d-flex align-items-center justify-content-center bg-light" style="width:40px;height:40px;border:1px solid rgba(0,0,0,.1);">
+                  <span class="text-muted" style="font-size:.9rem;">A</span>
+                </div>
+              {% endif %}
+              <div>
+                <div class="fw-semibold">{{ cour.title }}</div>
+                <div class="text-muted small">{{ cour.price }} DT</div>
+              </div>
+            </div>
+            <div class="d-flex align-items-center gap-2">
+              <a href="{{ path('app_cart_decrement', {id: cour.id}) }}" class="btn btn-outline-secondary btn-sm" title="Diminuer">−</a>
+              <span class="mx-1">{{ row.qty }}</span>
+              <a href="{{ path('app_cart_add', {id: cour.id}) }}" class="btn btn-outline-secondary btn-sm" title="Augmenter">+</a>
+              <span class="ms-3 fw-semibold">{{ row.line_total }} DT</span>
+              <a href="{{ path('app_cart_remove', {id: cour.id}) }}" class="btn btn-outline-danger btn-sm ms-3">Retirer</a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="fs-5"><strong>Total:</strong> {{ total }} DT</div>
+        <div class="d-flex gap-2">
+          <a href="{{ path('app_cart_clear') }}" class="btn btn-outline-warning">Vider le panier</a>
+          <a href="{{ path('app_cart_checkout') }}" class="btn btn-success">Passer au paiement</a>
+        </div>
+      </div>
+
+      <hr class="my-4"/>
+      <h2 class="h4 mb-3">Mes cours</h2>
+      <div class="row row-cols-1 row-cols-md-3 g-4">
+        {% for row in items %}
+          {% set cour = row.cours %}
+          <div class="col">
+            <div class="card h-100">
+              <div class="card-body d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                  <h5 class="card-title mb-0">{{ cour.title }}</h5>
+                  {% if cour.category is defined and cour.category %}
+                    <span class="badge bg-info text-dark">{{ cour.category }}</span>
+                  {% endif %}
+                </div>
+                <p class="card-text mb-2" style="display:-webkit-box;-webkit-line-clamp:4;-webkit-box-orient:vertical;overflow:hidden;">{{ cour.description|default('') }}</p>
+                <div class="mb-2">
+                  <span class="badge bg-primary me-2">{{ cour.price }} DT</span>
+                  <span class="badge bg-secondary">
+                    {% if cour.duration is not null %}
+                      {{ cour.duration|date('H:i') }}
+                    {% else %}
+                      Non défini
+                    {% endif %}
+                  </span>
+                </div>
+                <div class="mt-auto d-flex flex-wrap gap-2">
+                  <a href="{{ path('app_quiz_list', {'id': cour.id}) }}" class="btn btn-outline-primary">Voir Quiz</a>
+                  <a href="{{ path('app_home_course_show', { id: cour.id }) }}" class="btn btn-primary">Détails</a>
+                  {% if cour.auteur is defined and cour.auteur %}
+                    <a href="{{ path('app_home_author_show', { id: cour.auteur.id }) }}" class="btn btn-outline-secondary">Auteur</a>
+                  {% elseif cour.author is defined and cour.author %}
+                    <a href="{{ path('app_home_author_show', { id: cour.author.id }) }}" class="btn btn-outline-secondary">Auteur</a>
+                  {% else %}
+                    <a href="#" class="btn btn-outline-secondary disabled" aria-disabled="true" title="Auteur non disponible">Auteur</a>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    {% endif %}
+  </div>
+{% endblock %}

@@ -1,0 +1,624 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ forum_post.titre }}{% endblock %}
+
+{% block body %}
+    {{ include('_flash_messages.html.twig') }}
+    
+    <style>
+        .forum-show-wrapper * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        .forum-show-wrapper {
+            background: #f5f7fa;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .forum-show-container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+
+        .forum-post-main {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        .forum-post-header-section {
+            background: linear-gradient(135deg, #17bebb 0%, #14a8a5 100%);
+            color: white;
+            padding: 40px;
+        }
+
+        .forum-post-title {
+            font-size: 2em;
+            margin: 0 0 20px 0;
+            font-weight: 600;
+            line-height: 1.3;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .forum-post-metadata {
+            display: flex;
+            gap: 25px;
+            flex-wrap: wrap;
+            opacity: 0.95;
+            font-size: 0.95em;
+        }
+
+        .forum-meta-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .forum-meta-item svg {
+            flex-shrink: 0;
+        }
+
+        .forum-post-body {
+            padding: 40px;
+        }
+
+        .forum-post-content {
+            font-size: 1.05em;
+            line-height: 1.8;
+            color: #24292e;
+            margin-bottom: 30px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
+
+        .forum-post-image-container {
+            margin: 30px 0;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid #e1e4e8;
+        }
+
+        .forum-post-image-container img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .forum-post-dates {
+            background: #f6f8fa;
+            padding: 20px;
+            border-radius: 8px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 30px 0;
+            border: 1px solid #e1e4e8;
+        }
+
+        .forum-date-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            color: #586069;
+            font-size: 0.9em;
+        }
+
+        .forum-date-item svg {
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .forum-post-actions {
+            display: flex;
+            justify-content: space-between;
+            padding: 25px 40px;
+            border-top: 1px solid #e1e4e8;
+            flex-wrap: wrap;
+            gap: 15px;
+            background: #fafbfc;
+        }
+
+        .forum-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .forum-btn-back {
+            background: #586069;
+            color: white;
+        }
+
+        .forum-btn-back:hover {
+            background: #444d56;
+            color: white;
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+
+        .forum-btn-edit {
+            background: #17bebb;
+            color: white;
+        }
+
+        .forum-btn-edit:hover {
+            background: #14a8a5;
+            color: white;
+            text-decoration: none;
+            transform: translateY(-1px);
+        }
+
+        .forum-btn-delete {
+            background: #dc3545;
+            color: white;
+        }
+
+        .forum-btn-delete:hover {
+            background: #c82333;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .forum-comment-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            overflow: hidden;
+            margin-bottom: 25px;
+        }
+
+        .forum-comment-header {
+            background: #17bebb;
+            color: white;
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .forum-comment-header h3 {
+            margin: 0;
+            font-size: 1.3em;
+            font-weight: 600;
+        }
+
+        .forum-comment-form {
+            padding: 30px;
+        }
+
+        .forum-comment-textarea {
+            width: 100%;
+            padding: 15px;
+            border: 1px solid #e1e4e8;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-family: inherit;
+            resize: vertical;
+            min-height: 120px;
+            transition: all 0.2s;
+            background: #fafbfc;
+        }
+
+        .forum-comment-textarea:focus {
+            outline: none;
+            border-color: #17bebb;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(23, 190, 187, 0.1);
+        }
+
+        .forum-btn-submit {
+            background: #17bebb;
+            color: white;
+            margin-top: 15px;
+        }
+
+        .forum-btn-submit:hover {
+            background: #14a8a5;
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .forum-comments-list-section {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+            overflow: hidden;
+        }
+
+        .forum-comments-list-header {
+            background: #f6f8fa;
+            border-bottom: 1px solid #e1e4e8;
+            padding: 20px 30px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .forum-comments-list-header h3 {
+            margin: 0;
+            font-size: 1.3em;
+            font-weight: 600;
+            color: #24292e;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .forum-comment-count {
+            background: #17bebb;
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .forum-comments-body {
+            padding: 30px;
+        }
+
+        .forum-comment-item {
+            background: #fafbfc;
+            border-left: 3px solid #17bebb;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            transition: all 0.2s;
+            border: 1px solid #e1e4e8;
+            border-left: 3px solid #17bebb;
+        }
+
+        .forum-comment-item:hover {
+            transform: translateX(3px);
+            box-shadow: 0 4px 12px rgba(23, 190, 187, 0.1);
+        }
+
+        .forum-comment-author {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .forum-comment-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #17bebb, #14a8a5);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            font-size: 1.1em;
+            flex-shrink: 0;
+        }
+
+        .forum-comment-username {
+            font-weight: 600;
+            color: #24292e;
+            font-size: 1em;
+        }
+
+        .forum-comment-username small {
+            display: block;
+            font-weight: 400;
+            color: #586069;
+            font-size: 0.85em;
+            margin-top: 2px;
+        }
+
+        .forum-comment-text {
+            color: #24292e;
+            line-height: 1.6;
+            font-size: 0.95em;
+            margin-bottom: 12px;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            word-break: break-word;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn-sm {
+            padding: 6px 14px;
+            font-size: 0.85em;
+            border-radius: 6px;
+            border: 1px solid;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .btn-outline-primary {
+            background: white;
+            border-color: #17bebb;
+            color: #17bebb;
+        }
+
+        .btn-outline-primary:hover {
+            background: #17bebb;
+            color: white;
+        }
+
+        .btn-outline-danger {
+            background: white;
+            border-color: #dc3545;
+            color: #dc3545;
+        }
+
+        .btn-outline-danger:hover {
+            background: #dc3545;
+            color: white;
+        }
+
+        .edit-comment-form {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 12px;
+            border: 1px solid #e1e4e8;
+        }
+
+        .edit-comment-form textarea {
+            width: 100%;
+            min-height: 100px;
+            padding: 12px;
+            border: 1px solid #e1e4e8;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            font-family: inherit;
+            font-size: 0.95em;
+            background: #fafbfc;
+        }
+
+        .edit-comment-form textarea:focus {
+            outline: none;
+            border-color: #17bebb;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(23, 190, 187, 0.1);
+        }
+
+        .edit-notification {
+            padding: 6px 12px;
+            background: #d1f2f1;
+            color: #17bebb;
+            border-radius: 6px;
+            font-size: 0.85em;
+            margin-top: 8px;
+            display: inline-block;
+            border: 1px solid #17bebb;
+        }
+
+        .forum-empty-comments {
+            text-align: center;
+            padding: 50px 20px;
+            color: #586069;
+        }
+
+        .forum-empty-comments svg {
+            width: 70px;
+            height: 70px;
+            margin-bottom: 15px;
+            opacity: 0.4;
+        }
+
+        .forum-empty-comments h4 {
+            color: #24292e;
+            margin-bottom: 8px;
+            font-size: 1.2em;
+        }
+
+        @media (max-width: 768px) {
+            .forum-post-header-section {
+                padding: 30px 25px;
+            }
+
+            .forum-post-title {
+                font-size: 1.6em;
+            }
+
+            .forum-post-body {
+                padding: 25px;
+            }
+
+            .forum-post-actions {
+                padding: 20px;
+                flex-direction: column;
+            }
+
+            .forum-btn {
+                width: 100%;
+                justify-content: center;
+            }
+
+            .forum-comment-form {
+                padding: 20px;
+            }
+
+            .forum-comments-body {
+                padding: 20px;
+            }
+        }
+    </style>
+
+    <div class="forum-show-wrapper">
+        <div class="forum-show-container">
+            <!-- Post principal -->
+            <div class="forum-post-main">
+                <div class="forum-post-header-section">
+                    <h1 class="forum-post-title">{{ forum_post.titre }}</h1>
+                    <div class="forum-post-metadata">
+                        <div class="forum-meta-item">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>{{ forum_post.user.username ?? 'Anonyme' }}</span>
+                        </div>
+                        <div class="forum-meta-item">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M6 2a1 1 0 00-1 1v1H4a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V6a2 2 0 00-2-2h-1V3a1 1 0 10-2 0v1H7V3a1 1 0 00-1-1zm0 5a1 1 0 000 2h8a1 1 0 100-2H6z" clip-rule="evenodd"/>
+                            </svg>
+                            <span>{{ forum_post.createdAt|date('d/m/Y') }}</span>
+                        </div>
+                        {% if forum_post.category %}
+                        <div class="forum-meta-item">
+                            <span>{{ forum_post.category.icone ?? '📁' }}</span>
+                            <span>{{ forum_post.category.nom }}</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="forum-post-body">
+                    <div class="forum-post-content">
+                        {{ forum_post.contenu|nl2br }}
+                    </div>
+
+                    {% if forum_post.image %}
+                        <div class="forum-post-image-container">
+                            <img src="{{ asset('uploads/' ~ forum_post.image) }}" 
+                                 alt="{{ forum_post.titre }}"
+                                 onerror="this.style.display='none'">
+                        </div>
+                    {% endif %}
+
+                    <div class="forum-post-dates">
+                        <div class="forum-date-item">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                            </svg>
+                            <div>
+                                <strong>Créé le :</strong><br>
+                                {{ forum_post.createdAt|date('d/m/Y à H:i') }}
+                            </div>
+                        </div>
+                        {% if forum_post.updatedAt %}
+                        <div class="forum-date-item">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M4 2a1 1 0 011 1v2.101a7.002 7.002 0 0111.601 2.566 1 1 0 11-1.885.666A5.002 5.002 0 005.999 7H9a1 1 0 010 2H4a1 1 0 01-1-1V3a1 1 0 011-1zm.008 9.057a1 1 0 011.276.61A5.002 5.002 0 0014.001 13H11a1 1 0 110-2h5a1 1 0 011 1v5a1 1 0 11-2 0v-2.101a7.002 7.002 0 01-11.601-2.566 1 1 0 01.61-1.276z" clip-rule="evenodd"/>
+                            </svg>
+                            <div>
+                                <strong>Mis à jour :</strong><br>
+                                {{ forum_post.updatedAt|date('d/m/Y à H:i') }}
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="forum-post-actions">
+                    <a href="{{ path('app_forum_post_index') }}" class="forum-btn forum-btn-back">
+                        ← Retour à la liste
+                    </a>
+                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                        {% if app.user and forum_post.user is not null and app.user.id == forum_post.user.id %}
+                            <a href="{{ path('app_forum_post_edit', {'id': forum_post.id}) }}" class="forum-btn forum-btn-edit">
+                                ✏️ Modifier
+                            </a>
+                            {{ include('forum_post/_delete_form.html.twig') }}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Formulaire d'ajout de commentaire -->
+            <div class="forum-comment-section">
+                <div class="forum-comment-header">
+                    <span style="font-size: 1.4em;">💬</span>
+                    <h3>Ajouter un commentaire</h3>
+                </div>
+                <div class="forum-comment-form">
+                    <form method="post" action="{{ path('app_forul_comment_add', {'postId': forum_post.id}) }}">
+                        <textarea name="contenu" class="forum-comment-textarea" placeholder="Partagez votre avis, posez une question..." required></textarea>
+                        <button type="submit" class="forum-btn forum-btn-submit">
+                            ✨ Publier le commentaire
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Liste des commentaires -->
+            <div class="forum-comments-list-section">
+                <div class="forum-comments-list-header">
+                    <h3>
+                        <span>💭</span>
+                        <span>Commentaires</span>
+                    </h3>
+                    <span class="forum-comment-count">{{ forum_post.comments|length }}</span>
+                </div>
+                <div class="forum-comments-body">
+                    {% if forum_post.comments|length > 0 %}
+                        {% for comment in forum_post.comments %}
+                            <div class="forum-comment-item" id="comment-{{ comment.id }}">
+                                <div class="forum-comment-author">
+                                    <div class="forum-comment-avatar">
+                                        {{ comment.user.name|first|upper }}
+                                    </div>
+                                    <span class="forum-comment-username">
+                                        {{ comment.user.name ?? 'Utilisateur inconnu' }}
+                                        <small class="text-muted">
+                                            - {{ comment.createdAt|date('d/m/Y H:i') }}
+
+                                            {% if comment.updatedAt and comment.updatedAt != comment.createdAt %}
+                                                (modifié le {{ comment.updatedAt|date('d/m/Y H:i') }})
+                                            {% endif %}
+                                        </small>
+                                    </span>
+                                </div>
+                                <div class="forum-comment-text">
+                                    {{ comment.contenu|nl2br }}
+                                </div>
+                                
+                                {% if app.user and (app.user == comment.user or is_granted('ROLE_ADMIN')) %}
+                                <div class="comment-actions">
+                                    <button class="btn-sm btn-outline-primary edit-comment" 
+                                            data-comment-id="{{ comment.id }}"
+                                            data-original-content="{{ comment.contenu|e('html_attr') }}">
+                                        ✏️ Modifier
+                                    </button>
+                                    <form method="post" action="{{ path('app_forul_comment_delete', {'id': comment.id}) }}" 
+                                          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer ce commentaire ?');" 
+                                          style="display: inline-block;">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ comment.id) }}">
+                                        <button type="submit" class="btn-sm btn-outline-danger">
+                                            🗑️ Supprimer
+                                        </button>
+                                    </form>
+                                </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    {% else %}
+                        <div class="forum-empty-comments">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+                            </svg>
+                            <h4>Aucun commentaire pour le moment</h4>
+                            <p>Soyez le premier à partager votre avis !</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

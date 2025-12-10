@@ -1,0 +1,340 @@
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                ║
+║                🎉 WEBHOOK SYSTEM - COMPLETE SETUP GUIDE 🎉                    ║
+║                                                                                ║
+║             Test URL: https://webhook.site/401957a8-71fe-4435-9776-8d...     ║
+║                                                                                ║
+╚════════════════════════════════════════════════════════════════════════════════╝
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+🚀 QUICK START IN 5 STEPS (Total: ~3 minutes)
+═══════════════════════════════════════════════════════════════════════════════════
+
+Step 1: Setup Admin
+├─ Open PowerShell
+├─ cd "c:\xampp\htdocs\version final\Elearning"
+├─ php setup_webhook_admin.php
+└─ ✅ Done! Token generated in .webhook_token
+
+Step 2: Launch Symfony Server
+├─ Open NEW PowerShell window
+├─ cd "c:\xampp\htdocs\version final\Elearning"
+├─ php -S localhost:8000 -t public
+└─ ✅ Server running on http://localhost:8000
+
+Step 3: Run Test Script
+├─ Open ANOTHER PowerShell window
+├─ cd "c:\xampp\htdocs\version final\Elearning"
+├─ .\quick_test_webhook.ps1
+└─ ✅ Webhook created and test sent
+
+Step 4: Check Webhook.site
+├─ Go to: https://webhook.site/401957a8-71fe-4435-9776-8dfa554dbb5c
+├─ Refresh the page (F5)
+└─ ✅ You should see the POST request!
+
+Step 5: Test Real Quiz Flow
+├─ Go to: http://localhost:8000/front/
+├─ Login as student
+├─ Click "Commencer Quiz"
+├─ Submit quiz
+└─ ✅ Check webhook.site for 2 new events!
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+📁 FILES TO USE
+═══════════════════════════════════════════════════════════════════════════════════
+
+CONFIGURATION (RUN ONCE):
+├─ setup_webhook_admin.php
+│  └─ Sets up admin user, generates token
+│     Command: php setup_webhook_admin.php
+
+TESTING SCRIPTS (MAIN):
+├─ quick_test_webhook.ps1 ⭐ RECOMMENDED
+│  └─ Fastest way to test
+│     Command: .\quick_test_webhook.ps1
+│
+├─ test_webhook.ps1 (Alternative)
+│  └─ More detailed output
+│     Command: .\test_webhook.ps1
+│
+├─ test_curl.bat (For cURL)
+│  └─ If PowerShell fails
+│     Command: test_curl.bat
+│
+└─ QUICK_START_WEBHOOK.txt
+   └─ Quick reference guide (this file)
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+🔍 WHAT TO EXPECT
+═══════════════════════════════════════════════════════════════════════════════════
+
+After running quick_test_webhook.ps1, you should see:
+
+✅ Webhook created
+   ID: 1
+   URL: https://webhook.site/401957a8-71fe-4435-9776-8dfa554dbb5c
+   EventType: all
+   Status: Active
+
+✅ Test sent successfully
+   Message: "Webhook test sent successfully"
+
+✅ Verify on webhook.site
+   You'll see a POST request with:
+   - X-Webhook-Signature header (HMAC-SHA256)
+   - JSON body with test data
+   - Timestamp of when it was sent
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+🎯 REAL FLOW TEST
+═══════════════════════════════════════════════════════════════════════════════════
+
+Once setup is complete, test the real flow:
+
+1. STUDENT PERSPECTIVE
+   ├─ Login to http://localhost:8000/front/
+   ├─ Find a quiz
+   ├─ Click "Commencer Quiz"
+   │  └─ Event: quiz_started webhook sent
+   ├─ Answer questions
+   ├─ Click "Soumettre"
+   │  └─ Event: quiz_completed webhook sent
+   └─ Check webhook.site for both events
+
+2. WEBHOOK.SITE VERIFICATION
+   ├─ Go to: https://webhook.site/401957a8-71fe-4435-9776-8dfa554dbb5c
+   ├─ Refresh (F5) to see latest requests
+   ├─ You should see:
+   │  ├─ 1st request: quiz_started (student starts)
+   │  └─ 2nd request: quiz_completed (student submits)
+   ├─ Click each request to see:
+   │  ├─ Headers (including X-Webhook-Signature)
+   │  ├─ Body (JSON with quiz data)
+   │  └─ Response (200 OK)
+   └─ ✅ SUCCESS!
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+🔐 SECURITY - SIGNATURE VERIFICATION
+═══════════════════════════════════════════════════════════════════════════════════
+
+EVERY webhook includes an X-Webhook-Signature header:
+
+Format:
+  X-Webhook-Signature: sha256=<HASH>
+
+What it is:
+  - HASH = HMAC-SHA256 of the JSON body
+  - Created with your webhook's unique secret
+  - Proves the webhook came from YOUR server
+
+How to verify (in your webhook receiver):
+
+  1. Get the X-Webhook-Signature from the request header
+  2. Use your webhook's secret to generate HMAC:
+     hash = HMAC-SHA256(request_body_json, webhook_secret)
+  3. Compare with the header signature
+  4. If they match: ✅ Authentic
+     If they don't: ❌ Reject (potential fraud)
+
+Example in Node.js:
+  const crypto = require('crypto');
+  const signature = req.headers['x-webhook-signature'].replace('sha256=', '');
+  const hash = crypto.createHmac('sha256', secret)
+                      .update(JSON.stringify(req.body))
+                      .digest('hex');
+  if (crypto.timingSafeEqual(Buffer.from(signature), Buffer.from(hash))) {
+    // Webhook is authentic!
+  }
+
+See examples:
+  - examples/webhook-receiver-nodejs.js
+  - examples/webhook-receiver-python.py
+  - examples/webhook-receiver-php.php
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+❌ TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════════════════════════
+
+❌ "Token not found"
+   Solution: Run php setup_webhook_admin.php
+
+❌ "Server not responding"
+   Solution: Make sure to run php -S localhost:8000 -t public
+
+❌ "Connection refused on port 8000"
+   Solution: Port 8000 already in use
+   → Find process: netstat -ano | findstr :8000
+   → Kill process: taskkill /PID <PID> /F
+
+❌ "Webhook not created - Authorization error"
+   Solution: User doesn't have ROLE_ADMIN
+   → Re-run: php setup_webhook_admin.php
+   → Or check user roles: php bin/console doctrine:query:sql "SELECT id, roles FROM user"
+
+❌ "No webhooks on webhook.site"
+   Checklist:
+   ├─ Symfony is running on http://localhost:8000
+   ├─ Webhook was created (check with: .\quick_test_webhook.ps1)
+   ├─ No firewall blocking outbound HTTPS
+   ├─ URL is correct: https://webhook.site/401957a8-71fe-4435-9776-8dfa554dbb5c
+   └─ Check Symfony logs: tail -f var/log/dev.log
+
+❌ "Script execution policy error in PowerShell"
+   Solution: Run PowerShell as Administrator
+   Then: Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+   Then: .\quick_test_webhook.ps1
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+📊 WHAT GETS SENT
+═══════════════════════════════════════════════════════════════════════════════════
+
+QUIZ_STARTED Event:
+──────────────────────────────────────────────────────────
+  When: Student clicks "Commencer Quiz"
+  Contains:
+    ├─ event: "quiz_started"
+    ├─ timestamp: ISO 8601 datetime
+    ├─ data.student: ID, email, name
+    ├─ data.quiz: ID, title, duration
+    ├─ data.course: ID, title
+    └─ data.startedAt: When quiz started
+
+QUIZ_COMPLETED Event:
+──────────────────────────────────────────────────────────
+  When: Student clicks "Soumettre"
+  Contains:
+    ├─ event: "quiz_completed"
+    ├─ timestamp: ISO 8601 datetime
+    ├─ data.student: ID, email, name
+    ├─ data.quiz: ID, title, duration
+    ├─ data.course: ID, title
+    ├─ data.score: Points earned
+    ├─ data.maxScore: Total possible points
+    ├─ data.percentage: Score percentage
+    ├─ data.isPassed: True/False based on passing grade
+    └─ data.completedAt: When quiz completed
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+🛠️ MANUAL API CALLS (IF SCRIPTS DON'T WORK)
+═══════════════════════════════════════════════════════════════════════════════════
+
+Get token first:
+  cat .webhook_token
+  (Outputs your token, copy it)
+
+Then use TOKEN below:
+
+1. LIST WEBHOOKS
+   curl -X GET http://localhost:8000/api/webhooks \
+     -H "Authorization: Bearer TOKEN"
+
+2. CREATE WEBHOOK
+   curl -X POST http://localhost:8000/api/webhooks \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer TOKEN" \
+     -d '{"url":"https://webhook.site/401957a8-71fe-4435-9776-8dfa554dbb5c","eventType":"all"}'
+
+3. TEST WEBHOOK
+   curl -X POST http://localhost:8000/api/webhooks/1/test \
+     -H "Authorization: Bearer TOKEN"
+
+4. UPDATE WEBHOOK
+   curl -X PUT http://localhost:8000/api/webhooks/1 \
+     -H "Content-Type: application/json" \
+     -H "Authorization: Bearer TOKEN" \
+     -d '{"eventType":"quiz_started"}'
+
+5. DELETE WEBHOOK
+   curl -X DELETE http://localhost:8000/api/webhooks/1 \
+     -H "Authorization: Bearer TOKEN"
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+📈 NEXT STEPS AFTER SUCCESS
+═══════════════════════════════════════════════════════════════════════════════════
+
+Once you confirm webhooks work:
+
+1. INTEGRATE WITH YOUR SYSTEM
+   ├─ Use one of the provided examples:
+   │  ├─ examples/webhook-receiver-nodejs.js
+   │  ├─ examples/webhook-receiver-python.py
+   │  └─ examples/webhook-receiver-php.php
+   └─ Or build your own webhook receiver
+
+2. IMPLEMENT BUSINESS LOGIC
+   ├─ Send notifications (email, Slack, SMS)
+   ├─ Update dashboards
+   ├─ Log to analytics
+   ├─ Trigger external systems
+   └─ etc.
+
+3. DEPLOY TO PRODUCTION
+   ├─ Get a real HTTPS endpoint
+   ├─ Update webhook URL
+   ├─ Test with real data
+   └─ Monitor webhook deliveries
+
+4. ADVANCED FEATURES
+   ├─ Add webhook retries (already done!)
+   ├─ Add failure tracking (already done!)
+   ├─ Add webhook signature verification (examples provided)
+   ├─ Create admin dashboard for webhook management
+   └─ Add monitoring and alerting
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+💡 TIPS & TRICKS
+═══════════════════════════════════════════════════════════════════════════════════
+
+✅ Keep webhook.site tab open during testing
+   - Refresh (F5) to see new webhooks
+   - Click requests to see full details
+   - Copy headers for verification
+
+✅ Keep Symfony running in background
+   - Open a dedicated terminal for it
+   - You'll see logs there if something fails
+   - Check var/log/dev.log for detailed errors
+
+✅ Use the token saved in .webhook_token
+   - It's a 64-character SHA256 hash
+   - Keep it secure
+   - Don't commit it to git
+
+✅ Test with webhook.site first
+   - It's free and instant
+   - Good for validation
+   - Then move to your own webhook receiver
+
+✅ Check the X-Webhook-Signature header
+   - It proves the webhook is authentic
+   - Use it to verify in your receiver
+   - See examples for how to do this
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+
+╔════════════════════════════════════════════════════════════════════════════════╗
+║                                                                                ║
+║                          🎯 YOU'RE READY!                                    ║
+║                                                                                ║
+║   Open PowerShell and run:                                                   ║
+║                                                                                ║
+║   1. php setup_webhook_admin.php                                             ║
+║   2. php -S localhost:8000 -t public   (in separate terminal)               ║
+║   3. .\quick_test_webhook.ps1          (in third terminal)                  ║
+║   4. Check https://webhook.site/401957a8... for results                     ║
+║                                                                                ║
+║                     ✅ WEBHOOK SYSTEM LIVE IN 3 MINUTES! ✅                  ║
+║                                                                                ║
+╚════════════════════════════════════════════════════════════════════════════════╝

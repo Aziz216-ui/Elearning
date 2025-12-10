@@ -1,0 +1,223 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Mes Performances - Elearning{% endblock %}
+
+{% block body %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <h1 class="mb-4">
+                <i class="fas fa-chart-line text-primary"></i>
+                Mes Performances
+            </h1>
+            
+            <!-- Statistiques générales -->
+            <div class="row mb-4">
+                <div class="col-md-3">
+                    <div class="card bg-primary text-white">
+                        <div class="card-body text-center">
+                            <h3>{{ performanceStats|length }}</h3>
+                            <small>Quiz tentés</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-success text-white">
+                        <div class="card-body text-center">
+                            <h3>{{ passedQuizzes|length }}</h3>
+                            <small>Quiz réussis</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-warning text-white">
+                        <div class="card-body text-center">
+                            <h3>{{ recentFailed|length }}</h3>
+                            <small>Échecs récents</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-3">
+                    <div class="card bg-info text-white">
+                        <div class="card-body text-center">
+                            <h3>{{ certificates|length }}</h3>
+                            <small>Certificats</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Détails des performances par quiz -->
+            {% if performanceStats is not empty %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-analytics"></i>
+                            Performance détaillée par quiz
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Quiz</th>
+                                        <th>Tentatives</th>
+                                        <th>Meilleur score</th>
+                                        <th>Score moyen</th>
+                                        <th>Réussites</th>
+                                        <th>Progression</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for stat in performanceStats %}
+                                        <tr>
+                                            <td>
+                                                <strong>{{ stat.title }}</strong>
+                                                {% if stat.passedCount > 0 %}
+                                                    <span class="badge bg-success ms-2">✓</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <span class="badge bg-secondary">{{ stat.attempts }}</span>
+                                            </td>
+                                            <td>
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar {{ stat.bestScore >= 70 ? 'bg-success' : 'bg-warning' }}" 
+                                                         style="width: {{ stat.bestScore }}%">
+                                                        {{ stat.bestScore|round(1) }}%
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <span class="text-muted">{{ stat.avgScore|round(1) }}%</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge {{ stat.passedCount > 0 ? 'bg-success' : 'bg-danger' }}">
+                                                    {{ stat.passedCount }}/{{ stat.attempts }}
+                                                </span>
+                                            </td>
+                                            <td>
+                                                {% if stat.attempts > 1 %}
+                                                    {% if stat.avgScore >= stat.bestScore * 0.8 %}
+                                                        <span class="text-success">
+                                                            <i class="fas fa-arrow-up"></i> Stable
+                                                        </span>
+                                                    {% else %}
+                                                        <span class="text-warning">
+                                                            <i class="fas fa-arrow-down"></i> Variable
+                                                        </span>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <span class="text-muted">
+                                                        <i class="fas fa-minus"></i> Première tentative
+                                                    </span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- Quiz récemment échoués -->
+            {% if recentFailed is not empty %}
+                <div class="card mb-4 border-danger">
+                    <div class="card-header bg-danger text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            Quiz à retenter (7 derniers jours)
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for quiz in recentFailed %}
+                                <div class="col-md-6 col-lg-4 mb-3">
+                                    <div class="card border-warning">
+                                        <div class="card-body">
+                                            <h6 class="card-title">{{ quiz.title }}</h6>
+                                            <p class="card-text small text-muted">
+                                                Dernière tentative : {{ quiz.quizResults|first.completedAt|date('d/m/Y H:i') }}
+                                            </p>
+                                            <div class="d-grid gap-2">
+                                                <a href="{{ path('app_quiz_start', {'id': quiz.id}) }}" 
+                                                   class="btn btn-warning btn-sm">
+                                                    <i class="fas fa-redo"></i> Retenter
+                                                </a>
+                                                <a href="{{ path('app_quiz_results', {'id': quiz.id}) }}" 
+                                                   class="btn btn-outline-secondary btn-sm">
+                                                    <i class="fas fa-eye"></i> Voir les résultats
+                                                </a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- Quiz réussis -->
+            {% if passedQuizzes is not empty %}
+                <div class="card mb-4 border-success">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="mb-0">
+                            <i class="fas fa-trophy"></i>
+                            Quiz réussis
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for quiz in passedQuizzes %}
+                                <div class="col-md-6 col-lg-4 mb-3">
+                                    <div class="card border-success">
+                                        <div class="card-body">
+                                            <h6 class="card-title">{{ quiz.title }}</h6>
+                                            {% if quiz.quizResults|first %}
+                                                {% set result = quiz.quizResults|first %}
+                                                <div class="mb-2">
+                                                    <span class="badge bg-success">
+                                                        Score : {{ result.score }}/{{ result.totalPoints }}
+                                                    </span>
+                                                </div>
+                                                <p class="card-text small text-muted">
+                                                    Réussi le {{ result.completedAt|date('d/m/Y') }}
+                                                </p>
+                                                {% if result.certificatePath %}
+                                                    <a href="{{ path('app_certificat_pdf', {'id': result.id}) }}" 
+                                                       class="btn btn-outline-primary btn-sm">
+                                                        <i class="fas fa-download"></i> Certificat
+                                                    </a>
+                                                {% endif %}
+                                            {% endif %}
+                                        </div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- Actions -->
+            <div class="text-center mt-4">
+                <div class="btn-group" role="group">
+                    <a href="{{ path('app_quiz_dashboard') }}" class="btn btn-outline-primary">
+                        <i class="fas fa-tachometer-alt"></i> Tableau de bord
+                    </a>
+                    <a href="{{ path('app_quiz_certificates') }}" class="btn btn-outline-warning">
+                        <i class="fas fa-certificate"></i> Mes certificats
+                    </a>
+                    <a href="{{ path('app_dashboard') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-home"></i> Accueil
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

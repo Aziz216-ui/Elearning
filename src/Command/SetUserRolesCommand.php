@@ -1,0 +1,70 @@
+<?php
+
+namespace App\Command;
+
+use App\Repository\UserRepository;
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
+
+#[AsCommand(name: 'app:set-user-roles', description: 'Set roles for an existing user (by email)')]
+class SetUserRolesCommand extends Command
+{
+    public function __construct(
+        private EntityManagerInterface $em,
+        private UserRepository $userRepository
+    ) {
+        parent::__construct();
+    }
+
+    protected function configure(): void
+    {
+        $this
+            ->addOption('email', null, InputOption::VALUE_REQUIRED, 'Email of the user to update')
+            ->addOption('roles', null, InputOption::VALUE_REQUIRED, 'Comma separated roles to set (e.g. ROLE_USER,ROLE_ADMIN)')
+            ->addOption('append', null, InputOption::VALUE_NONE, 'Append roles instead of replacing');
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        $io = new SymfonyStyle($input, $output);
+
+        $email = $input->getOption('email');
+        $rolesOption = $input->getOption('roles');
+        $append = (bool) $input->getOption('append');
+
+        if (! $email) {
+            $email = $io->ask('Email of the user to update');
+        }
+
+        $user = $this->userRepository->findOneBy(['email' => $email]);
+        if (! $user) {
+            $io->error(sprintf('No user found with email %s', $email));
+            return Command::FAILURE;
+        }
+
+        if (! $rolesOption) {
+            $rolesOption = $io->ask('Roles (comma separated)', implode(',', $user->getRoles()));
+        }
+
+        $newRoles = array_values(array_unique(array_filter(array_map('trim', explode(',', $rolesOption)))));
+
+        if ($append) {
+            $merged = array_values(array_unique(array_merge($user->getRoles(), $newRoles)));
+            $user->setRoles($merged);
+        } else {
+            $user->setRoles($newRoles);
+        }
+
+        $this->em->persist($user);
+        $this->em->flush();
+
+        $io->success(sprintf('User %s roles updated to: %s', $email, implode(', ', $user->getRoles())));
+
+        return Command::SUCCESS;
+    }
+}
