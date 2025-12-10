@@ -9,7 +9,7 @@ use App\Repository\CoursRepository;
 
 class HomeStatController extends AbstractController
 {
-    #[Route('/home/stat', name: 'app_home_stat')]
+    #[Route('', name: 'app_home_stat')]
     public function index(CoursRepository $coursRepository): Response
     {
         // Load some data to drive the UI

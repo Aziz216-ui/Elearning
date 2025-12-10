@@ -34,7 +34,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[Assert\NotBlank(message: 'Le mot de passe est obligatoire.')]
-    #[Assert\Length(min: 6, minMessage: 'Le mot de passe doit contenir au moins {{ limit }} caractères.')]
+    #[Assert\Length(min: 8, minMessage: 'Le mot de passe doit contenir au moins {{ limit }} caractères.')]
+    #[Assert\Regex(
+        pattern: '/(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9]).+/',
+        message: 'Le mot de passe doit contenir au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial.'
+    )]
+
     private ?string $plainPassword = null;
 
     #[ORM\Column(length: 255)]
@@ -50,6 +55,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'date', nullable: true)]
     #[Assert\NotBlank(message: "la date de naissance est obligatoire !")]
+    #[Assert\LessThanOrEqual('today - 13 years', message: 'Vous devez avoir au moins 13 ans.')]
+    #[Assert\GreaterThanOrEqual('1925-01-01', message: "La date de naissance est trop ancienne ou invalide.")]
     private ?\DateTimeInterface $birthdate = null;
 
     #[ORM\Column(length: 255)]
@@ -161,11 +168,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $this->lastname = $lastname;
         return $this;
-    }
-
-    public function getFullName(): ?string
-    {
-        return trim($this->name . ' ' . $this->lastname);
     }
 
     public function getBirthdate(): ?\DateTimeInterface

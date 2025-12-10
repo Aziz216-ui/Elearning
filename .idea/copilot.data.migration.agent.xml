@@ -6,6 +6,7 @@
       <option value="0fd3df7a-dcdd-4f81-8fea-faeed454943b" />
       <option value="40518c38-ff9e-4db7-a406-225601396b74" />
       <option value="9805fe7d-99a9-44d3-8eb4-11f2d58d284b" />
+      <option value="ba32ac3e-182b-440f-80c3-28ad64d4c188" />
       <option value="bec32839-5997-4383-a86b-41d073d4b718" />
       <option value="bf431552-1b19-47cf-81f7-d4e2dc998e56" />
       <option value="cb087831-08c5-4d58-99cd-ef8b01a4665f" />
@@ -38,6 +39,17 @@
             </set>
           </value>
         </entry>
+        <entry key="ba32ac3e-182b-440f-80c3-28ad64d4c188">
+          <value>
+            <set>
+              <option value="cab9ff28-6ae0-4fad-97c1-4b08f1ea1439" />
+              <option value="2a3a0505-976a-4ab5-84f9-ad258f892555" />
+              <option value="39cdd1d6-2663-45dd-88a5-882b72e1b81e" />
+              <option value="3dc16f5a-f32a-4d23-b441-722dfa65ffe1" />
+              <option value="68375312-2a62-4f38-b7f6-af8e4aae399e" />
+            </set>
+          </value>
+        </entry>
         <entry key="bec32839-5997-4383-a86b-41d073d4b718">
           <value>
             <set>
@@ -66,9 +78,9 @@
         <entry key="d59f5847-e3d2-4b01-b5fa-8c483fdd5914">
           <value>
             <set>
-              <option value="f1d95d23-8c77-4d42-9706-b31913f3916f" />
-              <option value="81d37b83-63f7-430b-95bd-eeae99c74e63" />
               <option value="0fce2019-49ea-47cd-9a33-ea1c4684da89" />
+              <option value="81d37b83-63f7-430b-95bd-eeae99c74e63" />
+              <option value="f1d95d23-8c77-4d42-9706-b31913f3916f" />
             </set>
           </value>
         </entry>
@@ -83,13 +95,16 @@
     </option>
     <pendingWorkingSetItems>
       <entry key="9805fe7d-99a9-44d3-8eb4-11f2d58d284b" />
-      <entry key="bec32839-5997-4383-a86b-41d073d4b718" />
-      <entry key="cb087831-08c5-4d58-99cd-ef8b01a4665f" />
-      <entry key="d59f5847-e3d2-4b01-b5fa-8c483fdd5914">
+      <entry key="ba32ac3e-182b-440f-80c3-28ad64d4c188">
         <set>
-          <option value="file://$PROJECT_DIR$/.env.local" />
+          <option value="file://$PROJECT_DIR$/config/packages/security.yaml" />
+          <option value="file://$PROJECT_DIR$/src/Security/SecurityControllerAuthenticator.php" />
+          <option value="file://$PROJECT_DIR$/src/Security/BearerTokenAuthenticator.php" />
         </set>
       </entry>
+      <entry key="bec32839-5997-4383-a86b-41d073d4b718" />
+      <entry key="cb087831-08c5-4d58-99cd-ef8b01a4665f" />
+      <entry key="d59f5847-e3d2-4b01-b5fa-8c483fdd5914" />
     </pendingWorkingSetItems>
   </component>
 </project>

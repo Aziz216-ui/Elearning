@@ -54,7 +54,7 @@
             <li class="nav-item">
                 <a class="nav-link" href="{{ path('app_admin') }}">
                     <i class="fas fa-fw fa-users"></i>
-                    <span>Users</span>
+                    <span>Utilisateurs</span>
                 </a>
             </li>
 
@@ -81,21 +81,6 @@
 
             <li class="nav-item">
                 <a class="nav-link" href="{{ path('app_dashboard_forum') }}">
-                    <i class="fas fa-fw fa-comments"></i>
-                    <span>Posts de forum</span>
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="{{ path('admin_plan_index') }}">
-                    <i class="fas fa-fw fa-layer-group"></i>
-                    <span>Plans</span>
-                </a>
-            </li>
-
-            <li class="nav-item">
-                <a class="nav-link" href="{{ path('admin_payment_index') }}">
-                    <i class="fas fa-fw fa-credit-card"></i>
                     <span>Payments</span>
                 </a>
             </li>
@@ -112,6 +97,14 @@
                 <a class="nav-link" href="{{ path('admin_notifications') }}">
                     <i class="fas fa-fw fa-bell"></i>
                     <span>Notifications</span>
+                </a>
+            </li>
+
+            <!-- Nav Item - Logout -->
+            <li class="nav-item">
+                <a class="nav-link" href="#" data-toggle="modal" data-target="#logoutModal">
+                    <i class="fas fa-fw fa-sign-out-alt"></i>
+                    <span>Déconnexion</span>
                 </a>
             </li>
 

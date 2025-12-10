@@ -28,15 +28,42 @@ class SecurityControllerAuthenticator extends AbstractLoginFormAuthenticator
 
     public function authenticate(Request $request): Passport
     {
-        $email = $request->getPayload()->getString('email');
+        // Supporter à la fois les formulaires classiques (application/x-www-form-urlencoded)
+        // et les requêtes JSON (getPayload) utilisées par certaines API/frontends.
+        $email = $request->request->get('email');
+        $password = $request->request->get('password');
+        $csrfToken = $request->request->get('_csrf_token');
+
+        // Si on ne trouve pas les données dans le POST, tenter le payload JSON si disponible
+        if ((null === $email || null === $password) && method_exists($request, 'getPayload')) {
+            $payload = $request->getPayload();
+            if ($payload) {
+                // getString() peut lancer si la clé n'existe pas; on utilise un fallback
+                try {
+                    $email = $email ?? $payload->getString('email');
+                } catch (\Throwable) {
+                }
+                try {
+                    $password = $password ?? $payload->getString('password');
+                } catch (\Throwable) {
+                }
+                try {
+                    $csrfToken = $csrfToken ?? $payload->getString('_csrf_token');
+                } catch (\Throwable) {
+                }
+            }
+        }
+
+        // Si encore null, remplacer par chaîne vide pour éviter des valeurs nulles dans la session
+        $email = $email ?? '';
 
         $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $email);
 
         return new Passport(
             new UserBadge($email),
-            new PasswordCredentials($request->getPayload()->getString('password')),
+            new PasswordCredentials($password ?? ''),
             [
-                new CsrfTokenBadge('authenticate', $request->getPayload()->getString('_csrf_token')),
+                new CsrfTokenBadge('authenticate', $csrfToken ?? ''),
                 new RememberMeBadge(),
             ]
         );
@@ -44,11 +71,18 @@ class SecurityControllerAuthenticator extends AbstractLoginFormAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
-        if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
-            return new RedirectResponse($targetPath);
+        $roles = $token->getRoleNames();
+
+        if (in_array('ROLE_ADMIN', $roles, true)) {
+            return new RedirectResponse('/admin');
         }
 
-        return new RedirectResponse($this->urlGenerator->generate('app_dashboard'));
+        if (in_array('ROLE_USER', $roles, true)) {
+            return new RedirectResponse('/plan');
+        }
+
+        // Fallback redirection
+        return new RedirectResponse('/plan');
     }
 
     protected function getLoginUrl(Request $request): string

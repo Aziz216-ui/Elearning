@@ -2,73 +2,37 @@
 
 namespace App\Security;
 
-use Symfony\Component\DependencyInjection\ParameterBag\ParameterBagInterface;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
-use Symfony\Component\Security\Core\Exception\AuthenticationException;
-use Symfony\Component\Security\Core\Exception\CustomUserMessageAuthenticationException;
 use Symfony\Component\Security\Http\Authenticator\AbstractAuthenticator;
-use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
 use Symfony\Component\Security\Http\Authenticator\Passport\Passport;
-use Symfony\Component\Security\Http\Authenticator\Passport\SelfValidatingPassport;
+use Symfony\Component\Security\Http\Authenticator\Passport\Badge\UserBadge;
+use Symfony\Component\Security\Http\Authenticator\Passport\Credentials\PasswordCredentials;
 
 class BearerTokenAuthenticator extends AbstractAuthenticator
 {
-    private ParameterBagInterface $params;
-
-    public function __construct(ParameterBagInterface $params)
-    {
-        $this->params = $params;
-    }
-
+    // Implémentation minimale : ne supporte aucune requête (retourne false)
+    // Ceci évite d'interférer avec l'authentification existante.
     public function supports(Request $request): ?bool
     {
-        // Support l'authentification Bearer token pour les appels API
-        return $request->headers->has('Authorization') && 
-               str_starts_with($request->headers->get('Authorization'), 'Bearer ');
+        return false;
     }
 
     public function authenticate(Request $request): Passport
     {
-        $authHeader = $request->headers->get('Authorization');
-        $token = substr($authHeader, 7); // Remove "Bearer " prefix
-
-        if (empty($token)) {
-            throw new CustomUserMessageAuthenticationException('No API token provided');
-        }
-
-        // Vérifier le token stocké dans .webhook_token
-        $projectDir = $this->params->get('kernel.project_dir');
-        $tokenFile = $projectDir . '/.webhook_token';
-        
-        if (file_exists($tokenFile)) {
-            $storedToken = trim(file_get_contents($tokenFile));
-            if ($token !== $storedToken) {
-                throw new CustomUserMessageAuthenticationException('Invalid API token');
-            }
-
-            // Charger l'utilisateur admin
-            return new SelfValidatingPassport(
-                new UserBadge('fedi@test.com')
-            );
-        }
-
-        throw new CustomUserMessageAuthenticationException('No valid API token found');
+        // Si jamais appelé, lever une exception explicite
+        throw new \LogicException('BearerTokenAuthenticator should not be used in this environment.');
     }
 
-    public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
+    public function onAuthenticationSuccess(Request $request, \Symfony\Component\Security\Core\Authentication\Token\TokenInterface $token, string $firewallName): ?Response
     {
-        return null; // Allow the request to proceed
+        // Ne rien faire et laisser la requête continuer
+        return null;
     }
 
-    public function onAuthenticationFailure(Request $request, AuthenticationException $exception): ?Response
+    public function onAuthenticationFailure(Request $request, \Symfony\Component\Security\Core\Exception\AuthenticationException $exception): ?Response
     {
-        return new JsonResponse([
-            'error' => $exception->getMessageKey(),
-            'message' => $exception->getMessage()
-        ], Response::HTTP_UNAUTHORIZED);
+        return new Response('Authentication Failed', Response::HTTP_UNAUTHORIZED);
     }
 }
 
