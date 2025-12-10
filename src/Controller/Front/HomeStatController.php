@@ -9,13 +9,13 @@ use App\Repository\CoursRepository;
 
 class HomeStatController extends AbstractController
 {
-    #[Route('/home/stat', name: 'app_home_stat')]
+    #[Route('', name: 'app_home_stat')]
     public function index(CoursRepository $coursRepository): Response
     {
-        // Load some data to drive the UI
+
         $courses = $coursRepository->findBy([], ['id' => 'DESC'], 6);
 
-        // Provide stats expected by the Twig template
+
         $stats = [
             'users_count' => 1250,
             'courses_count' => count($courses),

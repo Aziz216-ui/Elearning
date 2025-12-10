@@ -38,8 +38,6 @@ class RegistrationController extends AbstractController
             }
         }
 
-
-
         if ($form->isSubmitted() && $form->isValid()) {
             // hash password
             $user->setPassword($passwordHasher->hashPassword($user, $form->get('plainPassword')->getData()));
@@ -115,3 +113,4 @@ class RegistrationController extends AbstractController
         }
     }
 }
+

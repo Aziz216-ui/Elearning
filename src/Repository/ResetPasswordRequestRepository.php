@@ -26,8 +26,20 @@ class ResetPasswordRequestRepository extends ServiceEntityRepository implements 
         parent::__construct($registry, ResetPasswordRequest::class);
     }
 
+    /**
+     * {@inheritdoc}
+     *
+     * @param object $user An instance of App\Entity\User
+     */
     public function createResetPasswordRequest(object $user, \DateTimeInterface $expiresAt, string $selector, string $hashedToken): ResetPasswordRequestInterface
     {
-        return new ResetPasswordRequest($user, $expiresAt, $selector, $hashedToken);
+        if (!($user instanceof \App\Entity\User)) {
+            throw new \TypeError(sprintf('Expected instance of %s, got %s', \App\Entity\User::class, is_object($user) ? get_class($user) : gettype($user)));
+        }
+
+        /** @var \App\Entity\User $userInstance */
+        $userInstance = $user;
+
+        return new ResetPasswordRequest($userInstance, $expiresAt, $selector, $hashedToken);
     }
 }

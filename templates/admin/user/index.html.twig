@@ -53,6 +53,15 @@
             box-shadow: 0 0 0 3px rgba(78, 115, 223, 0.15);
         }
 
+
+        .btn-red {
+            background-color: var(--danger-color) !important;
+            border-color: var(--danger-color) !important;
+            border-radius: 8px;
+            color: #fff !important;
+            padding: .5rem 1rem;
+        }
+
         .table-modern {
             width: 100%;
             border-collapse: separate;
@@ -153,6 +162,13 @@
     </style>
 
     {# Table Section #}
+    <div class="row">
+            <div class="col-12 mb-4">
+                <a href="{{ path('app_admin') }}" class="btn btn-primary shadow hover-scale px-4 btn-red">
+                    <i class="fas fa-arrow-left mr-2"></i> Retour
+                </a>
+            </div>
+        </div>
     <div class="container-fluid">
         <div class="card-modern">
             <div class="d-flex justify-content-between align-items-center px-4 py-4 border-bottom">

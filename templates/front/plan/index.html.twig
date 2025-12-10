@@ -11,6 +11,10 @@
                 Menu
             </button>
             <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dashboardMenu">
+                <li><a class="dropdown-item" href="{{ path('app_profile') }}">Profile</a></li>
+                <li><a class="dropdown-item text-danger" href="{{ path('app_logout') }}">Déconnexion</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item" href="#">Autre action</a></li>
             </ul>
         </div>
     </div>
