@@ -6,8 +6,8 @@
       <option value="0fd3df7a-dcdd-4f81-8fea-faeed454943b" />
       <option value="40518c38-ff9e-4db7-a406-225601396b74" />
       <option value="7e855847-1817-4a18-8df2-dbaa457f3ac6" />
-
       <option value="9805fe7d-99a9-44d3-8eb4-11f2d58d284b" />
+      <option value="ba32ac3e-182b-440f-80c3-28ad64d4c188" />
       <option value="bec32839-5997-4383-a86b-41d073d4b718" />
       <option value="bf431552-1b19-47cf-81f7-d4e2dc998e56" />
       <option value="cb087831-08c5-4d58-99cd-ef8b01a4665f" />
@@ -36,45 +36,50 @@
         <entry key="7e855847-1817-4a18-8df2-dbaa457f3ac6">
           <value>
             <set>
-              <option value="61198174-9dfe-4f73-87ec-d761016d56a1" />
-              <option value="556b7b47-c014-413c-8635-2302ae21410f" />
-              <option value="dff5fb39-534e-44c8-9a79-efdf5292fcb6" />
-              <option value="346474bc-ff4c-4d3b-80e2-7d45d6ba32a6" />
-              <option value="eb6b0f58-3ea9-4f95-96b3-ae7b27496c1d" />
-              <option value="4c410015-a19a-4e6a-9efa-bb1391fab3ac" />
-              <option value="3a607080-814f-46e1-8098-29a2ce010066" />
-              <option value="5a0c38e0-ffd1-420a-95d8-1a0dd3c1e7d3" />
-              <option value="8e264fd7-4075-4561-90b1-034b13478a6d" />
-              <option value="8071e6c7-a1fd-41a3-89fe-7c7d079b64ee" />
-              <option value="b98ae09a-f827-4a56-9dd3-451b7e6b961e" />
-              <option value="51cb43b1-bfac-4a2a-b832-4ee731b47296" />
-              <option value="af485371-c18a-4e55-96df-8076c2e8b538" />
-              <option value="758d2c88-46c7-4d8d-9af3-0ddaf24a1a27" />
-              <option value="e92037ae-1cf3-4c81-9ea5-84ebb400aaf5" />
-              <option value="cf82faf3-46bc-40c6-9b71-4bbbc8fca4bf" />
-              <option value="3173f504-bd25-4307-bb1b-949d2cf12e86" />
+              <option value="1240d3d9-94ba-4c3c-b1f4-3a35828d2bf8" />
               <option value="1d83d9b2-9f64-4161-a186-533623af9d16" />
-              <option value="50d7a468-78da-49e5-bc17-8ccc5348d145" />
-              <option value="691e597a-5e02-4191-a2a8-35227516f7dc" />
-              <option value="61de273c-9577-4979-82c3-ed5aff8bfefa" />
+              <option value="3173f504-bd25-4307-bb1b-949d2cf12e86" />
+              <option value="317b6057-2b20-4e9d-867e-f97feec6cc0b" />
+              <option value="346474bc-ff4c-4d3b-80e2-7d45d6ba32a6" />
+              <option value="3a607080-814f-46e1-8098-29a2ce010066" />
               <option value="487eba02-29f7-454a-9034-194db7323467" />
               <option value="4b310880-c8a7-4f26-9edd-5c005c042c87" />
-              <option value="aaf27279-72d6-44ec-b004-b28769c243eb" />
-              <option value="c66fb46f-2ae6-435f-8cc3-8ea3897be52d" />
+              <option value="4c410015-a19a-4e6a-9efa-bb1391fab3ac" />
+              <option value="50d7a468-78da-49e5-bc17-8ccc5348d145" />
+              <option value="51cb43b1-bfac-4a2a-b832-4ee731b47296" />
+              <option value="556b7b47-c014-413c-8635-2302ae21410f" />
+              <option value="5a0c38e0-ffd1-420a-95d8-1a0dd3c1e7d3" />
+              <option value="61198174-9dfe-4f73-87ec-d761016d56a1" />
+              <option value="61de273c-9577-4979-82c3-ed5aff8bfefa" />
               <option value="655a453a-1032-4178-992c-ab2c7486ecca" />
-              <option value="1240d3d9-94ba-4c3c-b1f4-3a35828d2bf8" />
-              <option value="aab38c8e-cb3c-415d-941f-574c018641ed" />
+              <option value="691e597a-5e02-4191-a2a8-35227516f7dc" />
+              <option value="758d2c88-46c7-4d8d-9af3-0ddaf24a1a27" />
+              <option value="8071e6c7-a1fd-41a3-89fe-7c7d079b64ee" />
               <option value="86f01442-71ce-4de7-aae1-45e799dbd21d" />
-              <option value="317b6057-2b20-4e9d-867e-f97feec6cc0b" />
+              <option value="8e264fd7-4075-4561-90b1-034b13478a6d" />
+              <option value="aab38c8e-cb3c-415d-941f-574c018641ed" />
+              <option value="aaf27279-72d6-44ec-b004-b28769c243eb" />
+              <option value="af485371-c18a-4e55-96df-8076c2e8b538" />
+              <option value="b98ae09a-f827-4a56-9dd3-451b7e6b961e" />
+              <option value="c66fb46f-2ae6-435f-8cc3-8ea3897be52d" />
+              <option value="cf82faf3-46bc-40c6-9b71-4bbbc8fca4bf" />
+              <option value="dff5fb39-534e-44c8-9a79-efdf5292fcb6" />
+              <option value="e92037ae-1cf3-4c81-9ea5-84ebb400aaf5" />
+              <option value="eb6b0f58-3ea9-4f95-96b3-ae7b27496c1d" />
             </set>
           </value>
         </entry>
-
-
         <entry key="9805fe7d-99a9-44d3-8eb4-11f2d58d284b">
           <value>
             <set>
               <option value="662f31cc-38b3-40f4-8a3c-3f32d4e4e1e3" />
+            </set>
+          </value>
+        </entry>
+        <entry key="ba32ac3e-182b-440f-80c3-28ad64d4c188">
+          <value>
+            <set>
+              <option value="72b3c2aa-f903-459e-b084-a9715d45a4b0" />
             </set>
           </value>
         </entry>
@@ -122,21 +127,7 @@
       </map>
     </option>
     <pendingWorkingSetItems>
-      <entry key="7e855847-1817-4a18-8df2-dbaa457f3ac6">
-        <set>
-          <option value="file://$PROJECT_DIR$/src/Controller/Front/SecurityController.php" />
-          <option value="file://$PROJECT_DIR$/src/Security/SecurityControllerAuthenticator.php" />
-          <option value="file://$PROJECT_DIR$/src/Entity/User.php" />
-          <option value="file://$PROJECT_DIR$/src/Form/RegistrationFormType.php" />
-          <option value="file://$PROJECT_DIR$/src/Controller/Front/RegistrationController.php" />
-          <option value="file://$PROJECT_DIR$/templates/front/registration/register.html.twig" />
-          <option value="file://$PROJECT_DIR$/.env.local" />
-          <option value="file://$PROJECT_DIR$/src/Form/ChangePasswordFormType.php" />
-          <option value="file://$PROJECT_DIR$/src/Repository/ResetPasswordRequestRepository.php" />
-          <option value="file://$PROJECT_DIR$/templates/front/plan/index.html.twig" />
-          <option value="file://$PROJECT_DIR$/templates/admin/user/index.html.twig" />
-        </set>
-      </entry>
+      <entry key="7e855847-1817-4a18-8df2-dbaa457f3ac6" />
       <entry key="9805fe7d-99a9-44d3-8eb4-11f2d58d284b" />
       <entry key="bec32839-5997-4383-a86b-41d073d4b718" />
       <entry key="cb087831-08c5-4d58-99cd-ef8b01a4665f" />

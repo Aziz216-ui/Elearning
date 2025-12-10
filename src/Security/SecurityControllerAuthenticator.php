@@ -50,17 +50,10 @@ class SecurityControllerAuthenticator extends AbstractLoginFormAuthenticator
         }
 
         // Si une cible était sauvegardée (ex : accès à une page protégée avant login), rediriger vers elle
-        // Si l'utilisateur a le rôle ROLE_ADMIN, forcer la redirection vers /admin
-        if (in_array('ROLE_ADMIN', $token->getRoleNames(), true)) {
-            return new RedirectResponse('/admin');
-        }
-
-        // Si une cible était sauvegardée (ex : accès à une page protégée avant login), rediriger vers elle
         if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
             return new RedirectResponse($targetPath);
         }
 
-        return new RedirectResponse($this->urlGenerator->generate('app_dashboard'));
         // Redirection par défaut vers /plan
         return new RedirectResponse('/plan');
     }
