@@ -8,9 +8,6 @@
     {% endfor %}
 
     {# Display general error and success flashes #}
-    {% for msg in app.flashes('error') %}
-        <div class="alert alert-danger" role="alert">{{ msg|nl2br }}</div>
-    {% endfor %}
     {% for msg in app.flashes('success') %}
         <div class="alert alert-success" role="alert">{{ msg }}</div>
     {% endfor %}
@@ -117,4 +114,5 @@
             </div>
         </div>
     </div>
+
 {% endblock %}

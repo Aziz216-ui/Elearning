@@ -10,26 +10,14 @@ use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Constraints\NotNull;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\IsTrue;
 
 class RegistrationFormType extends AbstractType
 {
-    private ValidatorInterface $validator;
-
-    public function __construct(ValidatorInterface $validator)
-    {
-        $this->validator = $validator;
-    }
-
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
-        
-        $invalidMessage = null;
-
-
         $builder
             ->add('email')
             ->add('agreeTerms', CheckboxType::class, [
@@ -39,7 +27,6 @@ class RegistrationFormType extends AbstractType
                 ],
             ])
             ->add('plainPassword', PasswordType::class, [
-                
                 'mapped' => true,
                 'required' => true,
                 'attr' => ['autocomplete' => 'new-password'],
@@ -67,25 +54,12 @@ class RegistrationFormType extends AbstractType
                 'placeholder' => 'Choisir',
                 'required' => true,
             ]);
-
     }
 
     public function configureOptions(OptionsResolver $resolver): void
     {
         $resolver->setDefaults([
             'data_class' => User::class,
-
         ]);
     }
-
-     public function checkPassport(Passport $passport)
-{
-    $user = $passport->getUser();
-
-    if (!$user->isVerified()) {
-        throw new CustomUserMessageAuthenticationException(
-            'Veuillez vérifier votre email avant de vous connecter.'
-        );
-    }
-}
 }

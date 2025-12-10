@@ -11,6 +11,7 @@ use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\NotCompromisedPassword;
 use Symfony\Component\Validator\Constraints\PasswordStrength;
+use Symfony\Component\Validator\Constraints\Regex;
 
 class ChangePasswordFormType extends AbstractType
 {
@@ -30,10 +31,14 @@ class ChangePasswordFormType extends AbstractType
                             'message' => 'Please enter a password',
                         ]),
                         new Length([
-                            'min' => 6,
-                            'minMessage' => 'Votre mots de passe doit contenir au moins {{ limit }} characters',
+                            'min' => 8,
+                            'minMessage' => 'Votre mot de passe doit contenir au moins {{ limit }} caractères',
                             // max length allowed by Symfony for security reasons
                             'max' => 4096,
+                        ]),
+                        new Regex([
+                            'pattern' => '/(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9]).+/',
+                            'message' => 'Le mot de passe doit contenir au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial.'
                         ]),
 
 
