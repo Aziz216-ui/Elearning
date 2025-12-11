@@ -1,0 +1,7 @@
+Array
+(
+    [user] => melkimohamedaziz4@gmail.com
+    [token] => 7WyrNGXolEQPs00az4QTFqdnC4bf2Xys8RR5rKBREqE=
+    [expires] => 1765393699
+    [signature] => wjgUCdhZqunUk9ML0n3ueSd4Onlccww4cu3kxK/uoGc=
+)

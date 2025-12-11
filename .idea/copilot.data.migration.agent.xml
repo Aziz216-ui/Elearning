@@ -5,6 +5,7 @@
     <option name="pendingSessionIds">
       <option value="0fd3df7a-dcdd-4f81-8fea-faeed454943b" />
       <option value="40518c38-ff9e-4db7-a406-225601396b74" />
+      <option value="8cfc5dd9-d263-4b46-81d0-b6326d32454f" />
       <option value="9805fe7d-99a9-44d3-8eb4-11f2d58d284b" />
       <option value="ba32ac3e-182b-440f-80c3-28ad64d4c188" />
       <option value="bec32839-5997-4383-a86b-41d073d4b718" />
@@ -12,6 +13,7 @@
       <option value="cb087831-08c5-4d58-99cd-ef8b01a4665f" />
       <option value="d59f5847-e3d2-4b01-b5fa-8c483fdd5914" />
       <option value="dcafd35c-b621-4db7-9ddd-ca70a0185fb8" />
+      <option value="feafeb9c-69c1-47ef-a1d2-ee4a8e07a955" />
     </option>
     <option name="pendingTurns">
       <map>
@@ -32,6 +34,13 @@
             </set>
           </value>
         </entry>
+        <entry key="8cfc5dd9-d263-4b46-81d0-b6326d32454f">
+          <value>
+            <set>
+              <option value="f2800481-3eca-4e21-be5d-7d9cf72be5ca" />
+            </set>
+          </value>
+        </entry>
         <entry key="9805fe7d-99a9-44d3-8eb4-11f2d58d284b">
           <value>
             <set>
@@ -42,11 +51,11 @@
         <entry key="ba32ac3e-182b-440f-80c3-28ad64d4c188">
           <value>
             <set>
-              <option value="cab9ff28-6ae0-4fad-97c1-4b08f1ea1439" />
               <option value="2a3a0505-976a-4ab5-84f9-ad258f892555" />
               <option value="39cdd1d6-2663-45dd-88a5-882b72e1b81e" />
               <option value="3dc16f5a-f32a-4d23-b441-722dfa65ffe1" />
               <option value="68375312-2a62-4f38-b7f6-af8e4aae399e" />
+              <option value="cab9ff28-6ae0-4fad-97c1-4b08f1ea1439" />
             </set>
           </value>
         </entry>
@@ -91,17 +100,21 @@
             </set>
           </value>
         </entry>
+        <entry key="feafeb9c-69c1-47ef-a1d2-ee4a8e07a955">
+          <value>
+            <set>
+              <option value="da75fa0f-628f-436c-a26d-955107dbd525" />
+              <option value="990d1dfb-a1bf-42a4-877d-36311f4f7e0a" />
+              <option value="5785b3b0-8dd7-42b7-aff4-0536ef215774" />
+              <option value="a05fd99d-f77d-4289-9d68-e6b0f1f26c29" />
+            </set>
+          </value>
+        </entry>
       </map>
     </option>
     <pendingWorkingSetItems>
       <entry key="9805fe7d-99a9-44d3-8eb4-11f2d58d284b" />
-      <entry key="ba32ac3e-182b-440f-80c3-28ad64d4c188">
-        <set>
-          <option value="file://$PROJECT_DIR$/config/packages/security.yaml" />
-          <option value="file://$PROJECT_DIR$/src/Security/SecurityControllerAuthenticator.php" />
-          <option value="file://$PROJECT_DIR$/src/Security/BearerTokenAuthenticator.php" />
-        </set>
-      </entry>
+      <entry key="ba32ac3e-182b-440f-80c3-28ad64d4c188" />
       <entry key="bec32839-5997-4383-a86b-41d073d4b718" />
       <entry key="cb087831-08c5-4d58-99cd-ef8b01a4665f" />
       <entry key="d59f5847-e3d2-4b01-b5fa-8c483fdd5914" />
