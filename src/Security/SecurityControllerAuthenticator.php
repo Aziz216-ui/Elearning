@@ -29,40 +29,42 @@ class SecurityControllerAuthenticator extends AbstractLoginFormAuthenticator
     public function authenticate(Request $request): Passport
     {
         // Supporter à la fois les formulaires classiques (application/x-www-form-urlencoded)
-        // et les requêtes JSON (getPayload) utilisées par certaines API/frontends.
+        // et les requêtes JSON (application/json) utilisées par certains frontends.
         $email = $request->request->get('email');
         $password = $request->request->get('password');
         $csrfToken = $request->request->get('_csrf_token');
 
-        // Si on ne trouve pas les données dans le POST, tenter le payload JSON si disponible
-        if ((null === $email || null === $password) && method_exists($request, 'getPayload')) {
-            $payload = $request->getPayload();
-            if ($payload) {
-                // getString() peut lancer si la clé n'existe pas; on utilise un fallback
+        // Si on ne trouve pas les données dans le POST, tenter d'extraire depuis le JSON brut
+        if ((null === $email || null === $password) && $request->getContent()) {
+            $contentType = $request->headers->get('content-type', '');
+            if (strpos($contentType, 'application/json') !== false) {
                 try {
-                    $email = $email ?? $payload->getString('email');
-                } catch (\Throwable) {
+                    $data = json_decode($request->getContent(), true, 512, JSON_THROW_ON_ERROR);
+                } catch (\JsonException) {
+                    $data = null;
                 }
-                try {
-                    $password = $password ?? $payload->getString('password');
-                } catch (\Throwable) {
-                }
-                try {
-                    $csrfToken = $csrfToken ?? $payload->getString('_csrf_token');
-                } catch (\Throwable) {
+
+                if (is_array($data)) {
+                    $email = $email ?? ($data['email'] ?? null);
+                    $password = $password ?? ($data['password'] ?? null);
+                    $csrfToken = $csrfToken ?? ($data['_csrf_token'] ?? null);
                 }
             }
         }
 
-        // Si encore null, remplacer par chaîne vide pour éviter des valeurs nulles dans la session
+        // Assurer des valeurs non nulles
         $email = $email ?? '';
+        $password = $password ?? '';
 
-        $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $email);
+        if ($request->hasSession()) {
+            $request->getSession()->set(SecurityRequestAttributes::LAST_USERNAME, $email);
+        }
 
         return new Passport(
             new UserBadge($email),
-            new PasswordCredentials($password ?? ''),
+            new PasswordCredentials($password),
             [
+                // s'assurer que l'id 'authenticate' correspond à votre formulaire
                 new CsrfTokenBadge('authenticate', $csrfToken ?? ''),
                 new RememberMeBadge(),
             ]
@@ -71,6 +73,13 @@ class SecurityControllerAuthenticator extends AbstractLoginFormAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
+        // Si une target précédente est sauvegardée (ex: accès protégé précédemment), y revenir d'abord
+        if ($request->hasSession()) {
+            if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
+                return new RedirectResponse($targetPath);
+            }
+        }
+
         $roles = $token->getRoleNames();
 
         if (in_array('ROLE_ADMIN', $roles, true)) {
