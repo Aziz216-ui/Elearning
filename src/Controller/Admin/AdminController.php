@@ -17,9 +17,10 @@ final class AdminController extends AbstractController
     #[Route('/admin', name: 'app_admin')]
     public function index(UserRepository $userRepository): Response
     {
+        $this->denyAccessUnlessGranted('ROLE_ADMIN');
+
         return $this->render('admin/dashboard/index.html.twig', [
             'users' => $userRepository->listUserByName()
-
         ]);
     }
     #[Route('/admin/users', name: 'admin_user_index', methods: ['GET'])]
@@ -34,7 +35,14 @@ final class AdminController extends AbstractController
     public function listCoursesByUser($id, UserRepository $userRepository): Response
     {
         $courses = $userRepository->showAllCoursesByUser((int) $id);
-        return $this->render('admin/listCoursesByUser.html.twig', ['tab' => $courses]);
+        
+        // Debug: Afficher les cours récupérés
+        dump($courses);
+        
+        return $this->render('admin/listCoursesByUser.html.twig', [
+            'tab' => $courses,
+            'userId' => $id
+        ]);
     }
 
     #[Route('/admin/user/new', name: 'admin_user_new', methods: ['GET', 'POST'])]
@@ -45,7 +53,11 @@ final class AdminController extends AbstractController
     ): Response {
         $user = new User();
         // Laisser UserType gérer les groupes de validation (Default + Registration pour la création)
-        $form = $this->createForm(UserType::class, $user, ['is_edit' => false]);
+        $form = $this->createForm(UserType::class, $user, [
+            'is_edit' => false,
+            // appliquer les contraintes du groupe Registration lors de la création par l'admin
+            'validation_groups' => ['Registration'],
+        ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
@@ -74,14 +86,52 @@ final class AdminController extends AbstractController
         EntityManagerInterface $entityManager,
         UserPasswordHasherInterface $passwordHasher
     ): Response {
+        // Sauvegarder les valeurs initiales pour faire des mises à jour partielles
+        $originalData = [
+            'email' => $user->getEmail(),
+            'name' => $user->getName(),
+            'lastname' => $user->getLastname(),
+            'birthdate' => $user->getBirthdate(),
+            'sexe' => $user->getSexe(),
+        ];
+
         $form = $this->createForm(UserType::class, $user, ['is_edit' => true]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            if ($form->get('plainPassword')->getData()) {
+            // Pour chaque champ, si l'admin a soumis une valeur vide (ou null),
+            // on restaure la valeur originale pour éviter d'écraser accidentellement.
+            $email = $form->get('email')->getData();
+            if ($email === null || $email === '') {
+                $user->setEmail($originalData['email']);
+            }
+
+            $name = $form->get('name')->getData();
+            if ($name === null || $name === '') {
+                $user->setName($originalData['name']);
+            }
+
+            $lastname = $form->get('lastname')->getData();
+            if ($lastname === null || $lastname === '') {
+                $user->setLastname($originalData['lastname']);
+            }
+
+            $birthdate = $form->get('birthdate')->getData();
+            if ($birthdate === null || $birthdate === '') {
+                $user->setBirthdate($originalData['birthdate']);
+            }
+
+            $sexe = $form->get('sexe')->getData();
+            if ($sexe === null || $sexe === '') {
+                $user->setSexe($originalData['sexe']);
+            }
+
+            // Mot de passe : si fourni, hacher et mettre à jour; sinon ne pas changer
+            $plainPassword = $form->get('plainPassword')->getData();
+            if ($plainPassword) {
                 $hashedPassword = $passwordHasher->hashPassword(
                     $user,
-                    $form->get('plainPassword')->getData()
+                    $plainPassword
                 );
                 $user->setPassword($hashedPassword);
             }

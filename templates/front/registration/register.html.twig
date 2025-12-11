@@ -18,9 +18,9 @@
     <div class="container mt-5">
         <div class="row justify-content-center">
             <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h1 class="h3 mb-3 font-weight-normal">Register</h1>
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h1 class="h3 mb-3 font-weight-normal text-center">Créer un compte</h1>
                     </div>
                     <div class="card-body">
 
@@ -30,86 +30,80 @@
 
 
                         <div class="mb-3">
-                            {{ form_label(registrationForm.email, 'Email address', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_label(registrationForm.email, 'Adresse email', {'label_attr': {'class': 'form-label'}}) }}
                             {{ form_widget(registrationForm.email, {
                                 'attr': {
-                                    'class': 'form-control',
-                                    'placeholder': 'Enter email',
+                                    'class': 'form-control form-control-lg',
+                                    'placeholder': 'Entrez votre email',
                                     'id': 'emailInput'
                                 }
                             }) }}
 
-                            <div id="emailHelp" class="form-text">Ne share pas votre  email !</div>
+                            <div id="emailHelp" class="form-text">Ne partagez pas votre email !</div>
                             {{ form_errors(registrationForm.email) }}
                         </div>
 
                         <div class="mb-3">
-                            {{ form_label(registrationForm.plainPassword, 'Password', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_label(registrationForm.plainPassword, 'Mot de passe', {'label_attr': {'class': 'form-label'}}) }}
                             {{ form_widget(registrationForm.plainPassword, {
                                 'attr': {
-                                    'class': 'form-control',
-                                    'placeholder': 'Password',
+                                    'class': 'form-control form-control-lg',
+                                    'placeholder': 'Choisissez un mot de passe sécurisé',
                                     'id': 'passwordInput'
                                 }
                             }) }}
                             {{ form_errors(registrationForm.plainPassword) }}
                         </div>
 
-                        <div class="mb-3">
-                            {{ form_label(registrationForm.name, 'First Name', {'label_attr': {'class': 'form-label'}}) }}
-                            {{ form_widget(registrationForm.name, {
-                                'attr': {
-                                    'class': 'form-control',
-                                    'placeholder': 'Enter your first name'
-                                }
-                            }) }}
-                            {{ form_errors(registrationForm.name) }}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form_label(registrationForm.name, 'Prénom', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(registrationForm.name, {
+                                    'attr': {
+                                        'class': 'form-control',
+                                        'placeholder': 'Prénom'
+                                    }
+                                }) }}
+                                {{ form_errors(registrationForm.name) }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form_label(registrationForm.lastname, 'Nom', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(registrationForm.lastname, {
+                                    'attr': {
+                                        'class': 'form-control',
+                                        'placeholder': 'Nom'
+                                    }
+                                }) }}
+                                {{ form_errors(registrationForm.lastname) }}
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            {{ form_label(registrationForm.lastname, 'Last Name', {'label_attr': {'class': 'form-label'}}) }}
-                            {{ form_widget(registrationForm.lastname, {
-                                'attr': {
-                                    'class': 'form-control',
-                                    'placeholder': 'Enter your last name'
-                                }
-                            }) }}
-                            {{ form_errors(registrationForm.lastname) }}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                {{ form_label(registrationForm.birthdate, 'Date de naissance', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(registrationForm.birthdate, {
+                                    'attr': {
+                                        'class': 'form-control',
+                                        'placeholder': 'AAAA-MM-JJ'
+                                    }
+                                }) }}
+                                {{ form_errors(registrationForm.birthdate) }}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                {{ form_label(registrationForm.sexe, 'Sexe', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(registrationForm.sexe, {
+                                    'attr': {
+                                        'class': 'form-control',
+                                        'placeholder': 'Sélectionnez'
+                                    }
+                                }) }}
+                                {{ form_errors(registrationForm.sexe) }}
+                            </div>
                         </div>
 
-                        <div class="mb-3">
-                            {{ form_label(registrationForm.birthdate, 'Date of Birth', {'label_attr': {'class': 'form-label'}}) }}
-                            {{ form_widget(registrationForm.birthdate, {
-                                'attr': {
-                                    'class': 'form-control',
-                                    'placeholder': 'Select your date of birth'
-                                }
-                            }) }}
-                            {{ form_errors(registrationForm.birthdate) }}
+                        <p class="small text-muted">En créant un compte, vous acceptez nos <a href="#">conditions d'utilisation</a> et notre <a href="#">politique de confidentialité</a>.</p>
 
-                        </div>
-                        <div class="mb-3">
-                            {{ form_label(registrationForm.sexe, 'Sexe', {'label_attr': {'class': 'form-label'}}) }}
-                            {{ form_widget(registrationForm.sexe, {
-                                'attr': {
-                                    'class': 'form-control',
-                                    'placeholder': 'Select your sexe'
-                                }
-                            }) }}
-                            {{ form_errors(registrationForm.sexe) }}
-                        </div>
-
-                        <div class="mb-3 form-check">
-                            {{ form_widget(registrationForm.agreeTerms, {
-                                'attr': {'class': 'form-check-input'}
-                            }) }}
-                            {{ form_label(registrationForm.agreeTerms, 'I agree to the terms and conditions', {
-                                'label_attr': {'class': 'form-check-label'}
-                            }) }}
-                            {{ form_errors(registrationForm.agreeTerms) }}
-                        </div>
-
-                        <button type="submit" class="btn btn-primary w-100">Register</button>
+                        <button type="submit" class="btn btn-primary btn-lg w-100">Créer mon compte</button>
 
                         {{ form_end(registrationForm) }}
                     </div>

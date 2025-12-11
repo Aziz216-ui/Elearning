@@ -23,8 +23,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?int $id = null;
 
     #[ORM\Column(length: 180)]
-    #[Assert\NotBlank(message: "l'email est obligatoire !")]
-    #[Assert\Email(message: "l'email '{{ value }}' est invalide !")]
+    #[Assert\NotBlank(groups: ['Registration'], message: "l'email est obligatoire !")]
+    #[Assert\Email(groups: ['Registration'], message: "l'email '{{ value }}' est invalide !")]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -33,33 +33,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column]
     private ?string $password = null;
 
-    #[Assert\NotBlank(message: 'Le mot de passe est obligatoire.')]
-    #[Assert\Length(min: 8, minMessage: 'Le mot de passe doit contenir au moins {{ limit }} caractères.')]
-    #[Assert\Regex(
+    #[Assert\NotBlank(groups: ['Registration'], message: 'Le mot de passe est obligatoire.')]
+    #[Assert\Length(groups: ['Registration'], min: 8, minMessage: 'Le mot de passe doit contenir au moins {{ limit }} caractères.')]
+    #[Assert\Regex(groups: ['Registration'],
         pattern: '/(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[^A-Za-z0-9]).+/',
         message: 'Le mot de passe doit contenir au moins une lettre majuscule, une lettre minuscule, un chiffre et un caractère spécial.'
     )]
     private ?string $plainPassword = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "le nom est obligatoire !")]
+    #[Assert\NotBlank(groups: ['Registration'], message: "le nom est obligatoire !")]
     private ?string $name = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "le nom est obligatoire !")]
+    #[Assert\NotBlank(groups: ['Registration'], message: "le nom est obligatoire !")]
     private ?string $lastname = null;
 
     #[ORM\Column]
     private bool $isVerified = false;
 
     #[ORM\Column(type: 'date', nullable: true)]
-    #[Assert\NotBlank(message: "la date de naissance est obligatoire !")]
-    #[Assert\LessThanOrEqual('today - 13 years', message: 'Vous devez avoir au moins 13 ans.')]
-    #[Assert\GreaterThanOrEqual('1925-01-01', message: "La date de naissance est trop ancienne ou invalide.")]
+    #[Assert\NotBlank(groups: ['Registration'], message: "la date de naissance est obligatoire !")]
+    #[Assert\LessThanOrEqual('today - 13 years', groups: ['Registration'], message: 'Vous devez avoir au moins 13 ans.')]
+    #[Assert\GreaterThanOrEqual('1925-01-01', groups: ['Registration'], message: "La date de naissance est trop ancienne ou invalide.")]
     private ?\DateTimeInterface $birthdate = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "le sexe est obligatoire !")]
+    #[Assert\NotBlank(groups: ['Registration'], message: "le sexe est obligatoire !")]
     private ?string $sexe = null;
 
     #[ORM\Column(type: 'datetime')]
@@ -71,7 +71,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: ForumPost::class, cascade: ['persist'], orphanRemoval: true)]
     private Collection $posts;
 
-    #[ORM\OneToMany(targetEntity: QuizResult::class, mappedBy: 'user')]
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: QuizResult::class)]
     private Collection $quizResults;
 
     #[ORM\OneToMany(targetEntity: Panier::class, mappedBy: 'user', orphanRemoval: true)]

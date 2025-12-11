@@ -174,13 +174,13 @@
                                     }
                                 }) }}
                             </div>
-                             <small class="text-muted mt-1" style="font-size: 0.75rem;">Le mot de passe doit contenir au moins 6 caractères.</small>
+
                             <small class="form-text text-danger">{{ form_errors(form.plainPassword) }}</small>
                         </div>
                     </div>
                 </div>
 
-                <div class="card-footer bg-white border-top-0 d-flex justify-content-end pb-4 pr-4 rounded-bottom" style="border-radius: 0 0 12px 12px;">
+                <div class="card-footer bg-white border-top-0 d-flex justify-content-start pb-4 pl-4 rounded-bottom" style="border-radius: 0 0 12px 12px;">
                     <a href="{{ path('admin_user_index') }}" class="btn btn-modern-light mr-3">
                         <i class="fas fa-times mr-2"></i> Annuler
                     </a>

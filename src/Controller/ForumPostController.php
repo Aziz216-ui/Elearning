@@ -385,19 +385,19 @@ class ForumPostController extends AbstractController
     }
 
     // ---------------------- TOGGLE ENABLE/DISABLE ----------------------
-   #[Route('/admin/post/{id}/toggle', name: 'app_post_toggle', methods: ['POST','GET'])]
-public function toggle(?ForumPost $post, EntityManagerInterface $em): Response
-{
-    if (!$post) {
-        throw $this->createNotFoundException('Post introuvable');
+    #[Route('/admin/post/{id}/toggle', name: 'app_post_toggle', methods: ['POST','GET'])]
+    public function toggle(?ForumPost $post, EntityManagerInterface $em): Response
+    {
+        if (!$post) {
+            throw $this->createNotFoundException('Post introuvable');
+        }
+
+        $post->setEnabled(!$post->isEnabled());
+        $em->flush();
+
+        $this->addFlash('success', 'État du post modifié.');
+
+        return $this->redirectToRoute('app_dashboard_forum');
     }
-
-    $post->setEnabled(!$post->isEnabled());
-    $em->flush();
-
-    $this->addFlash('success', 'État du post modifié.');
-
-    return $this->redirectToRoute('app_dashboard_forum');
-}
 
 }

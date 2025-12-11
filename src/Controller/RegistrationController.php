@@ -61,19 +61,19 @@ class RegistrationController extends AbstractController
                 );
 
                 $this->addFlash('success', 'Un email de confirmation a été envoyé à ' . $user->getEmail() . '. Veuillez vérifier votre boîte de réception.');
-                
+
                 // Connecte automatiquement l'utilisateur (ne pas passer le nom de firewall comme authenticator)
                 return $security->login($user);
-                
+
             } catch (\Exception $e) {
                 $this->addFlash('error', 'Une erreur est survenue lors de l\'envoi de l\'email de confirmation : ' . $e->getMessage());
-                
+
                 // Enregistrement de l'erreur dans les logs
                 $this->logger->error('Erreur lors de l\'inscription : ' . $e->getMessage(), [
                     'email' => $user->getEmail(),
                     'trace' => $e->getTraceAsString()
                 ]);
-                
+
                 return $this->redirectToRoute('app_register'); // l'emplacement de l'enregistrement
             }
         }

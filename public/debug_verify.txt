@@ -5,3 +5,10 @@ Array
     [expires] => 1765393699
     [signature] => wjgUCdhZqunUk9ML0n3ueSd4Onlccww4cu3kxK/uoGc=
 )
+Array
+(
+    [user] => melkimohamedaziz4@gmail.com
+    [token] => Xb8uGiDC+aGnAeVr+cZZfqcJ1gPe1jF9vKhMNrycqRY=
+    [expires] => 1765465411
+    [signature] => Tcxme3e2i2CowsQRXEpDLInPfrz0lDe0nbe8kCTGrOA=
+)
