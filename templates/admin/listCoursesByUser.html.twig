@@ -45,7 +45,9 @@
                                         {{ cours.price }} TND
                                     </div>
                                     <p class="mt-3 text-muted small">
-                                        {{ cours.description|u.truncate(60, '...') }}
+                                        {# Troncature sans l'extension twig/string-extra #}
+                                        {% set desc = cours.description %}
+                                        {{ desc is not empty and desc|length > 60 ? (desc|slice(0, 60) ~ '...') : desc }}
                                     </p>
                                 </div>
                             </div>

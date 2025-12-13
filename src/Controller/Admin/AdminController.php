@@ -35,10 +35,10 @@ final class AdminController extends AbstractController
     public function listCoursesByUser($id, UserRepository $userRepository): Response
     {
         $courses = $userRepository->showAllCoursesByUser((int) $id);
-        
+
         // Debug: Afficher les cours récupérés
         dump($courses);
-        
+
         return $this->render('admin/listCoursesByUser.html.twig', [
             'tab' => $courses,
             'userId' => $id
@@ -53,19 +53,29 @@ final class AdminController extends AbstractController
     ): Response {
         $user = new User();
         // Laisser UserType gérer les groupes de validation (Default + Registration pour la création)
+        // Activer les groupes de validation 'Default' et 'Registration' pour imposer les contraintes d'entité
         $form = $this->createForm(UserType::class, $user, [
             'is_edit' => false,
-            // appliquer les contraintes du groupe Registration lors de la création par l'admin
-            'validation_groups' => ['Registration'],
+            'validation_groups' => ['Default', 'Registration'],
         ]);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $hashedPassword = $passwordHasher->hashPassword(
-                $user,
-                $form->get('plainPassword')->getData()
-            );
-            $user->setPassword($hashedPassword);
+            // Récupérer le mot de passe en clair depuis le formulaire
+            $plainPassword = $form->get('plainPassword')->getData();
+
+            // Ne hacher que si le mot de passe est fourni et non vide
+            if (is_string($plainPassword) && $plainPassword !== '') {
+                $hashedPassword = $passwordHasher->hashPassword($user, $plainPassword);
+                $user->setPassword($hashedPassword);
+            } else {
+                // Ajout d'une erreur de formulaire si le mot de passe est manquant
+                $form->get('plainPassword')->addError(new \Symfony\Component\Form\FormError('Le mot de passe est obligatoire.'));
+                // Renvoyer le formulaire avec les erreurs affichées
+                return $this->render('admin/user/new.html.twig', [
+                    'form' => $form->createView(),
+                ]);
+            }
 
             $entityManager->persist($user);
             $entityManager->flush();

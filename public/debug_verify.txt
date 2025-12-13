@@ -12,3 +12,10 @@ Array
     [expires] => 1765465411
     [signature] => Tcxme3e2i2CowsQRXEpDLInPfrz0lDe0nbe8kCTGrOA=
 )
+Array
+(
+    [user] => melkimohamedaziz4@gmail.com
+    [token] => V2dkUFR7YpAdncBDXbHcu8wFfEPqq5qSV4TtnoV9In8=
+    [expires] => 1765568602
+    [signature] => 6oV5guc+jIrf37FAlcot4yGDm4xn4oK+kGvL5aeR7C8=
+)

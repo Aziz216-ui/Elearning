@@ -19,7 +19,8 @@ class SecurityController extends AbstractController
                 return $this->redirect('/admin');
             }
 
-            return $this->redirectToRoute('app_dashboard_cours');
+            // Rediriger les utilisateurs vers /plan (route app_dashboard) au lieu de /mes-cours
+            return $this->redirectToRoute('app_dashboard');
         }
 
 

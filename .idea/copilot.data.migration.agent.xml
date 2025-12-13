@@ -4,7 +4,9 @@
     <option name="migrationStatus" value="IN_PROGRESS" />
     <option name="pendingSessionIds">
       <option value="0fd3df7a-dcdd-4f81-8fea-faeed454943b" />
+      <option value="13a0ea21-ea21-4d76-a65d-85a2c2a19463" />
       <option value="40518c38-ff9e-4db7-a406-225601396b74" />
+      <option value="55461140-7ba8-462a-bc65-2b2d1e1e13fa" />
       <option value="7ed608a1-d94a-41ec-b011-1ed7b097b427" />
       <option value="8cfc5dd9-d263-4b46-81d0-b6326d32454f" />
       <option value="9805fe7d-99a9-44d3-8eb4-11f2d58d284b" />
@@ -27,6 +29,20 @@
             </set>
           </value>
         </entry>
+        <entry key="13a0ea21-ea21-4d76-a65d-85a2c2a19463">
+          <value>
+            <set>
+              <option value="80e94088-7fa3-43ad-b655-8023a1a65711" />
+              <option value="009ff7db-d697-4626-9227-9b4d319cceb3" />
+              <option value="584315d6-b413-4ccf-810e-a6a17334ab7d" />
+              <option value="3dccc15e-05ce-4331-91ce-8640b02eafba" />
+              <option value="babfee88-aff5-432f-8a74-93a251d3cdd7" />
+              <option value="6721bbc3-b3e0-45e8-be04-21b3045574ff" />
+              <option value="dbeb3d5e-6fed-4049-945f-424d80d4b1ea" />
+              <option value="37183a83-0ac1-429e-be11-d90825acd54b" />
+            </set>
+          </value>
+        </entry>
         <entry key="40518c38-ff9e-4db7-a406-225601396b74">
           <value>
             <set>
@@ -35,38 +51,52 @@
             </set>
           </value>
         </entry>
+        <entry key="55461140-7ba8-462a-bc65-2b2d1e1e13fa">
+          <value>
+            <set>
+              <option value="e2597608-6423-4036-94a4-916f96a50316" />
+              <option value="f97e0586-d3f2-4a7b-b3c1-00a6b0285263" />
+              <option value="097f48cd-5c66-489b-95e0-4b29eb1a2fd8" />
+              <option value="bd8b9deb-ada6-4e14-ae00-1664e9aab5c5" />
+              <option value="06b78218-37f7-4525-a434-e69c48b6bf63" />
+              <option value="d637d3f7-0b4f-4915-bfee-cde579c18910" />
+              <option value="873212d9-8c88-43f2-a9ae-648aca07ab2e" />
+            </set>
+          </value>
+        </entry>
         <entry key="7ed608a1-d94a-41ec-b011-1ed7b097b427">
           <value>
             <set>
-              <option value="2fc28cf2-3f54-4244-8ab2-32eabd0d33d8" />
-              <option value="f43910b1-df2d-4a71-a6b6-ba0e78f842bb" />
-              <option value="5ffa721b-edee-44e9-94c0-9ac9b0896cd9" />
+              <option value="05df009e-179b-40f5-937b-cb8182e92e7c" />
               <option value="171f242b-ebc7-4088-857f-10ab65cef856" />
-              <option value="37098b0a-1569-4503-bfa0-860e8e18b22d" />
-              <option value="f4181d8c-16d5-4cce-9773-a27380b4d59d" />
               <option value="2a0df0bf-4d94-4a95-b68e-09826756344b" />
-              <option value="f06579c8-9134-458f-acfe-215e772aabdc" />
-              <option value="badb3deb-93cb-4066-84a4-efa01ab3800a" />
-              <option value="9ec2632c-d8cc-46d2-b9db-02a125e50b16" />
+              <option value="2fc28cf2-3f54-4244-8ab2-32eabd0d33d8" />
+              <option value="37098b0a-1569-4503-bfa0-860e8e18b22d" />
+              <option value="54940f3c-1d87-4e1b-9486-d53a6b52c134" />
+              <option value="56dade45-7c35-46b0-91c9-05b8399714a5" />
+              <option value="57eca619-3ed7-4dba-8907-e70368fded16" />
+              <option value="5c8d2b0b-d15a-409d-a898-336ba71bd325" />
               <option value="5db33034-c9e0-494b-ab73-d7875f2394d2" />
-              <option value="c4984693-e281-4a22-b393-0fdd495be954" />
-              <option value="fe954821-780d-49b0-bf10-e75385b33990" />
+              <option value="5ffa721b-edee-44e9-94c0-9ac9b0896cd9" />
+              <option value="6c2c52a9-920e-42ad-a2d7-38de3e9ce925" />
+              <option value="6fc1d3cc-101d-42de-965b-481cc398ffcf" />
+              <option value="871984d4-9ded-4991-b46f-9332288dbea9" />
+              <option value="91fb1639-ba97-40a9-8a2d-83e5b62d9ccb" />
+              <option value="9dec9527-6201-4f18-a538-2ed2c0de99fd" />
+              <option value="9ec2632c-d8cc-46d2-b9db-02a125e50b16" />
+              <option value="a5c2b645-53e7-4d83-b675-632651363063" />
               <option value="ac7d4d9d-6552-49c5-82d2-a41e37473dd1" />
               <option value="b6c0f779-2110-4831-8413-34a6739fc282" />
-              <option value="56dade45-7c35-46b0-91c9-05b8399714a5" />
-              <option value="a5c2b645-53e7-4d83-b675-632651363063" />
-              <option value="91fb1639-ba97-40a9-8a2d-83e5b62d9ccb" />
-              <option value="05df009e-179b-40f5-937b-cb8182e92e7c" />
-              <option value="6fc1d3cc-101d-42de-965b-481cc398ffcf" />
-              <option value="ce27407e-8096-48ca-a855-2dc7da0c1d24" />
-              <option value="9dec9527-6201-4f18-a538-2ed2c0de99fd" />
+              <option value="b902ad52-0287-45b6-ba2b-35f5e1021399" />
+              <option value="badb3deb-93cb-4066-84a4-efa01ab3800a" />
+              <option value="c4984693-e281-4a22-b393-0fdd495be954" />
               <option value="c531c175-7f01-4034-8581-64e18c6a844c" />
-              <option value="871984d4-9ded-4991-b46f-9332288dbea9" />
-              <option value="5c8d2b0b-d15a-409d-a898-336ba71bd325" />
-              <option value="6c2c52a9-920e-42ad-a2d7-38de3e9ce925" />
+              <option value="ce27407e-8096-48ca-a855-2dc7da0c1d24" />
               <option value="dc39a36f-ae5e-45cb-aef8-9f9c09ad381b" />
-              <option value="57eca619-3ed7-4dba-8907-e70368fded16" />
-              <option value="54940f3c-1d87-4e1b-9486-d53a6b52c134" />
+              <option value="f06579c8-9134-458f-acfe-215e772aabdc" />
+              <option value="f4181d8c-16d5-4cce-9773-a27380b4d59d" />
+              <option value="f43910b1-df2d-4a71-a6b6-ba0e78f842bb" />
+              <option value="fe954821-780d-49b0-bf10-e75385b33990" />
             </set>
           </value>
         </entry>
@@ -165,27 +195,24 @@
       </map>
     </option>
     <pendingWorkingSetItems>
-      <entry key="7ed608a1-d94a-41ec-b011-1ed7b097b427">
+      <entry key="13a0ea21-ea21-4d76-a65d-85a2c2a19463">
         <set>
-          <option value="file://$PROJECT_DIR$/src/Controller/RegistrationController.php" />
-          <option value="file://$PROJECT_DIR$/templates/profile/edit.html.twig" />
-          <option value="file://$PROJECT_DIR$/src/Form/RegistrationFormType.php" />
-          <option value="file://$PROJECT_DIR$/templates/registration/register.html.twig" />
-          <option value="file://$PROJECT_DIR$/templates/front/registration/register.html.twig" />
-          <option value="file://$PROJECT_DIR$/src/Security/SecurityControllerAuthenticator.php" />
-          <option value="file://$PROJECT_DIR$/src/Controller/LoginRedirectController.php" />
-          <option value="file://$PROJECT_DIR$/templates/user/show.html.twig" />
-          <option value="file://$PROJECT_DIR$/src/Command/GrantAdminCommand.php" />
-          <option value="file://$PROJECT_DIR$/src/Form/ProfileFormType.php" />
-          <option value="file://$PROJECT_DIR$/src/Controller/ProfileController.php" />
-          <option value="file://$PROJECT_DIR$/src/Controller/Admin/AdminController.php" />
-          <option value="file://$PROJECT_DIR$/templates/admin/user/edit.html.twig" />
-          <option value="file://$PROJECT_DIR$/src/Entity/User.php" />
-          <option value="file://$PROJECT_DIR$/src/Security/EmailVerifier.php" />
-          <option value="file://$PROJECT_DIR$/src/Controller/Dev/EmailDebugController.php" />
           <option value="file://$PROJECT_DIR$/.env.local" />
+          <option value="file://$PROJECT_DIR$/set-mailer-password.ps1" />
+          <option value="file://$PROJECT_DIR$/.env" />
         </set>
       </entry>
+      <entry key="55461140-7ba8-462a-bc65-2b2d1e1e13fa">
+        <set>
+          <option value="file://$PROJECT_DIR$/src/Controller/RegistrationController.php" />
+          <option value="file://$PROJECT_DIR$/src/Controller/Front/PlanController.php" />
+          <option value="file://$PROJECT_DIR$/src/Security/SecurityControllerAuthenticator.php" />
+          <option value="file://$PROJECT_DIR$/src/Controller/Front/SecurityController.php" />
+          <option value="file://$PROJECT_DIR$/src/Controller/Admin/AdminController.php" />
+          <option value="file://$PROJECT_DIR$/templates/admin/listCoursesByUser.html.twig" />
+        </set>
+      </entry>
+      <entry key="7ed608a1-d94a-41ec-b011-1ed7b097b427" />
       <entry key="9805fe7d-99a9-44d3-8eb4-11f2d58d284b" />
       <entry key="ba32ac3e-182b-440f-80c3-28ad64d4c188" />
       <entry key="bec32839-5997-4383-a86b-41d073d4b718" />

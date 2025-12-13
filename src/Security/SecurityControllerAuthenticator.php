@@ -73,12 +73,7 @@ class SecurityControllerAuthenticator extends AbstractLoginFormAuthenticator
 
     public function onAuthenticationSuccess(Request $request, TokenInterface $token, string $firewallName): ?Response
     {
-        // Si une target précédente est sauvegardée (ex: accès protégé précédemment), y revenir d'abord
-        if ($request->hasSession()) {
-            if ($targetPath = $this->getTargetPath($request->getSession(), $firewallName)) {
-                return new RedirectResponse($targetPath);
-            }
-        }
+        // Ignorer le targetPath sauvegardé et forcer la redirection par rôle
 
         $roles = $token->getRoleNames();
 

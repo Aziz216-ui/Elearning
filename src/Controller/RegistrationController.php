@@ -5,6 +5,7 @@ namespace App\Controller;
 use App\Entity\User;
 use App\Form\RegistrationFormType;
 use App\Security\EmailVerifier;
+use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -29,7 +30,7 @@ class RegistrationController extends AbstractController
     }
 
     #[Route('/register', name: 'app_register')]
-    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, Security $security, EntityManagerInterface $entityManager): Response
+    public function register(Request $request, UserPasswordHasherInterface $userPasswordHasher, EntityManagerInterface $entityManager): Response
     {
         $user = new User();
         $form = $this->createForm(RegistrationFormType::class, $user);
@@ -57,13 +58,14 @@ class RegistrationController extends AbstractController
                         ))
                         ->to($user->getEmail())
                         ->subject('Veuillez confirmer votre email')
-                        ->htmlTemplate('registration/confirmation_email.html.twig')
+                        // Utiliser le template présent dans templates/emails/comfirmation_email.html.twig
+                        ->htmlTemplate('emails/comfirmation_email.html.twig')
                 );
 
                 $this->addFlash('success', 'Un email de confirmation a été envoyé à ' . $user->getEmail() . '. Veuillez vérifier votre boîte de réception.');
 
-                // Connecte automatiquement l'utilisateur (ne pas passer le nom de firewall comme authenticator)
-                return $security->login($user);
+                // Ne pas connecter automatiquement l'utilisateur : rediriger vers la page de login
+                return $this->redirectToRoute('app_login');
 
             } catch (\Exception $e) {
                 $this->addFlash('error', 'Une erreur est survenue lors de l\'envoi de l\'email de confirmation : ' . $e->getMessage());
@@ -84,33 +86,34 @@ class RegistrationController extends AbstractController
     }
 
     #[Route('/verify/email', name: 'app_verify_email')]
-    public function verifyUserEmail(Request $request, TranslatorInterface $translator): Response
+    public function verifyUserEmail(Request $request, TranslatorInterface $translator, UserRepository $userRepository): Response
     {
-        $this->denyAccessUnlessGranted('IS_AUTHENTICATED_FULLY');
+        // Permettre la vérification sans que l'utilisateur soit connecté : récupérer l'id depuis la query
+        $id = $request->query->get('id');
+
+        if (null === $id) {
+            // Rediriger vers la page de login (au lieu de register)
+            return $this->redirectToRoute('app_login');
+        }
+
+        $user = $userRepository->find($id);
+        if (null === $user) {
+            // Rediriger vers la page de login (au lieu de register)
+            return $this->redirectToRoute('app_login');
+        }
 
         try {
-            /** @var User $user */
-            $user = $this->getUser();
-
-            // Ajoutez ceci pour le débogage
-            \file_put_contents('debug_verify.txt', print_r([
-                'user' => $user->getEmail(),
-                'token' => $request->query->get('token'),
-                'expires' => $request->query->get('expires'),
-                'signature' => $request->query->get('signature')
-            ], true), FILE_APPEND);
-
             $this->emailVerifier->handleEmailConfirmation($request, $user);
 
-            $this->addFlash('success', 'Votre adresse email a été vérifiée avec succès !');
-            return $this->redirectToRoute('app_dashboard'); // Changez pour votre route de tableau de bord
+            $this->addFlash('success', 'Votre adresse email a été vérifiée avec succès ! Veuillez vous connecter.');
+            return $this->redirectToRoute('app_login');
 
         } catch (VerifyEmailExceptionInterface $exception) {
             $errorMessage = $translator->trans($exception->getReason(), [], 'VerifyEmailBundle');
             $this->addFlash('error', 'Erreur de vérification : ' . $errorMessage);
-            \file_put_contents('verify_error.txt', $errorMessage . "\n", FILE_APPEND);
 
-            return $this->redirectToRoute('app_register');
+            // En cas d'erreur de validation du lien, rediriger vers la page de login
+            return $this->redirectToRoute('app_login');
         }
     }
 }
